@@ -1,0 +1,1660 @@
+openapi: 3.0.3
+
+info:
+  title: MS Patrimoine - API
+  description: |
+    API Contract-First du microservice de gestion du patrimoine touristique
+    de la Plateforme de Gestion et de Valorisation du Patrimoine Touristique
+    (PGVPT) du Sénégal.
+
+    Le microservice ms-patrimoine assure la gestion complète des patrimoines
+    touristiques matériels et naturels :
+      - Sites naturels
+      - Musées
+      - Monuments
+
+    Il gère également les informations historiques, culturelles, touristiques,
+    géographiques, administratives, environnementales, les horaires,
+    l'accessibilité, les tarifs, les photographies et autres médias.
+  version: 1.0.0
+  contact:
+    name: PGVPT
+    email: contact@pgvpt.sn
+
+servers:
+  - url: http://localhost:8082/api/v1
+    description: Environnement local
+  - url: https://api.pgvpt.sn/patrimoine/api/v1
+    description: Environnement de production
+
+tags:
+  - name: Patrimoines
+    description: Gestion des patrimoines touristiques
+  - name: Recherche
+    description: Recherche et filtrage des patrimoines
+  - name: Photos
+    description: Gestion des photographies
+  - name: Horaires
+    description: Gestion des horaires d'ouverture
+  - name: Conservation
+    description: Gestion de l'état et des actions de conservation
+  - name: Publication
+    description: Publication et dépublication des patrimoines
+
+paths:
+
+  /patrimoines:
+    get:
+      tags:
+        - Patrimoines
+      summary: Lister les patrimoines
+      operationId: getPatrimoines
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+        - name: categorie
+          in: query
+          schema:
+            $ref: '#/components/schemas/CategoriePatrimoine'
+        - name: type
+          in: query
+          schema:
+            $ref: '#/components/schemas/TypePatrimoine'
+        - name: region
+          in: query
+          schema:
+            type: string
+        - name: departement
+          in: query
+          schema:
+            type: string
+        - name: commune
+          in: query
+          schema:
+            type: string
+        - name: statut
+          in: query
+          schema:
+            $ref: '#/components/schemas/StatutPatrimoine'
+        - name: etatConservation
+          in: query
+          schema:
+            $ref: '#/components/schemas/EtatConservation'
+        - name: accessiblePublic
+          in: query
+          schema:
+            type: boolean
+        - name: inscritUnesco
+          in: query
+          schema:
+            type: boolean
+        - name: classePatrimoine
+          in: query
+          schema:
+            type: boolean
+        - name: q
+          in: query
+          description: Recherche textuelle sur le nom, description ou historique
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Liste paginée des patrimoines
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagePatrimoine'
+
+    post:
+      tags:
+        - Patrimoines
+      summary: Créer un patrimoine
+      operationId: createPatrimoine
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatrimoineCreate'
+      responses:
+        '201':
+          description: Patrimoine créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patrimoine'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /patrimoines/{id}:
+    get:
+      tags:
+        - Patrimoines
+      summary: Obtenir le détail d'un patrimoine
+      operationId: getPatrimoine
+      parameters:
+        - $ref: '#/components/parameters/PatrimoineId'
+      responses:
+        '200':
+          description: Patrimoine trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patrimoine'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Patrimoines
+      summary: Modifier un patrimoine
+      operationId: updatePatrimoine
+      parameters:
+        - $ref: '#/components/parameters/PatrimoineId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatrimoineUpdate'
+      responses:
+        '200':
+          description: Patrimoine modifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patrimoine'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Patrimoines
+      summary: Supprimer un patrimoine
+      operationId: deletePatrimoine
+      parameters:
+        - $ref: '#/components/parameters/PatrimoineId'
+      responses:
+        '204':
+          description: Patrimoine supprimé
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /patrimoines/{id}/publier:
+    patch:
+      tags:
+        - Publication
+      summary: Publier un patrimoine
+      operationId: publierPatrimoine
+      parameters:
+        - $ref: '#/components/parameters/PatrimoineId'
+      responses:
+        '200':
+          description: Patrimoine publié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patrimoine'
+
+  /patrimoines/{id}/depublier:
+    patch:
+      tags:
+        - Publication
+      summary: Dépublier un patrimoine
+      operationId: depublierPatrimoine
+      parameters:
+        - $ref: '#/components/parameters/PatrimoineId'
+      responses:
+        '200':
+          description: Patrimoine dépublié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patrimoine'
+
+  /patrimoines/recherche:
+    get:
+      tags:
+        - Recherche
+      summary: Recherche avancée de patrimoines
+      operationId: rechercherPatrimoines
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+        - name: type
+          in: query
+          schema:
+            $ref: '#/components/schemas/TypePatrimoine'
+        - name: categorie
+          in: query
+          schema:
+            $ref: '#/components/schemas/CategoriePatrimoine'
+        - name: region
+          in: query
+          schema:
+            type: string
+        - name: departement
+          in: query
+          schema:
+            type: string
+        - name: commune
+          in: query
+          schema:
+            type: string
+        - name: latitude
+          in: query
+          schema:
+            type: number
+            format: double
+        - name: longitude
+          in: query
+          schema:
+            type: number
+            format: double
+        - name: rayonKm
+          in: query
+          schema:
+            type: number
+            format: double
+            minimum: 0
+      responses:
+        '200':
+          description: Résultats de recherche
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PatrimoineSummary'
+
+  /patrimoines/{id}/photos:
+    get:
+      tags:
+        - Photos
+      summary: Lister les photos d'un patrimoine
+      operationId: getPhotos
+      parameters:
+        - $ref: '#/components/parameters/PatrimoineId'
+      responses:
+        '200':
+          description: Photos du patrimoine
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Photo'
+
+    post:
+      tags:
+        - Photos
+      summary: Ajouter une photo
+      operationId: addPhoto
+      parameters:
+        - $ref: '#/components/parameters/PatrimoineId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhotoCreate'
+      responses:
+        '201':
+          description: Photo ajoutée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Photo'
+
+  /patrimoines/{id}/photos/{photoId}:
+    delete:
+      tags:
+        - Photos
+      summary: Supprimer une photo
+      operationId: deletePhoto
+      parameters:
+        - $ref: '#/components/parameters/PatrimoineId'
+        - name: photoId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Photo supprimée
+
+  /patrimoines/{id}/horaires:
+    get:
+      tags:
+        - Horaires
+      summary: Obtenir les horaires d'ouverture
+      operationId: getHoraires
+      parameters:
+        - $ref: '#/components/parameters/PatrimoineId'
+      responses:
+        '200':
+          description: Horaires d'ouverture
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HoraireOuverture'
+
+    put:
+      tags:
+        - Horaires
+      summary: Mettre à jour les horaires
+      operationId: updateHoraires
+      parameters:
+        - $ref: '#/components/parameters/PatrimoineId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/HoraireOuverture'
+      responses:
+        '200':
+          description: Horaires mis à jour
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HoraireOuverture'
+
+  /patrimoines/{id}/conservation:
+    get:
+      tags:
+        - Conservation
+      summary: Obtenir les informations de conservation
+      operationId: getConservation
+      parameters:
+        - $ref: '#/components/parameters/PatrimoineId'
+      responses:
+        '200':
+          description: Informations de conservation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conservation'
+
+    put:
+      tags:
+        - Conservation
+      summary: Mettre à jour les informations de conservation
+      operationId: updateConservation
+      parameters:
+        - $ref: '#/components/parameters/PatrimoineId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Conservation'
+      responses:
+        '200':
+          description: Conservation mise à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conservation'
+
+components:
+
+  parameters:
+
+    PatrimoineId:
+      name: id
+      in: path
+      required: true
+      description: Identifiant unique du patrimoine
+      schema:
+        type: string
+        format: uuid
+
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+
+    Size:
+      name: size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+    Sort:
+      name: sort
+      in: query
+      schema:
+        type: string
+        example: nom,asc
+
+  responses:
+
+    BadRequest:
+      description: Requête invalide
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+
+    NotFound:
+      description: Patrimoine introuvable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+
+  schemas:
+
+    # ============================================================
+    # PATRIMOINE
+    # ============================================================
+
+    Patrimoine:
+      oneOf:
+        - $ref: '#/components/schemas/SiteNaturel'
+        - $ref: '#/components/schemas/Musee'
+        - $ref: '#/components/schemas/Monument'
+      discriminator:
+        propertyName: type
+        mapping:
+          SITE_NATUREL: '#/components/schemas/SiteNaturel'
+          MUSEE: '#/components/schemas/Musee'
+          MONUMENT: '#/components/schemas/Monument'
+
+    PatrimoineCreate:
+      oneOf:
+        - $ref: '#/components/schemas/SiteNaturelCreate'
+        - $ref: '#/components/schemas/MuseeCreate'
+        - $ref: '#/components/schemas/MonumentCreate'
+      discriminator:
+        propertyName: type
+
+    PatrimoineUpdate:
+      oneOf:
+        - $ref: '#/components/schemas/SiteNaturelUpdate'
+        - $ref: '#/components/schemas/MuseeUpdate'
+        - $ref: '#/components/schemas/MonumentUpdate'
+      discriminator:
+        propertyName: type
+
+    PatrimoineBase:
+      type: object
+      required:
+        - nom
+        - type
+        - categorie
+        - description
+        - localisation
+      properties:
+
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+
+        code:
+          type: string
+          maxLength: 50
+          description: Code métier unique du patrimoine
+          example: SN-DKR-00125
+
+        nom:
+          type: string
+          maxLength: 255
+          example: Maison des Esclaves
+
+        nomLocal:
+          type: string
+          maxLength: 255
+          description: Nom traditionnel ou nom local
+
+        nomHistorique:
+          type: string
+          maxLength: 255
+
+        type:
+          $ref: '#/components/schemas/TypePatrimoine'
+
+        categorie:
+          $ref: '#/components/schemas/CategoriePatrimoine'
+
+        sousCategorie:
+          type: string
+          maxLength: 150
+
+        periode:
+          $ref: '#/components/schemas/PeriodeHistorique'
+
+        siecle:
+          type: string
+          example: XVIIIe siècle
+
+        dateOuverture:
+          type: string
+          format: date
+
+        description:
+          type: string
+
+        descriptionCourte:
+          type: string
+          maxLength: 1000
+
+        historique:
+          type: string
+
+        importanceHistorique:
+          type: string
+
+        importanceCulturelle:
+          type: string
+
+        importanceTouristique:
+          type: string
+
+        valeurPatrimoniale:
+          type: string
+
+        valeurSpirituelle:
+          type: string
+
+        traditionsAssociees:
+          type: array
+          items:
+            type: string
+
+        langues:
+          type: array
+          items:
+            type: string
+          example:
+            - Français
+            - Wolof
+            - Anglais
+
+        etatConservation:
+          $ref: '#/components/schemas/EtatConservation'
+
+        statut:
+          $ref: '#/components/schemas/StatutPatrimoine'
+
+        classePatrimoine:
+          type: boolean
+          description: Indique si le patrimoine bénéficie d'un classement officiel
+
+        referenceClassement:
+          type: string
+
+        dateClassement:
+          type: string
+          format: date
+
+        inscritUnesco:
+          type: boolean
+
+        nomSiteUnesco:
+          type: string
+
+        dateInscriptionUnesco:
+          type: string
+          format: date
+
+        protectionJuridique:
+          type: string
+
+        organismeGestionnaire:
+          type: string
+
+        proprietaire:
+          type: string
+
+        gestionnaire:
+          type: string
+
+        contact:
+          $ref: '#/components/schemas/Contact'
+
+        siteWeb:
+          type: string
+          format: uri
+
+        email:
+          type: string
+          format: email
+
+        telephone:
+          type: string
+
+        localisation:
+          $ref: '#/components/schemas/Localisation'
+
+        accessibilite:
+          $ref: '#/components/schemas/Accessibilite'
+
+        tarification:
+          $ref: '#/components/schemas/Tarification'
+
+        horaires:
+          type: array
+          items:
+            $ref: '#/components/schemas/HoraireOuverture'
+
+        photos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Photo'
+
+        medias:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+
+        conservation:
+          $ref: '#/components/schemas/Conservation'
+
+        menaces:
+          type: array
+          items:
+            $ref: '#/components/schemas/Menace'
+
+        recommandationsVisiteur:
+          type: array
+          items:
+            type: string
+
+        reglesVisite:
+          type: array
+          items:
+            type: string
+
+        activitesTouristiques:
+          type: array
+          items:
+            type: string
+          example:
+            - Visite guidée
+            - Photographie
+            - Observation
+            - Randonnée
+
+        meilleurePeriodeVisite:
+          type: string
+
+        dureeVisiteEstimeeMinutes:
+          type: integer
+          minimum: 0
+
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+
+        publishedAt:
+          type: string
+          format: date-time
+          readOnly: true
+
+    SiteNaturel:
+      allOf:
+        - $ref: '#/components/schemas/PatrimoineBase'
+        - type: object
+          properties:
+            superficie:
+              type: number
+              format: double
+              minimum: 0
+              description: Superficie en hectares
+
+            natureSite:
+              $ref: '#/components/schemas/NatureSiteNaturel'
+
+            ecosysteme:
+              type: string
+              example: Écosystème de mangrove
+
+            especesProtegees:
+              type: array
+              items:
+                $ref: '#/components/schemas/EspeceProtegee'
+
+            biodiversite:
+              type: string
+
+            zoneProtegee:
+              type: boolean
+
+            categorieProtection:
+              type: string
+              example: Parc national
+
+            risquesEnvironnementaux:
+              type: array
+              items:
+                type: string
+
+            ressourcesNaturelles:
+              type: array
+              items:
+                type: string
+
+            activitesEcotouristiques:
+              type: array
+              items:
+                type: string
+
+            capaciteAccueil:
+              type: integer
+              minimum: 0
+
+    Musee:
+      allOf:
+        - $ref: '#/components/schemas/PatrimoineBase'
+        - type: object
+          properties:
+            nombreCollections:
+              type: integer
+              minimum: 0
+
+            nombreOeuvres:
+              type: integer
+              minimum: 0
+
+            collections:
+              type: array
+              items:
+                $ref: '#/components/schemas/CollectionMusee'
+
+            expositions:
+              type: array
+              items:
+                $ref: '#/components/schemas/Exposition'
+
+            typesCollections:
+              type: array
+              items:
+                type: string
+
+            servicesMusee:
+              type: array
+              items:
+                type: string
+              example:
+                - Visite guidée
+                - Boutique
+                - Cafétéria
+                - Centre de documentation
+
+            capaciteAccueil:
+              type: integer
+              minimum: 0
+
+            museographie:
+              type: string
+
+    Monument:
+      allOf:
+        - $ref: '#/components/schemas/PatrimoineBase'
+        - type: object
+          properties:
+            styleArchitectural:
+              type: string
+              example: Architecture coloniale
+
+            anneeConstruction:
+              type: integer
+              minimum: 0
+
+            anneeRenovation:
+              type: integer
+              minimum: 0
+
+            architecte:
+              type: string
+
+            identiteArchitecte:
+              type: string
+
+            natureMonument:
+              $ref: '#/components/schemas/NatureMonument'
+
+            materiauxConstruction:
+              type: array
+              items:
+                type: string
+
+            dimensions:
+              type: string
+
+            commanditaire:
+              type: string
+
+            contexteHistorique:
+              type: string
+
+            personnagesAssocies:
+              type: array
+              items:
+                type: string
+
+    # ============================================================
+    # CREATE / UPDATE
+    # ============================================================
+
+    SiteNaturelCreate:
+      allOf:
+        - $ref: '#/components/schemas/PatrimoineBase'
+        - type: object
+          required:
+            - type
+            - superficie
+            - natureSite
+            - ecosysteme
+          properties:
+            type:
+              type: string
+              enum:
+                - SITE_NATUREL
+            superficie:
+              type: number
+              format: double
+            natureSite:
+              $ref: '#/components/schemas/NatureSiteNaturel'
+            ecosysteme:
+              type: string
+            especesProtegees:
+              type: array
+              items:
+                $ref: '#/components/schemas/EspeceProtegee'
+
+    MuseeCreate:
+      allOf:
+        - $ref: '#/components/schemas/PatrimoineBase'
+        - type: object
+          required:
+            - type
+            - nombreCollections
+          properties:
+            type:
+              type: string
+              enum:
+                - MUSEE
+            nombreCollections:
+              type: integer
+              minimum: 0
+            collections:
+              type: array
+              items:
+                $ref: '#/components/schemas/CollectionMusee'
+            expositions:
+              type: array
+              items:
+                $ref: '#/components/schemas/Exposition'
+
+    MonumentCreate:
+      allOf:
+        - $ref: '#/components/schemas/PatrimoineBase'
+        - type: object
+          required:
+            - type
+            - styleArchitectural
+            - natureMonument
+          properties:
+            type:
+              type: string
+              enum:
+                - MONUMENT
+            styleArchitectural:
+              type: string
+            anneeConstruction:
+              type: integer
+            identiteArchitecte:
+              type: string
+            natureMonument:
+              $ref: '#/components/schemas/NatureMonument'
+
+    SiteNaturelUpdate:
+      allOf:
+        - $ref: '#/components/schemas/SiteNaturelCreate'
+
+    MuseeUpdate:
+      allOf:
+        - $ref: '#/components/schemas/MuseeCreate'
+
+    MonumentUpdate:
+      allOf:
+        - $ref: '#/components/schemas/MonumentCreate'
+
+    # ============================================================
+    # LOCALISATION
+    # ============================================================
+
+    Localisation:
+      type: object
+      required:
+        - latitude
+        - longitude
+      properties:
+        adresse:
+          type: string
+
+        region:
+          type: string
+          example: Dakar
+
+        departement:
+          type: string
+          example: Dakar
+
+        arrondissement:
+          type: string
+
+        commune:
+          type: string
+          example: Gorée
+
+        quartier:
+          type: string
+
+        village:
+          type: string
+
+        lieuDit:
+          type: string
+
+        latitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+
+        longitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+
+        altitude:
+          type: number
+          format: double
+
+        precision:
+          type: number
+          format: double
+          description: Précision de la géolocalisation en mètres
+
+        zoneGeographique:
+          type: string
+          example: Petite Côte
+
+        aireGeographique:
+          type: string
+
+        codePostal:
+          type: string
+
+        distanceCentreVilleKm:
+          type: number
+          format: double
+
+    # ============================================================
+    # ACCESSIBILITE
+    # ============================================================
+
+    Accessibilite:
+      type: object
+      properties:
+        accessiblePublic:
+          type: boolean
+
+        accessibilitePMR:
+          type: boolean
+
+        accesFauteuilRoulant:
+          type: boolean
+
+        accesTransportPublic:
+          type: boolean
+
+        parking:
+          type: boolean
+
+        guideDisponible:
+          type: boolean
+
+        guideAudio:
+          type: boolean
+
+        langueVisite:
+          type: array
+          items:
+            type: string
+
+        accesEnfant:
+          type: boolean
+
+        conditionsAcces:
+          type: string
+
+        restrictions:
+          type: array
+          items:
+            type: string
+
+    # ============================================================
+    # TARIFICATION
+    # ============================================================
+
+    Tarification:
+      type: object
+      properties:
+        gratuit:
+          type: boolean
+
+        tarifNormal:
+          type: number
+          format: double
+          minimum: 0
+
+        devise:
+          type: string
+          default: XOF
+          example: XOF
+
+        tarifEnfant:
+          type: number
+          format: double
+          minimum: 0
+
+        tarifEtudiant:
+          type: number
+          format: double
+          minimum: 0
+
+        tarifResident:
+          type: number
+          format: double
+          minimum: 0
+
+        tarifGroupe:
+          type: number
+          format: double
+          minimum: 0
+
+        tarifGuide:
+          type: number
+          format: double
+          minimum: 0
+
+        conditionsTarifaires:
+          type: string
+
+    # ============================================================
+    # HORAIRES
+    # ============================================================
+
+    HoraireOuverture:
+      type: object
+      required:
+        - jour
+      properties:
+        jour:
+          $ref: '#/components/schemas/JourSemaine'
+
+        ouvert:
+          type: boolean
+
+        heureOuverture:
+          type: string
+          format: time
+          example: "09:00:00"
+
+        heureFermeture:
+          type: string
+          format: time
+          example: "18:00:00"
+
+        pauseDebut:
+          type: string
+          format: time
+
+        pauseFin:
+          type: string
+          format: time
+
+        surReservation:
+          type: boolean
+
+        commentaire:
+          type: string
+
+    # ============================================================
+    # PHOTO / MEDIA
+    # ============================================================
+
+    Photo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+
+        url:
+          type: string
+          format: uri
+
+        miniatureUrl:
+          type: string
+          format: uri
+
+        titre:
+          type: string
+
+        description:
+          type: string
+
+        auteur:
+          type: string
+
+        datePrise:
+          type: string
+          format: date
+
+        droits:
+          type: string
+
+        licence:
+          type: string
+
+        photoPrincipale:
+          type: boolean
+
+        ordre:
+          type: integer
+
+    PhotoCreate:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          format: uri
+        miniatureUrl:
+          type: string
+          format: uri
+        titre:
+          type: string
+        description:
+          type: string
+        auteur:
+          type: string
+        datePrise:
+          type: string
+          format: date
+        droits:
+          type: string
+        licence:
+          type: string
+        photoPrincipale:
+          type: boolean
+        ordre:
+          type: integer
+
+    Media:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+
+        type:
+          $ref: '#/components/schemas/TypeMedia'
+
+        titre:
+          type: string
+
+        description:
+          type: string
+
+        url:
+          type: string
+          format: uri
+
+        miniatureUrl:
+          type: string
+          format: uri
+
+        duree:
+          type: integer
+          description: Durée en secondes pour une vidéo ou un audio
+
+        auteur:
+          type: string
+
+        licence:
+          type: string
+
+    # ============================================================
+    # CONSERVATION
+    # ============================================================
+
+    Conservation:
+      type: object
+      properties:
+        etat:
+          $ref: '#/components/schemas/EtatConservation'
+
+        dateEvaluation:
+          type: string
+          format: date
+
+        evaluateur:
+          type: string
+
+        descriptionEtat:
+          type: string
+
+        degradations:
+          type: array
+          items:
+            type: string
+
+        causesDegradation:
+          type: array
+          items:
+            type: string
+
+        travauxNecessaires:
+          type: array
+          items:
+            type: string
+
+        dernierTravaux:
+          type: string
+
+        dateDerniersTravaux:
+          type: string
+          format: date
+
+        organismeConservation:
+          type: string
+
+        budgetEstime:
+          type: number
+          format: double
+
+        recommandations:
+          type: array
+          items:
+            type: string
+
+    Menace:
+      type: object
+      properties:
+        type:
+          type: string
+          example: Erosion côtière
+
+        niveau:
+          type: string
+          enum:
+            - FAIBLE
+            - MOYEN
+            - ELEVE
+            - CRITIQUE
+
+        description:
+          type: string
+
+        mesuresPrevention:
+          type: string
+
+    # ============================================================
+    # SITE NATUREL
+    # ============================================================
+
+    EspeceProtegee:
+      type: object
+      required:
+        - nomCommun
+      properties:
+        id:
+          type: string
+          format: uuid
+
+        nomCommun:
+          type: string
+
+        nomScientifique:
+          type: string
+
+        nomLocal:
+          type: string
+
+        type:
+          type: string
+          enum:
+            - FAUNE
+            - FLORE
+
+        statutConservation:
+          type: string
+
+        niveauProtection:
+          type: string
+
+        description:
+          type: string
+
+        photoUrl:
+          type: string
+          format: uri
+
+    CollectionMusee:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+
+        nom:
+          type: string
+
+        description:
+          type: string
+
+        nombreOeuvres:
+          type: integer
+          minimum: 0
+
+        periode:
+          type: string
+
+        origine:
+          type: string
+
+        themes:
+          type: array
+          items:
+            type: string
+
+    Exposition:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+
+        titre:
+          type: string
+
+        description:
+          type: string
+
+        dateDebut:
+          type: string
+          format: date
+
+        dateFin:
+          type: string
+          format: date
+
+        commissaire:
+          type: string
+
+        lieu:
+          type: string
+
+        expositionPermanente:
+          type: boolean
+
+        imageUrl:
+          type: string
+          format: uri
+
+    # ============================================================
+    # CONTACT
+    # ============================================================
+
+    Contact:
+      type: object
+      properties:
+        nom:
+          type: string
+
+        fonction:
+          type: string
+
+        telephone:
+          type: string
+
+        email:
+          type: string
+          format: email
+
+        siteWeb:
+          type: string
+          format: uri
+
+    # ============================================================
+    # ENUMERATIONS
+    # ============================================================
+
+    TypePatrimoine:
+      type: string
+      enum:
+        - SITE_NATUREL
+        - MUSEE
+        - MONUMENT
+
+    CategoriePatrimoine:
+      type: string
+      enum:
+        - PATRIMOINE_NATUREL
+        - PATRIMOINE_HISTORIQUE
+        - PATRIMOINE_CULTUREL
+        - PATRIMOINE_ARCHITECTURAL
+        - PATRIMOINE_RELIGIEUX
+        - PATRIMOINE_COLONIAL
+        - PATRIMOINE_ARCHEOLOGIQUE
+        - PATRIMOINE_MUSEAL
+        - PATRIMOINE_MEMORIEL
+        - PATRIMOINE_MARITIME
+        - PATRIMOINE_RURAL
+        - AUTRE
+
+    StatutPatrimoine:
+      type: string
+      enum:
+        - BROUILLON
+        - EN_VALIDATION
+        - VALIDE
+        - PUBLIE
+        - ARCHIVE
+
+    EtatConservation:
+      type: string
+      enum:
+        - EXCELLENT
+        - BON
+        - MOYEN
+        - MAUVAIS
+        - CRITIQUE
+        - RUINE
+
+    NatureSiteNaturel:
+      type: string
+      enum:
+        - PARC_NATIONAL
+        - RESERVE_NATURELLE
+        - RESERVE_COMMUNAUTAIRE
+        - AIRE_MARINE_PROTEGEE
+        - FORET
+        - MANGROVE
+        - LAC
+        - LAGON
+        - FLEUVE
+        - CASCADE
+        - PLAGE
+        - FALAISE
+        - DESERT
+        - SAVANE
+        - ZONE_HUMIDE
+        - DELTA
+        - AUTRE
+
+    NatureMonument:
+      type: string
+      enum:
+        - MONUMENT_HISTORIQUE
+        - MONUMENT_COMMEMORATIF
+        - EDIFICE_RELIGIEUX
+        - EDIFICE_COLONIAL
+        - EDIFICE_ADMINISTRATIF
+        - FORTIFICATION
+        - PHARE
+        - PORTE_HISTORIQUE
+        - MAUSOLEE
+        - STATUE
+        - AUTRE
+
+    PeriodeHistorique:
+      type: string
+      enum:
+        - PREHISTORIQUE
+        - ANTIQUITE
+        - MEDIEVALE
+        - PRECOLONIALE
+        - COLONIALE
+        - POSTCOLONIALE
+        - CONTEMPORAINE
+        - INDETERMINEE
+
+    JourSemaine:
+      type: string
+      enum:
+        - LUNDI
+        - MARDI
+        - MERCREDI
+        - JEUDI
+        - VENDREDI
+        - SAMEDI
+        - DIMANCHE
+
+    TypeMedia:
+      type: string
+      enum:
+        - PHOTO
+        - VIDEO
+        - AUDIO
+        - DOCUMENT
+        - VISITE_VIRTUELLE
+        - MODELE_3D
+
+    # ============================================================
+    # PAGINATION
+    # ============================================================
+
+    PatrimoineSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        nom:
+          type: string
+        type:
+          $ref: '#/components/schemas/TypePatrimoine'
+        categorie:
+          $ref: '#/components/schemas/CategoriePatrimoine'
+        descriptionCourte:
+          type: string
+        localisation:
+          $ref: '#/components/schemas/Localisation'
+        photoPrincipale:
+          type: string
+          format: uri
+        etatConservation:
+          $ref: '#/components/schemas/EtatConservation'
+        inscritUnesco:
+          type: boolean
+
+    PagePatrimoine:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Patrimoine'
+
+        page:
+          type: integer
+
+        size:
+          type: integer
+
+        totalElements:
+          type: integer
+          format: int64
+
+        totalPages:
+          type: integer
+
+        first:
+          type: boolean
+
+        last:
+          type: boolean
+
+    # ============================================================
+    # ERREURS
+    # ============================================================
+
+    ApiError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+
+        status:
+          type: integer
+
+        error:
+          type: string
+
+        code:
+          type: string
+
+        message:
+          type: string
+
+        path:
+          type: string
+
+        details:
+          type: array
+          items:
+            type: string
