@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.pgvpt.dto.CategoriePatrimoine;
 import com.pgvpt.dto.EtatConservation;
-import com.pgvpt.dto.Localisation;
 import com.pgvpt.dto.TypePatrimoine;
 import java.net.URI;
 import java.util.UUID;
@@ -38,8 +37,6 @@ public class PatrimoineSummary {
   private CategoriePatrimoine categorie;
 
   private String descriptionCourte;
-
-  private Localisation localisation;
 
   private URI photoPrincipale;
 
@@ -147,26 +144,6 @@ public class PatrimoineSummary {
     this.descriptionCourte = descriptionCourte;
   }
 
-  public PatrimoineSummary localisation(Localisation localisation) {
-    this.localisation = localisation;
-    return this;
-  }
-
-  /**
-   * Get localisation
-   * @return localisation
-   */
-  @Valid 
-  @Schema(name = "localisation", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("localisation")
-  public Localisation getLocalisation() {
-    return localisation;
-  }
-
-  public void setLocalisation(Localisation localisation) {
-    this.localisation = localisation;
-  }
-
   public PatrimoineSummary photoPrincipale(URI photoPrincipale) {
     this.photoPrincipale = photoPrincipale;
     return this;
@@ -241,7 +218,6 @@ public class PatrimoineSummary {
         Objects.equals(this.type, patrimoineSummary.type) &&
         Objects.equals(this.categorie, patrimoineSummary.categorie) &&
         Objects.equals(this.descriptionCourte, patrimoineSummary.descriptionCourte) &&
-        Objects.equals(this.localisation, patrimoineSummary.localisation) &&
         Objects.equals(this.photoPrincipale, patrimoineSummary.photoPrincipale) &&
         Objects.equals(this.etatConservation, patrimoineSummary.etatConservation) &&
         Objects.equals(this.inscritUnesco, patrimoineSummary.inscritUnesco);
@@ -249,7 +225,7 @@ public class PatrimoineSummary {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, nom, type, categorie, descriptionCourte, localisation, photoPrincipale, etatConservation, inscritUnesco);
+    return Objects.hash(id, nom, type, categorie, descriptionCourte, photoPrincipale, etatConservation, inscritUnesco);
   }
 
   @Override
@@ -261,7 +237,6 @@ public class PatrimoineSummary {
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    categorie: ").append(toIndentedString(categorie)).append("\n");
     sb.append("    descriptionCourte: ").append(toIndentedString(descriptionCourte)).append("\n");
-    sb.append("    localisation: ").append(toIndentedString(localisation)).append("\n");
     sb.append("    photoPrincipale: ").append(toIndentedString(photoPrincipale)).append("\n");
     sb.append("    etatConservation: ").append(toIndentedString(etatConservation)).append("\n");
     sb.append("    inscritUnesco: ").append(toIndentedString(inscritUnesco)).append("\n");

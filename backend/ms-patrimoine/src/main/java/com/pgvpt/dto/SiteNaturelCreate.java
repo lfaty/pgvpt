@@ -12,7 +12,6 @@ import com.pgvpt.dto.Contact;
 import com.pgvpt.dto.EspeceProtegee;
 import com.pgvpt.dto.EtatConservation;
 import com.pgvpt.dto.HoraireOuverture;
-import com.pgvpt.dto.Localisation;
 import com.pgvpt.dto.Media;
 import com.pgvpt.dto.Menace;
 import com.pgvpt.dto.NatureSiteNaturel;
@@ -59,40 +58,7 @@ public class SiteNaturelCreate implements PatrimoineCreate {
 
   private String nomHistorique;
 
-  /**
-   * Gets or Sets type
-   */
-  public enum TypeEnum {
-    SITE_NATUREL("SITE_NATUREL");
-
-    private String value;
-
-    TypeEnum(String value) {
-      this.value = value;
-    }
-
-    @JsonValue
-    public String getValue() {
-      return value;
-    }
-
-    @Override
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static TypeEnum fromValue(String value) {
-      for (TypeEnum b : TypeEnum.values()) {
-        if (b.value.equals(value)) {
-          return b;
-        }
-      }
-      throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-  }
-
-  private TypeEnum type;
+  private String type;
 
   private CategoriePatrimoine categorie;
 
@@ -161,8 +127,6 @@ public class SiteNaturelCreate implements PatrimoineCreate {
 
   private String telephone;
 
-  private Localisation localisation;
-
   private Accessibilite accessibilite;
 
   private Tarification tarification;
@@ -219,12 +183,11 @@ public class SiteNaturelCreate implements PatrimoineCreate {
   /**
    * Constructor with only required parameters
    */
-  public SiteNaturelCreate(String nom, TypeEnum type, CategoriePatrimoine categorie, String description, Localisation localisation, Double superficie, NatureSiteNaturel natureSite, String ecosysteme) {
+  public SiteNaturelCreate(String nom, String type, CategoriePatrimoine categorie, String description, Double superficie, NatureSiteNaturel natureSite, String ecosysteme) {
     this.nom = nom;
     this.type = type;
     this.categorie = categorie;
     this.description = description;
-    this.localisation = localisation;
     this.superficie = superficie;
     this.natureSite = natureSite;
     this.ecosysteme = ecosysteme;
@@ -330,7 +293,7 @@ public class SiteNaturelCreate implements PatrimoineCreate {
     this.nomHistorique = nomHistorique;
   }
 
-  public SiteNaturelCreate type(TypeEnum type) {
+  public SiteNaturelCreate type(String type) {
     this.type = type;
     return this;
   }
@@ -342,11 +305,11 @@ public class SiteNaturelCreate implements PatrimoineCreate {
   @NotNull 
   @Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("type")
-  public TypeEnum getType() {
+  public String getType() {
     return type;
   }
 
-  public void setType(TypeEnum type) {
+  public void setType(String type) {
     this.type = type;
   }
 
@@ -986,26 +949,6 @@ public class SiteNaturelCreate implements PatrimoineCreate {
     this.telephone = telephone;
   }
 
-  public SiteNaturelCreate localisation(Localisation localisation) {
-    this.localisation = localisation;
-    return this;
-  }
-
-  /**
-   * Get localisation
-   * @return localisation
-   */
-  @NotNull @Valid 
-  @Schema(name = "localisation", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("localisation")
-  public Localisation getLocalisation() {
-    return localisation;
-  }
-
-  public void setLocalisation(Localisation localisation) {
-    this.localisation = localisation;
-  }
-
   public SiteNaturelCreate accessibilite(Accessibilite accessibilite) {
     this.accessibilite = accessibilite;
     return this;
@@ -1497,7 +1440,6 @@ public class SiteNaturelCreate implements PatrimoineCreate {
         Objects.equals(this.siteWeb, siteNaturelCreate.siteWeb) &&
         Objects.equals(this.email, siteNaturelCreate.email) &&
         Objects.equals(this.telephone, siteNaturelCreate.telephone) &&
-        Objects.equals(this.localisation, siteNaturelCreate.localisation) &&
         Objects.equals(this.accessibilite, siteNaturelCreate.accessibilite) &&
         Objects.equals(this.tarification, siteNaturelCreate.tarification) &&
         Objects.equals(this.horaires, siteNaturelCreate.horaires) &&
@@ -1521,7 +1463,7 @@ public class SiteNaturelCreate implements PatrimoineCreate {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, code, nom, nomLocal, nomHistorique, type, categorie, sousCategorie, periode, siecle, dateOuverture, description, descriptionCourte, historique, importanceHistorique, importanceCulturelle, importanceTouristique, valeurPatrimoniale, valeurSpirituelle, traditionsAssociees, langues, etatConservation, statut, classePatrimoine, referenceClassement, dateClassement, inscritUnesco, nomSiteUnesco, dateInscriptionUnesco, protectionJuridique, organismeGestionnaire, proprietaire, gestionnaire, contact, siteWeb, email, telephone, localisation, accessibilite, tarification, horaires, photos, medias, conservation, menaces, recommandationsVisiteur, reglesVisite, activitesTouristiques, meilleurePeriodeVisite, dureeVisiteEstimeeMinutes, createdAt, updatedAt, publishedAt, superficie, natureSite, ecosysteme, especesProtegees);
+    return Objects.hash(id, code, nom, nomLocal, nomHistorique, type, categorie, sousCategorie, periode, siecle, dateOuverture, description, descriptionCourte, historique, importanceHistorique, importanceCulturelle, importanceTouristique, valeurPatrimoniale, valeurSpirituelle, traditionsAssociees, langues, etatConservation, statut, classePatrimoine, referenceClassement, dateClassement, inscritUnesco, nomSiteUnesco, dateInscriptionUnesco, protectionJuridique, organismeGestionnaire, proprietaire, gestionnaire, contact, siteWeb, email, telephone, accessibilite, tarification, horaires, photos, medias, conservation, menaces, recommandationsVisiteur, reglesVisite, activitesTouristiques, meilleurePeriodeVisite, dureeVisiteEstimeeMinutes, createdAt, updatedAt, publishedAt, superficie, natureSite, ecosysteme, especesProtegees);
   }
 
   @Override
@@ -1565,7 +1507,6 @@ public class SiteNaturelCreate implements PatrimoineCreate {
     sb.append("    siteWeb: ").append(toIndentedString(siteWeb)).append("\n");
     sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("    telephone: ").append(toIndentedString(telephone)).append("\n");
-    sb.append("    localisation: ").append(toIndentedString(localisation)).append("\n");
     sb.append("    accessibilite: ").append(toIndentedString(accessibilite)).append("\n");
     sb.append("    tarification: ").append(toIndentedString(tarification)).append("\n");
     sb.append("    horaires: ").append(toIndentedString(horaires)).append("\n");

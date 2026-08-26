@@ -70,7 +70,7 @@ public interface ConservationApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"descriptionEtat\" : \"descriptionEtat\", \"budgetEstime\" : 1.0246457001441578, \"dernierTravaux\" : \"dernierTravaux\", \"dateDerniersTravaux\" : \"2000-01-23\", \"recommandations\" : [ \"recommandations\", \"recommandations\" ], \"organismeConservation\" : \"organismeConservation\", \"dateEvaluation\" : \"2000-01-23\", \"evaluateur\" : \"evaluateur\", \"degradations\" : [ \"degradations\", \"degradations\" ], \"travauxNecessaires\" : [ \"travauxNecessaires\", \"travauxNecessaires\" ], \"causesDegradation\" : [ \"causesDegradation\", \"causesDegradation\" ] }";
+                    String exampleString = "{ \"descriptionEtat\" : \"descriptionEtat\", \"budgetEstime\" : 3.616076749251911, \"dernierTravaux\" : \"dernierTravaux\", \"dateDerniersTravaux\" : \"2000-01-23\", \"recommandations\" : [ \"recommandations\", \"recommandations\" ], \"organismeConservation\" : \"organismeConservation\", \"dateEvaluation\" : \"2000-01-23\", \"evaluateur\" : \"evaluateur\", \"degradations\" : [ \"degradations\", \"degradations\" ], \"travauxNecessaires\" : [ \"travauxNecessaires\", \"travauxNecessaires\" ], \"causesDegradation\" : [ \"causesDegradation\", \"causesDegradation\" ] }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -112,7 +112,7 @@ public interface ConservationApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"descriptionEtat\" : \"descriptionEtat\", \"budgetEstime\" : 1.0246457001441578, \"dernierTravaux\" : \"dernierTravaux\", \"dateDerniersTravaux\" : \"2000-01-23\", \"recommandations\" : [ \"recommandations\", \"recommandations\" ], \"organismeConservation\" : \"organismeConservation\", \"dateEvaluation\" : \"2000-01-23\", \"evaluateur\" : \"evaluateur\", \"degradations\" : [ \"degradations\", \"degradations\" ], \"travauxNecessaires\" : [ \"travauxNecessaires\", \"travauxNecessaires\" ], \"causesDegradation\" : [ \"causesDegradation\", \"causesDegradation\" ] }";
+                    String exampleString = "{ \"descriptionEtat\" : \"descriptionEtat\", \"budgetEstime\" : 3.616076749251911, \"dernierTravaux\" : \"dernierTravaux\", \"dateDerniersTravaux\" : \"2000-01-23\", \"recommandations\" : [ \"recommandations\", \"recommandations\" ], \"organismeConservation\" : \"organismeConservation\", \"dateEvaluation\" : \"2000-01-23\", \"evaluateur\" : \"evaluateur\", \"degradations\" : [ \"degradations\", \"degradations\" ], \"travauxNecessaires\" : [ \"travauxNecessaires\", \"travauxNecessaires\" ], \"causesDegradation\" : [ \"causesDegradation\", \"causesDegradation\" ] }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

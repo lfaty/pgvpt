@@ -11,14 +11,12 @@ import com.pgvpt.dto.Conservation;
 import com.pgvpt.dto.Contact;
 import com.pgvpt.dto.EtatConservation;
 import com.pgvpt.dto.HoraireOuverture;
-import com.pgvpt.dto.Localisation;
 import com.pgvpt.dto.Media;
 import com.pgvpt.dto.Menace;
 import com.pgvpt.dto.PeriodeHistorique;
 import com.pgvpt.dto.Photo;
 import com.pgvpt.dto.StatutPatrimoine;
 import com.pgvpt.dto.Tarification;
-import com.pgvpt.dto.TypePatrimoine;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -55,7 +53,7 @@ public class PatrimoineBase {
 
   private String nomHistorique;
 
-  private TypePatrimoine type;
+  private String type;
 
   private CategoriePatrimoine categorie;
 
@@ -124,8 +122,6 @@ public class PatrimoineBase {
 
   private String telephone;
 
-  private Localisation localisation;
-
   private Accessibilite accessibilite;
 
   private Tarification tarification;
@@ -173,12 +169,11 @@ public class PatrimoineBase {
   /**
    * Constructor with only required parameters
    */
-  public PatrimoineBase(String nom, TypePatrimoine type, CategoriePatrimoine categorie, String description, Localisation localisation) {
+  public PatrimoineBase(String nom, String type, CategoriePatrimoine categorie, String description) {
     this.nom = nom;
     this.type = type;
     this.categorie = categorie;
     this.description = description;
-    this.localisation = localisation;
   }
 
   public PatrimoineBase id(UUID id) {
@@ -281,7 +276,7 @@ public class PatrimoineBase {
     this.nomHistorique = nomHistorique;
   }
 
-  public PatrimoineBase type(TypePatrimoine type) {
+  public PatrimoineBase type(String type) {
     this.type = type;
     return this;
   }
@@ -290,14 +285,14 @@ public class PatrimoineBase {
    * Get type
    * @return type
    */
-  @NotNull @Valid 
+  @NotNull 
   @Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("type")
-  public TypePatrimoine getType() {
+  public String getType() {
     return type;
   }
 
-  public void setType(TypePatrimoine type) {
+  public void setType(String type) {
     this.type = type;
   }
 
@@ -937,26 +932,6 @@ public class PatrimoineBase {
     this.telephone = telephone;
   }
 
-  public PatrimoineBase localisation(Localisation localisation) {
-    this.localisation = localisation;
-    return this;
-  }
-
-  /**
-   * Get localisation
-   * @return localisation
-   */
-  @NotNull @Valid 
-  @Schema(name = "localisation", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("localisation")
-  public Localisation getLocalisation() {
-    return localisation;
-  }
-
-  public void setLocalisation(Localisation localisation) {
-    this.localisation = localisation;
-  }
-
   public PatrimoineBase accessibilite(Accessibilite accessibilite) {
     this.accessibilite = accessibilite;
     return this;
@@ -1360,7 +1335,6 @@ public class PatrimoineBase {
         Objects.equals(this.siteWeb, patrimoineBase.siteWeb) &&
         Objects.equals(this.email, patrimoineBase.email) &&
         Objects.equals(this.telephone, patrimoineBase.telephone) &&
-        Objects.equals(this.localisation, patrimoineBase.localisation) &&
         Objects.equals(this.accessibilite, patrimoineBase.accessibilite) &&
         Objects.equals(this.tarification, patrimoineBase.tarification) &&
         Objects.equals(this.horaires, patrimoineBase.horaires) &&
@@ -1380,7 +1354,7 @@ public class PatrimoineBase {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, code, nom, nomLocal, nomHistorique, type, categorie, sousCategorie, periode, siecle, dateOuverture, description, descriptionCourte, historique, importanceHistorique, importanceCulturelle, importanceTouristique, valeurPatrimoniale, valeurSpirituelle, traditionsAssociees, langues, etatConservation, statut, classePatrimoine, referenceClassement, dateClassement, inscritUnesco, nomSiteUnesco, dateInscriptionUnesco, protectionJuridique, organismeGestionnaire, proprietaire, gestionnaire, contact, siteWeb, email, telephone, localisation, accessibilite, tarification, horaires, photos, medias, conservation, menaces, recommandationsVisiteur, reglesVisite, activitesTouristiques, meilleurePeriodeVisite, dureeVisiteEstimeeMinutes, createdAt, updatedAt, publishedAt);
+    return Objects.hash(id, code, nom, nomLocal, nomHistorique, type, categorie, sousCategorie, periode, siecle, dateOuverture, description, descriptionCourte, historique, importanceHistorique, importanceCulturelle, importanceTouristique, valeurPatrimoniale, valeurSpirituelle, traditionsAssociees, langues, etatConservation, statut, classePatrimoine, referenceClassement, dateClassement, inscritUnesco, nomSiteUnesco, dateInscriptionUnesco, protectionJuridique, organismeGestionnaire, proprietaire, gestionnaire, contact, siteWeb, email, telephone, accessibilite, tarification, horaires, photos, medias, conservation, menaces, recommandationsVisiteur, reglesVisite, activitesTouristiques, meilleurePeriodeVisite, dureeVisiteEstimeeMinutes, createdAt, updatedAt, publishedAt);
   }
 
   @Override
@@ -1424,7 +1398,6 @@ public class PatrimoineBase {
     sb.append("    siteWeb: ").append(toIndentedString(siteWeb)).append("\n");
     sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("    telephone: ").append(toIndentedString(telephone)).append("\n");
-    sb.append("    localisation: ").append(toIndentedString(localisation)).append("\n");
     sb.append("    accessibilite: ").append(toIndentedString(accessibilite)).append("\n");
     sb.append("    tarification: ").append(toIndentedString(tarification)).append("\n");
     sb.append("    horaires: ").append(toIndentedString(horaires)).append("\n");

@@ -13,7 +13,6 @@ import com.pgvpt.dto.Contact;
 import com.pgvpt.dto.EtatConservation;
 import com.pgvpt.dto.Exposition;
 import com.pgvpt.dto.HoraireOuverture;
-import com.pgvpt.dto.Localisation;
 import com.pgvpt.dto.Media;
 import com.pgvpt.dto.Menace;
 import com.pgvpt.dto.PeriodeHistorique;
@@ -59,40 +58,7 @@ public class MuseeUpdate implements PatrimoineUpdate {
 
   private String nomHistorique;
 
-  /**
-   * Gets or Sets type
-   */
-  public enum TypeEnum {
-    MUSEE("MUSEE");
-
-    private String value;
-
-    TypeEnum(String value) {
-      this.value = value;
-    }
-
-    @JsonValue
-    public String getValue() {
-      return value;
-    }
-
-    @Override
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static TypeEnum fromValue(String value) {
-      for (TypeEnum b : TypeEnum.values()) {
-        if (b.value.equals(value)) {
-          return b;
-        }
-      }
-      throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-  }
-
-  private TypeEnum type;
+  private String type;
 
   private CategoriePatrimoine categorie;
 
@@ -161,8 +127,6 @@ public class MuseeUpdate implements PatrimoineUpdate {
 
   private String telephone;
 
-  private Localisation localisation;
-
   private Accessibilite accessibilite;
 
   private Tarification tarification;
@@ -218,12 +182,11 @@ public class MuseeUpdate implements PatrimoineUpdate {
   /**
    * Constructor with only required parameters
    */
-  public MuseeUpdate(String nom, TypeEnum type, CategoriePatrimoine categorie, String description, Localisation localisation, Integer nombreCollections) {
+  public MuseeUpdate(String nom, String type, CategoriePatrimoine categorie, String description, Integer nombreCollections) {
     this.nom = nom;
     this.type = type;
     this.categorie = categorie;
     this.description = description;
-    this.localisation = localisation;
     this.nombreCollections = nombreCollections;
   }
 
@@ -327,7 +290,7 @@ public class MuseeUpdate implements PatrimoineUpdate {
     this.nomHistorique = nomHistorique;
   }
 
-  public MuseeUpdate type(TypeEnum type) {
+  public MuseeUpdate type(String type) {
     this.type = type;
     return this;
   }
@@ -339,11 +302,11 @@ public class MuseeUpdate implements PatrimoineUpdate {
   @NotNull 
   @Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("type")
-  public TypeEnum getType() {
+  public String getType() {
     return type;
   }
 
-  public void setType(TypeEnum type) {
+  public void setType(String type) {
     this.type = type;
   }
 
@@ -983,26 +946,6 @@ public class MuseeUpdate implements PatrimoineUpdate {
     this.telephone = telephone;
   }
 
-  public MuseeUpdate localisation(Localisation localisation) {
-    this.localisation = localisation;
-    return this;
-  }
-
-  /**
-   * Get localisation
-   * @return localisation
-   */
-  @NotNull @Valid 
-  @Schema(name = "localisation", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("localisation")
-  public Localisation getLocalisation() {
-    return localisation;
-  }
-
-  public void setLocalisation(Localisation localisation) {
-    this.localisation = localisation;
-  }
-
   public MuseeUpdate accessibilite(Accessibilite accessibilite) {
     this.accessibilite = accessibilite;
     return this;
@@ -1483,7 +1426,6 @@ public class MuseeUpdate implements PatrimoineUpdate {
         Objects.equals(this.siteWeb, museeUpdate.siteWeb) &&
         Objects.equals(this.email, museeUpdate.email) &&
         Objects.equals(this.telephone, museeUpdate.telephone) &&
-        Objects.equals(this.localisation, museeUpdate.localisation) &&
         Objects.equals(this.accessibilite, museeUpdate.accessibilite) &&
         Objects.equals(this.tarification, museeUpdate.tarification) &&
         Objects.equals(this.horaires, museeUpdate.horaires) &&
@@ -1506,7 +1448,7 @@ public class MuseeUpdate implements PatrimoineUpdate {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, code, nom, nomLocal, nomHistorique, type, categorie, sousCategorie, periode, siecle, dateOuverture, description, descriptionCourte, historique, importanceHistorique, importanceCulturelle, importanceTouristique, valeurPatrimoniale, valeurSpirituelle, traditionsAssociees, langues, etatConservation, statut, classePatrimoine, referenceClassement, dateClassement, inscritUnesco, nomSiteUnesco, dateInscriptionUnesco, protectionJuridique, organismeGestionnaire, proprietaire, gestionnaire, contact, siteWeb, email, telephone, localisation, accessibilite, tarification, horaires, photos, medias, conservation, menaces, recommandationsVisiteur, reglesVisite, activitesTouristiques, meilleurePeriodeVisite, dureeVisiteEstimeeMinutes, createdAt, updatedAt, publishedAt, nombreCollections, collections, expositions);
+    return Objects.hash(id, code, nom, nomLocal, nomHistorique, type, categorie, sousCategorie, periode, siecle, dateOuverture, description, descriptionCourte, historique, importanceHistorique, importanceCulturelle, importanceTouristique, valeurPatrimoniale, valeurSpirituelle, traditionsAssociees, langues, etatConservation, statut, classePatrimoine, referenceClassement, dateClassement, inscritUnesco, nomSiteUnesco, dateInscriptionUnesco, protectionJuridique, organismeGestionnaire, proprietaire, gestionnaire, contact, siteWeb, email, telephone, accessibilite, tarification, horaires, photos, medias, conservation, menaces, recommandationsVisiteur, reglesVisite, activitesTouristiques, meilleurePeriodeVisite, dureeVisiteEstimeeMinutes, createdAt, updatedAt, publishedAt, nombreCollections, collections, expositions);
   }
 
   @Override
@@ -1550,7 +1492,6 @@ public class MuseeUpdate implements PatrimoineUpdate {
     sb.append("    siteWeb: ").append(toIndentedString(siteWeb)).append("\n");
     sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("    telephone: ").append(toIndentedString(telephone)).append("\n");
-    sb.append("    localisation: ").append(toIndentedString(localisation)).append("\n");
     sb.append("    accessibilite: ").append(toIndentedString(accessibilite)).append("\n");
     sb.append("    tarification: ").append(toIndentedString(tarification)).append("\n");
     sb.append("    horaires: ").append(toIndentedString(horaires)).append("\n");

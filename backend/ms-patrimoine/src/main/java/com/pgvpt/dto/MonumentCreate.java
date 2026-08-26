@@ -11,7 +11,6 @@ import com.pgvpt.dto.Conservation;
 import com.pgvpt.dto.Contact;
 import com.pgvpt.dto.EtatConservation;
 import com.pgvpt.dto.HoraireOuverture;
-import com.pgvpt.dto.Localisation;
 import com.pgvpt.dto.Media;
 import com.pgvpt.dto.Menace;
 import com.pgvpt.dto.NatureMonument;
@@ -58,40 +57,7 @@ public class MonumentCreate implements PatrimoineCreate {
 
   private String nomHistorique;
 
-  /**
-   * Gets or Sets type
-   */
-  public enum TypeEnum {
-    MONUMENT("MONUMENT");
-
-    private String value;
-
-    TypeEnum(String value) {
-      this.value = value;
-    }
-
-    @JsonValue
-    public String getValue() {
-      return value;
-    }
-
-    @Override
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static TypeEnum fromValue(String value) {
-      for (TypeEnum b : TypeEnum.values()) {
-        if (b.value.equals(value)) {
-          return b;
-        }
-      }
-      throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-  }
-
-  private TypeEnum type;
+  private String type;
 
   private CategoriePatrimoine categorie;
 
@@ -160,8 +126,6 @@ public class MonumentCreate implements PatrimoineCreate {
 
   private String telephone;
 
-  private Localisation localisation;
-
   private Accessibilite accessibilite;
 
   private Tarification tarification;
@@ -217,12 +181,11 @@ public class MonumentCreate implements PatrimoineCreate {
   /**
    * Constructor with only required parameters
    */
-  public MonumentCreate(String nom, TypeEnum type, CategoriePatrimoine categorie, String description, Localisation localisation, String styleArchitectural, NatureMonument natureMonument) {
+  public MonumentCreate(String nom, String type, CategoriePatrimoine categorie, String description, String styleArchitectural, NatureMonument natureMonument) {
     this.nom = nom;
     this.type = type;
     this.categorie = categorie;
     this.description = description;
-    this.localisation = localisation;
     this.styleArchitectural = styleArchitectural;
     this.natureMonument = natureMonument;
   }
@@ -327,7 +290,7 @@ public class MonumentCreate implements PatrimoineCreate {
     this.nomHistorique = nomHistorique;
   }
 
-  public MonumentCreate type(TypeEnum type) {
+  public MonumentCreate type(String type) {
     this.type = type;
     return this;
   }
@@ -339,11 +302,11 @@ public class MonumentCreate implements PatrimoineCreate {
   @NotNull 
   @Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("type")
-  public TypeEnum getType() {
+  public String getType() {
     return type;
   }
 
-  public void setType(TypeEnum type) {
+  public void setType(String type) {
     this.type = type;
   }
 
@@ -983,26 +946,6 @@ public class MonumentCreate implements PatrimoineCreate {
     this.telephone = telephone;
   }
 
-  public MonumentCreate localisation(Localisation localisation) {
-    this.localisation = localisation;
-    return this;
-  }
-
-  /**
-   * Get localisation
-   * @return localisation
-   */
-  @NotNull @Valid 
-  @Schema(name = "localisation", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("localisation")
-  public Localisation getLocalisation() {
-    return localisation;
-  }
-
-  public void setLocalisation(Localisation localisation) {
-    this.localisation = localisation;
-  }
-
   public MonumentCreate accessibilite(Accessibilite accessibilite) {
     this.accessibilite = accessibilite;
     return this;
@@ -1486,7 +1429,6 @@ public class MonumentCreate implements PatrimoineCreate {
         Objects.equals(this.siteWeb, monumentCreate.siteWeb) &&
         Objects.equals(this.email, monumentCreate.email) &&
         Objects.equals(this.telephone, monumentCreate.telephone) &&
-        Objects.equals(this.localisation, monumentCreate.localisation) &&
         Objects.equals(this.accessibilite, monumentCreate.accessibilite) &&
         Objects.equals(this.tarification, monumentCreate.tarification) &&
         Objects.equals(this.horaires, monumentCreate.horaires) &&
@@ -1510,7 +1452,7 @@ public class MonumentCreate implements PatrimoineCreate {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, code, nom, nomLocal, nomHistorique, type, categorie, sousCategorie, periode, siecle, dateOuverture, description, descriptionCourte, historique, importanceHistorique, importanceCulturelle, importanceTouristique, valeurPatrimoniale, valeurSpirituelle, traditionsAssociees, langues, etatConservation, statut, classePatrimoine, referenceClassement, dateClassement, inscritUnesco, nomSiteUnesco, dateInscriptionUnesco, protectionJuridique, organismeGestionnaire, proprietaire, gestionnaire, contact, siteWeb, email, telephone, localisation, accessibilite, tarification, horaires, photos, medias, conservation, menaces, recommandationsVisiteur, reglesVisite, activitesTouristiques, meilleurePeriodeVisite, dureeVisiteEstimeeMinutes, createdAt, updatedAt, publishedAt, styleArchitectural, anneeConstruction, identiteArchitecte, natureMonument);
+    return Objects.hash(id, code, nom, nomLocal, nomHistorique, type, categorie, sousCategorie, periode, siecle, dateOuverture, description, descriptionCourte, historique, importanceHistorique, importanceCulturelle, importanceTouristique, valeurPatrimoniale, valeurSpirituelle, traditionsAssociees, langues, etatConservation, statut, classePatrimoine, referenceClassement, dateClassement, inscritUnesco, nomSiteUnesco, dateInscriptionUnesco, protectionJuridique, organismeGestionnaire, proprietaire, gestionnaire, contact, siteWeb, email, telephone, accessibilite, tarification, horaires, photos, medias, conservation, menaces, recommandationsVisiteur, reglesVisite, activitesTouristiques, meilleurePeriodeVisite, dureeVisiteEstimeeMinutes, createdAt, updatedAt, publishedAt, styleArchitectural, anneeConstruction, identiteArchitecte, natureMonument);
   }
 
   @Override
@@ -1554,7 +1496,6 @@ public class MonumentCreate implements PatrimoineCreate {
     sb.append("    siteWeb: ").append(toIndentedString(siteWeb)).append("\n");
     sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("    telephone: ").append(toIndentedString(telephone)).append("\n");
-    sb.append("    localisation: ").append(toIndentedString(localisation)).append("\n");
     sb.append("    accessibilite: ").append(toIndentedString(accessibilite)).append("\n");
     sb.append("    tarification: ").append(toIndentedString(tarification)).append("\n");
     sb.append("    horaires: ").append(toIndentedString(horaires)).append("\n");

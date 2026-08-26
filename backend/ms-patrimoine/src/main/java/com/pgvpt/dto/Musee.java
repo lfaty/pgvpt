@@ -13,14 +13,12 @@ import com.pgvpt.dto.Contact;
 import com.pgvpt.dto.EtatConservation;
 import com.pgvpt.dto.Exposition;
 import com.pgvpt.dto.HoraireOuverture;
-import com.pgvpt.dto.Localisation;
 import com.pgvpt.dto.Media;
 import com.pgvpt.dto.Menace;
 import com.pgvpt.dto.PeriodeHistorique;
 import com.pgvpt.dto.Photo;
 import com.pgvpt.dto.StatutPatrimoine;
 import com.pgvpt.dto.Tarification;
-import com.pgvpt.dto.TypePatrimoine;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -60,7 +58,7 @@ public class Musee implements Patrimoine {
 
   private String nomHistorique;
 
-  private TypePatrimoine type;
+  private String type;
 
   private CategoriePatrimoine categorie;
 
@@ -129,8 +127,6 @@ public class Musee implements Patrimoine {
 
   private String telephone;
 
-  private Localisation localisation;
-
   private Accessibilite accessibilite;
 
   private Tarification tarification;
@@ -198,12 +194,11 @@ public class Musee implements Patrimoine {
   /**
    * Constructor with only required parameters
    */
-  public Musee(String nom, TypePatrimoine type, CategoriePatrimoine categorie, String description, Localisation localisation) {
+  public Musee(String nom, String type, CategoriePatrimoine categorie, String description) {
     this.nom = nom;
     this.type = type;
     this.categorie = categorie;
     this.description = description;
-    this.localisation = localisation;
   }
 
   public Musee id(UUID id) {
@@ -306,7 +301,7 @@ public class Musee implements Patrimoine {
     this.nomHistorique = nomHistorique;
   }
 
-  public Musee type(TypePatrimoine type) {
+  public Musee type(String type) {
     this.type = type;
     return this;
   }
@@ -315,14 +310,14 @@ public class Musee implements Patrimoine {
    * Get type
    * @return type
    */
-  @NotNull @Valid 
+  @NotNull 
   @Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("type")
-  public TypePatrimoine getType() {
+  public String getType() {
     return type;
   }
 
-  public void setType(TypePatrimoine type) {
+  public void setType(String type) {
     this.type = type;
   }
 
@@ -962,26 +957,6 @@ public class Musee implements Patrimoine {
     this.telephone = telephone;
   }
 
-  public Musee localisation(Localisation localisation) {
-    this.localisation = localisation;
-    return this;
-  }
-
-  /**
-   * Get localisation
-   * @return localisation
-   */
-  @NotNull @Valid 
-  @Schema(name = "localisation", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("localisation")
-  public Localisation getLocalisation() {
-    return localisation;
-  }
-
-  public void setLocalisation(Localisation localisation) {
-    this.localisation = localisation;
-  }
-
   public Musee accessibilite(Accessibilite accessibilite) {
     this.accessibilite = accessibilite;
     return this;
@@ -1580,7 +1555,6 @@ public class Musee implements Patrimoine {
         Objects.equals(this.siteWeb, musee.siteWeb) &&
         Objects.equals(this.email, musee.email) &&
         Objects.equals(this.telephone, musee.telephone) &&
-        Objects.equals(this.localisation, musee.localisation) &&
         Objects.equals(this.accessibilite, musee.accessibilite) &&
         Objects.equals(this.tarification, musee.tarification) &&
         Objects.equals(this.horaires, musee.horaires) &&
@@ -1608,7 +1582,7 @@ public class Musee implements Patrimoine {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, code, nom, nomLocal, nomHistorique, type, categorie, sousCategorie, periode, siecle, dateOuverture, description, descriptionCourte, historique, importanceHistorique, importanceCulturelle, importanceTouristique, valeurPatrimoniale, valeurSpirituelle, traditionsAssociees, langues, etatConservation, statut, classePatrimoine, referenceClassement, dateClassement, inscritUnesco, nomSiteUnesco, dateInscriptionUnesco, protectionJuridique, organismeGestionnaire, proprietaire, gestionnaire, contact, siteWeb, email, telephone, localisation, accessibilite, tarification, horaires, photos, medias, conservation, menaces, recommandationsVisiteur, reglesVisite, activitesTouristiques, meilleurePeriodeVisite, dureeVisiteEstimeeMinutes, createdAt, updatedAt, publishedAt, nombreCollections, nombreOeuvres, collections, expositions, typesCollections, servicesMusee, capaciteAccueil, museographie);
+    return Objects.hash(id, code, nom, nomLocal, nomHistorique, type, categorie, sousCategorie, periode, siecle, dateOuverture, description, descriptionCourte, historique, importanceHistorique, importanceCulturelle, importanceTouristique, valeurPatrimoniale, valeurSpirituelle, traditionsAssociees, langues, etatConservation, statut, classePatrimoine, referenceClassement, dateClassement, inscritUnesco, nomSiteUnesco, dateInscriptionUnesco, protectionJuridique, organismeGestionnaire, proprietaire, gestionnaire, contact, siteWeb, email, telephone, accessibilite, tarification, horaires, photos, medias, conservation, menaces, recommandationsVisiteur, reglesVisite, activitesTouristiques, meilleurePeriodeVisite, dureeVisiteEstimeeMinutes, createdAt, updatedAt, publishedAt, nombreCollections, nombreOeuvres, collections, expositions, typesCollections, servicesMusee, capaciteAccueil, museographie);
   }
 
   @Override
@@ -1652,7 +1626,6 @@ public class Musee implements Patrimoine {
     sb.append("    siteWeb: ").append(toIndentedString(siteWeb)).append("\n");
     sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("    telephone: ").append(toIndentedString(telephone)).append("\n");
-    sb.append("    localisation: ").append(toIndentedString(localisation)).append("\n");
     sb.append("    accessibilite: ").append(toIndentedString(accessibilite)).append("\n");
     sb.append("    tarification: ").append(toIndentedString(tarification)).append("\n");
     sb.append("    horaires: ").append(toIndentedString(horaires)).append("\n");

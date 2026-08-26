@@ -52,9 +52,6 @@ public interface RechercheApi {
      * @param region  (optional)
      * @param departement  (optional)
      * @param commune  (optional)
-     * @param latitude  (optional)
-     * @param longitude  (optional)
-     * @param rayonKm  (optional)
      * @return Résultats de recherche (status code 200)
      */
     @Operation(
@@ -79,15 +76,12 @@ public interface RechercheApi {
         @Parameter(name = "categorie", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "categorie", required = false) CategoriePatrimoine categorie,
         @Parameter(name = "region", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "region", required = false) String region,
         @Parameter(name = "departement", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "departement", required = false) String departement,
-        @Parameter(name = "commune", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "commune", required = false) String commune,
-        @Parameter(name = "latitude", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "latitude", required = false) Double latitude,
-        @Parameter(name = "longitude", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "longitude", required = false) Double longitude,
-        @DecimalMin("0") @Parameter(name = "rayonKm", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "rayonKm", required = false) Double rayonKm
+        @Parameter(name = "commune", description = "", in = ParameterIn.QUERY) @Valid @RequestParam(value = "commune", required = false) String commune
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"categorie\" : \"PATRIMOINE_NATUREL\", \"etatConservation\" : \"EXCELLENT\", \"descriptionCourte\" : \"descriptionCourte\", \"localisation\" : { \"altitude\" : 1.4658129805029452, \"departement\" : \"Dakar\", \"commune\" : \"Gorée\", \"arrondissement\" : \"arrondissement\", \"latitude\" : -75.5850925717018, \"precision\" : 5.962133916683182, \"codePostal\" : \"codePostal\", \"zoneGeographique\" : \"Petite Côte\", \"lieuDit\" : \"lieuDit\", \"distanceCentreVilleKm\" : 5.637376656633329, \"aireGeographique\" : \"aireGeographique\", \"quartier\" : \"quartier\", \"adresse\" : \"adresse\", \"region\" : \"Dakar\", \"village\" : \"village\", \"longitude\" : 36.988422590534526 }, \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"photoPrincipale\" : \"https://openapi-generator.tech\", \"type\" : \"SITE_NATUREL\", \"inscritUnesco\" : true, \"nom\" : \"nom\" }, { \"categorie\" : \"PATRIMOINE_NATUREL\", \"etatConservation\" : \"EXCELLENT\", \"descriptionCourte\" : \"descriptionCourte\", \"localisation\" : { \"altitude\" : 1.4658129805029452, \"departement\" : \"Dakar\", \"commune\" : \"Gorée\", \"arrondissement\" : \"arrondissement\", \"latitude\" : -75.5850925717018, \"precision\" : 5.962133916683182, \"codePostal\" : \"codePostal\", \"zoneGeographique\" : \"Petite Côte\", \"lieuDit\" : \"lieuDit\", \"distanceCentreVilleKm\" : 5.637376656633329, \"aireGeographique\" : \"aireGeographique\", \"quartier\" : \"quartier\", \"adresse\" : \"adresse\", \"region\" : \"Dakar\", \"village\" : \"village\", \"longitude\" : 36.988422590534526 }, \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"photoPrincipale\" : \"https://openapi-generator.tech\", \"type\" : \"SITE_NATUREL\", \"inscritUnesco\" : true, \"nom\" : \"nom\" } ]";
+                    String exampleString = "[ { \"categorie\" : \"PATRIMOINE_NATUREL\", \"etatConservation\" : \"EXCELLENT\", \"descriptionCourte\" : \"descriptionCourte\", \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"photoPrincipale\" : \"https://openapi-generator.tech\", \"type\" : \"SITE_NATUREL\", \"inscritUnesco\" : true, \"nom\" : \"nom\" }, { \"categorie\" : \"PATRIMOINE_NATUREL\", \"etatConservation\" : \"EXCELLENT\", \"descriptionCourte\" : \"descriptionCourte\", \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"photoPrincipale\" : \"https://openapi-generator.tech\", \"type\" : \"SITE_NATUREL\", \"inscritUnesco\" : true, \"nom\" : \"nom\" } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

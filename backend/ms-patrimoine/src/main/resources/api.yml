@@ -244,22 +244,7 @@ paths:
           in: query
           schema:
             type: string
-        - name: latitude
-          in: query
-          schema:
-            type: number
-            format: double
-        - name: longitude
-          in: query
-          schema:
-            type: number
-            format: double
-        - name: rayonKm
-          in: query
-          schema:
-            type: number
-            format: double
-            minimum: 0
+
       responses:
         '200':
           description: Résultats de recherche
@@ -485,6 +470,10 @@ components:
         - $ref: '#/components/schemas/MonumentCreate'
       discriminator:
         propertyName: type
+        mapping:
+          SITE_NATUREL: '#/components/schemas/SiteNaturelCreate'
+          MUSEE: '#/components/schemas/MuseeCreate'
+          MONUMENT: '#/components/schemas/MonumentCreate'
 
     PatrimoineUpdate:
       oneOf:
@@ -493,6 +482,10 @@ components:
         - $ref: '#/components/schemas/MonumentUpdate'
       discriminator:
         propertyName: type
+        mapping:
+          SITE_NATUREL: '#/components/schemas/SiteNaturelUpdate'
+          MUSEE: '#/components/schemas/MuseeUpdate'
+          MONUMENT: '#/components/schemas/MonumentUpdate'
 
     PatrimoineBase:
       type: object
@@ -501,7 +494,6 @@ components:
         - type
         - categorie
         - description
-        - localisation
       properties:
 
         id:
@@ -530,7 +522,7 @@ components:
           maxLength: 255
 
         type:
-          $ref: '#/components/schemas/TypePatrimoine'
+          type: string
 
         categorie:
           $ref: '#/components/schemas/CategoriePatrimoine'
@@ -642,8 +634,6 @@ components:
         telephone:
           type: string
 
-        localisation:
-          $ref: '#/components/schemas/Localisation'
 
         accessibilite:
           $ref: '#/components/schemas/Accessibilite'
@@ -872,10 +862,6 @@ components:
             - natureSite
             - ecosysteme
           properties:
-            type:
-              type: string
-              enum:
-                - SITE_NATUREL
             superficie:
               type: number
               format: double
@@ -896,10 +882,6 @@ components:
             - type
             - nombreCollections
           properties:
-            type:
-              type: string
-              enum:
-                - MUSEE
             nombreCollections:
               type: integer
               minimum: 0
@@ -921,10 +903,6 @@ components:
             - styleArchitectural
             - natureMonument
           properties:
-            type:
-              type: string
-              enum:
-                - MONUMENT
             styleArchitectural:
               type: string
             anneeConstruction:
@@ -946,77 +924,6 @@ components:
       allOf:
         - $ref: '#/components/schemas/MonumentCreate'
 
-    # ============================================================
-    # LOCALISATION
-    # ============================================================
-
-    Localisation:
-      type: object
-      required:
-        - latitude
-        - longitude
-      properties:
-        adresse:
-          type: string
-
-        region:
-          type: string
-          example: Dakar
-
-        departement:
-          type: string
-          example: Dakar
-
-        arrondissement:
-          type: string
-
-        commune:
-          type: string
-          example: Gorée
-
-        quartier:
-          type: string
-
-        village:
-          type: string
-
-        lieuDit:
-          type: string
-
-        latitude:
-          type: number
-          format: double
-          minimum: -90
-          maximum: 90
-
-        longitude:
-          type: number
-          format: double
-          minimum: -180
-          maximum: 180
-
-        altitude:
-          type: number
-          format: double
-
-        precision:
-          type: number
-          format: double
-          description: Précision de la géolocalisation en mètres
-
-        zoneGeographique:
-          type: string
-          example: Petite Côte
-
-        aireGeographique:
-          type: string
-
-        codePostal:
-          type: string
-
-        distanceCentreVilleKm:
-          type: number
-          format: double
 
     # ============================================================
     # ACCESSIBILITE
@@ -1591,8 +1498,6 @@ components:
           $ref: '#/components/schemas/CategoriePatrimoine'
         descriptionCourte:
           type: string
-        localisation:
-          $ref: '#/components/schemas/Localisation'
         photoPrincipale:
           type: string
           format: uri

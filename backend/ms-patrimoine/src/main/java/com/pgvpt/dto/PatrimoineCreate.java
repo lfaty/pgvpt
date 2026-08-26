@@ -17,7 +17,6 @@ import com.pgvpt.dto.EspeceProtegee;
 import com.pgvpt.dto.EtatConservation;
 import com.pgvpt.dto.Exposition;
 import com.pgvpt.dto.HoraireOuverture;
-import com.pgvpt.dto.Localisation;
 import com.pgvpt.dto.Media;
 import com.pgvpt.dto.Menace;
 import com.pgvpt.dto.MonumentCreate;
@@ -55,6 +54,9 @@ import jakarta.annotation.Generated;
 )
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible = true)
 @JsonSubTypes({
+  @JsonSubTypes.Type(value = MonumentCreate.class, name = "MONUMENT"),
+  @JsonSubTypes.Type(value = MuseeCreate.class, name = "MUSEE"),
+  @JsonSubTypes.Type(value = SiteNaturelCreate.class, name = "SITE_NATUREL"),
   @JsonSubTypes.Type(value = MonumentCreate.class, name = "MonumentCreate"),
   @JsonSubTypes.Type(value = MuseeCreate.class, name = "MuseeCreate"),
   @JsonSubTypes.Type(value = SiteNaturelCreate.class, name = "SiteNaturelCreate")

@@ -11,7 +11,6 @@ import com.pgvpt.dto.Conservation;
 import com.pgvpt.dto.Contact;
 import com.pgvpt.dto.EtatConservation;
 import com.pgvpt.dto.HoraireOuverture;
-import com.pgvpt.dto.Localisation;
 import com.pgvpt.dto.Media;
 import com.pgvpt.dto.Menace;
 import com.pgvpt.dto.NatureMonument;
@@ -19,7 +18,6 @@ import com.pgvpt.dto.PeriodeHistorique;
 import com.pgvpt.dto.Photo;
 import com.pgvpt.dto.StatutPatrimoine;
 import com.pgvpt.dto.Tarification;
-import com.pgvpt.dto.TypePatrimoine;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -59,7 +57,7 @@ public class Monument implements Patrimoine {
 
   private String nomHistorique;
 
-  private TypePatrimoine type;
+  private String type;
 
   private CategoriePatrimoine categorie;
 
@@ -127,8 +125,6 @@ public class Monument implements Patrimoine {
   private String email;
 
   private String telephone;
-
-  private Localisation localisation;
 
   private Accessibilite accessibilite;
 
@@ -201,12 +197,11 @@ public class Monument implements Patrimoine {
   /**
    * Constructor with only required parameters
    */
-  public Monument(String nom, TypePatrimoine type, CategoriePatrimoine categorie, String description, Localisation localisation) {
+  public Monument(String nom, String type, CategoriePatrimoine categorie, String description) {
     this.nom = nom;
     this.type = type;
     this.categorie = categorie;
     this.description = description;
-    this.localisation = localisation;
   }
 
   public Monument id(UUID id) {
@@ -309,7 +304,7 @@ public class Monument implements Patrimoine {
     this.nomHistorique = nomHistorique;
   }
 
-  public Monument type(TypePatrimoine type) {
+  public Monument type(String type) {
     this.type = type;
     return this;
   }
@@ -318,14 +313,14 @@ public class Monument implements Patrimoine {
    * Get type
    * @return type
    */
-  @NotNull @Valid 
+  @NotNull 
   @Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("type")
-  public TypePatrimoine getType() {
+  public String getType() {
     return type;
   }
 
-  public void setType(TypePatrimoine type) {
+  public void setType(String type) {
     this.type = type;
   }
 
@@ -963,26 +958,6 @@ public class Monument implements Patrimoine {
 
   public void setTelephone(String telephone) {
     this.telephone = telephone;
-  }
-
-  public Monument localisation(Localisation localisation) {
-    this.localisation = localisation;
-    return this;
-  }
-
-  /**
-   * Get localisation
-   * @return localisation
-   */
-  @NotNull @Valid 
-  @Schema(name = "localisation", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("localisation")
-  public Localisation getLocalisation() {
-    return localisation;
-  }
-
-  public void setLocalisation(Localisation localisation) {
-    this.localisation = localisation;
   }
 
   public Monument accessibilite(Accessibilite accessibilite) {
@@ -1626,7 +1601,6 @@ public class Monument implements Patrimoine {
         Objects.equals(this.siteWeb, monument.siteWeb) &&
         Objects.equals(this.email, monument.email) &&
         Objects.equals(this.telephone, monument.telephone) &&
-        Objects.equals(this.localisation, monument.localisation) &&
         Objects.equals(this.accessibilite, monument.accessibilite) &&
         Objects.equals(this.tarification, monument.tarification) &&
         Objects.equals(this.horaires, monument.horaires) &&
@@ -1657,7 +1631,7 @@ public class Monument implements Patrimoine {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, code, nom, nomLocal, nomHistorique, type, categorie, sousCategorie, periode, siecle, dateOuverture, description, descriptionCourte, historique, importanceHistorique, importanceCulturelle, importanceTouristique, valeurPatrimoniale, valeurSpirituelle, traditionsAssociees, langues, etatConservation, statut, classePatrimoine, referenceClassement, dateClassement, inscritUnesco, nomSiteUnesco, dateInscriptionUnesco, protectionJuridique, organismeGestionnaire, proprietaire, gestionnaire, contact, siteWeb, email, telephone, localisation, accessibilite, tarification, horaires, photos, medias, conservation, menaces, recommandationsVisiteur, reglesVisite, activitesTouristiques, meilleurePeriodeVisite, dureeVisiteEstimeeMinutes, createdAt, updatedAt, publishedAt, styleArchitectural, anneeConstruction, anneeRenovation, architecte, identiteArchitecte, natureMonument, materiauxConstruction, dimensions, commanditaire, contexteHistorique, personnagesAssocies);
+    return Objects.hash(id, code, nom, nomLocal, nomHistorique, type, categorie, sousCategorie, periode, siecle, dateOuverture, description, descriptionCourte, historique, importanceHistorique, importanceCulturelle, importanceTouristique, valeurPatrimoniale, valeurSpirituelle, traditionsAssociees, langues, etatConservation, statut, classePatrimoine, referenceClassement, dateClassement, inscritUnesco, nomSiteUnesco, dateInscriptionUnesco, protectionJuridique, organismeGestionnaire, proprietaire, gestionnaire, contact, siteWeb, email, telephone, accessibilite, tarification, horaires, photos, medias, conservation, menaces, recommandationsVisiteur, reglesVisite, activitesTouristiques, meilleurePeriodeVisite, dureeVisiteEstimeeMinutes, createdAt, updatedAt, publishedAt, styleArchitectural, anneeConstruction, anneeRenovation, architecte, identiteArchitecte, natureMonument, materiauxConstruction, dimensions, commanditaire, contexteHistorique, personnagesAssocies);
   }
 
   @Override
@@ -1701,7 +1675,6 @@ public class Monument implements Patrimoine {
     sb.append("    siteWeb: ").append(toIndentedString(siteWeb)).append("\n");
     sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("    telephone: ").append(toIndentedString(telephone)).append("\n");
-    sb.append("    localisation: ").append(toIndentedString(localisation)).append("\n");
     sb.append("    accessibilite: ").append(toIndentedString(accessibilite)).append("\n");
     sb.append("    tarification: ").append(toIndentedString(tarification)).append("\n");
     sb.append("    horaires: ").append(toIndentedString(horaires)).append("\n");

@@ -12,7 +12,6 @@ import com.pgvpt.dto.Contact;
 import com.pgvpt.dto.EspeceProtegee;
 import com.pgvpt.dto.EtatConservation;
 import com.pgvpt.dto.HoraireOuverture;
-import com.pgvpt.dto.Localisation;
 import com.pgvpt.dto.Media;
 import com.pgvpt.dto.Menace;
 import com.pgvpt.dto.NatureSiteNaturel;
@@ -20,7 +19,6 @@ import com.pgvpt.dto.PeriodeHistorique;
 import com.pgvpt.dto.Photo;
 import com.pgvpt.dto.StatutPatrimoine;
 import com.pgvpt.dto.Tarification;
-import com.pgvpt.dto.TypePatrimoine;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -60,7 +58,7 @@ public class SiteNaturel implements Patrimoine {
 
   private String nomHistorique;
 
-  private TypePatrimoine type;
+  private String type;
 
   private CategoriePatrimoine categorie;
 
@@ -128,8 +126,6 @@ public class SiteNaturel implements Patrimoine {
   private String email;
 
   private String telephone;
-
-  private Localisation localisation;
 
   private Accessibilite accessibilite;
 
@@ -204,12 +200,11 @@ public class SiteNaturel implements Patrimoine {
   /**
    * Constructor with only required parameters
    */
-  public SiteNaturel(String nom, TypePatrimoine type, CategoriePatrimoine categorie, String description, Localisation localisation) {
+  public SiteNaturel(String nom, String type, CategoriePatrimoine categorie, String description) {
     this.nom = nom;
     this.type = type;
     this.categorie = categorie;
     this.description = description;
-    this.localisation = localisation;
   }
 
   public SiteNaturel id(UUID id) {
@@ -312,7 +307,7 @@ public class SiteNaturel implements Patrimoine {
     this.nomHistorique = nomHistorique;
   }
 
-  public SiteNaturel type(TypePatrimoine type) {
+  public SiteNaturel type(String type) {
     this.type = type;
     return this;
   }
@@ -321,14 +316,14 @@ public class SiteNaturel implements Patrimoine {
    * Get type
    * @return type
    */
-  @NotNull @Valid 
+  @NotNull 
   @Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("type")
-  public TypePatrimoine getType() {
+  public String getType() {
     return type;
   }
 
-  public void setType(TypePatrimoine type) {
+  public void setType(String type) {
     this.type = type;
   }
 
@@ -966,26 +961,6 @@ public class SiteNaturel implements Patrimoine {
 
   public void setTelephone(String telephone) {
     this.telephone = telephone;
-  }
-
-  public SiteNaturel localisation(Localisation localisation) {
-    this.localisation = localisation;
-    return this;
-  }
-
-  /**
-   * Get localisation
-   * @return localisation
-   */
-  @NotNull @Valid 
-  @Schema(name = "localisation", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("localisation")
-  public Localisation getLocalisation() {
-    return localisation;
-  }
-
-  public void setLocalisation(Localisation localisation) {
-    this.localisation = localisation;
   }
 
   public SiteNaturel accessibilite(Accessibilite accessibilite) {
@@ -1645,7 +1620,6 @@ public class SiteNaturel implements Patrimoine {
         Objects.equals(this.siteWeb, siteNaturel.siteWeb) &&
         Objects.equals(this.email, siteNaturel.email) &&
         Objects.equals(this.telephone, siteNaturel.telephone) &&
-        Objects.equals(this.localisation, siteNaturel.localisation) &&
         Objects.equals(this.accessibilite, siteNaturel.accessibilite) &&
         Objects.equals(this.tarification, siteNaturel.tarification) &&
         Objects.equals(this.horaires, siteNaturel.horaires) &&
@@ -1676,7 +1650,7 @@ public class SiteNaturel implements Patrimoine {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, code, nom, nomLocal, nomHistorique, type, categorie, sousCategorie, periode, siecle, dateOuverture, description, descriptionCourte, historique, importanceHistorique, importanceCulturelle, importanceTouristique, valeurPatrimoniale, valeurSpirituelle, traditionsAssociees, langues, etatConservation, statut, classePatrimoine, referenceClassement, dateClassement, inscritUnesco, nomSiteUnesco, dateInscriptionUnesco, protectionJuridique, organismeGestionnaire, proprietaire, gestionnaire, contact, siteWeb, email, telephone, localisation, accessibilite, tarification, horaires, photos, medias, conservation, menaces, recommandationsVisiteur, reglesVisite, activitesTouristiques, meilleurePeriodeVisite, dureeVisiteEstimeeMinutes, createdAt, updatedAt, publishedAt, superficie, natureSite, ecosysteme, especesProtegees, biodiversite, zoneProtegee, categorieProtection, risquesEnvironnementaux, ressourcesNaturelles, activitesEcotouristiques, capaciteAccueil);
+    return Objects.hash(id, code, nom, nomLocal, nomHistorique, type, categorie, sousCategorie, periode, siecle, dateOuverture, description, descriptionCourte, historique, importanceHistorique, importanceCulturelle, importanceTouristique, valeurPatrimoniale, valeurSpirituelle, traditionsAssociees, langues, etatConservation, statut, classePatrimoine, referenceClassement, dateClassement, inscritUnesco, nomSiteUnesco, dateInscriptionUnesco, protectionJuridique, organismeGestionnaire, proprietaire, gestionnaire, contact, siteWeb, email, telephone, accessibilite, tarification, horaires, photos, medias, conservation, menaces, recommandationsVisiteur, reglesVisite, activitesTouristiques, meilleurePeriodeVisite, dureeVisiteEstimeeMinutes, createdAt, updatedAt, publishedAt, superficie, natureSite, ecosysteme, especesProtegees, biodiversite, zoneProtegee, categorieProtection, risquesEnvironnementaux, ressourcesNaturelles, activitesEcotouristiques, capaciteAccueil);
   }
 
   @Override
@@ -1720,7 +1694,6 @@ public class SiteNaturel implements Patrimoine {
     sb.append("    siteWeb: ").append(toIndentedString(siteWeb)).append("\n");
     sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("    telephone: ").append(toIndentedString(telephone)).append("\n");
-    sb.append("    localisation: ").append(toIndentedString(localisation)).append("\n");
     sb.append("    accessibilite: ").append(toIndentedString(accessibilite)).append("\n");
     sb.append("    tarification: ").append(toIndentedString(tarification)).append("\n");
     sb.append("    horaires: ").append(toIndentedString(horaires)).append("\n");
