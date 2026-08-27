@@ -16,5 +16,9 @@ public interface PatrimoineService {
 
     Patrimoine updatePatrimoine(UUID id, PatrimoineUpdate patrimoineUpdate);
 
-    PagePatrimoine getPatrimoines(Integer page, Integer size);
+    PagePatrimoine getPatrimoines(Integer page, Integer size, String sort, 
+        com.pgvpt.dto.CategoriePatrimoine categorie, com.pgvpt.dto.TypePatrimoine type, String region, 
+        String departement, String commune, com.pgvpt.dto.StatutPatrimoine statut, 
+        com.pgvpt.dto.EtatConservation etatConservation, Boolean accessiblePublic, 
+        Boolean inscritUnesco, Boolean classePatrimoine, String q);
 }

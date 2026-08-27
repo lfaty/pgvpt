@@ -11,6 +11,11 @@ import com.pgvpt.dto.PatrimoineUpdate;
 import com.pgvpt.dto.PagePatrimoine;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import jakarta.persistence.criteria.JoinType;
+import com.pgvpt.exception.InvalidRequestException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -39,32 +44,30 @@ public class PatrimoineServiceImpl implements PatrimoineService {
     @Override
     public Patrimoine getPatrimoine(UUID id) {
         PatrimoineEntity entity = patrimoineRepository.findById(id)
-                .orElseThrow(() -> new com.pgvpt.exception.PatrimoineNotFoundException("Patrimoine not found with id: " + id));
+                .orElseThrow(() -> new com.pgvpt.exception.ResourceNotFoundException("Patrimoine not found with id: " + id));
         return patrimoineMapper.toDto(entity);
     }
 
     @Override
     public void deletePatrimoine(UUID id) {
-        if (!patrimoineRepository.existsById(id)) {
-            throw new com.pgvpt.exception.PatrimoineNotFoundException("Patrimoine not found with id: " + id);
-        }
-        patrimoineRepository.deleteById(id);
+        PatrimoineEntity existing = patrimoineRepository.findById(id)
+                .orElseThrow(() -> new com.pgvpt.exception.ResourceNotFoundException("Patrimoine not found with id: " + id));
+        patrimoineRepository.delete(existing);
     }
 
     @Override
     public Patrimoine updatePatrimoine(UUID id, PatrimoineUpdate patrimoineUpdate) {
         PatrimoineEntity existing = patrimoineRepository.findById(id)
-                .orElseThrow(() -> new com.pgvpt.exception.PatrimoineNotFoundException("Patrimoine not found with id: " + id));
+                .orElseThrow(() -> new com.pgvpt.exception.ResourceNotFoundException("Patrimoine not found with id: " + id));
         
-        if (patrimoineUpdate instanceof com.pgvpt.dto.MuseeUpdate mUpdate) {
-            if (mUpdate.getNom() != null) existing.setNom(mUpdate.getNom());
-            if (mUpdate.getDescription() != null) existing.setDescription(mUpdate.getDescription());
-        } else if (patrimoineUpdate instanceof com.pgvpt.dto.MonumentUpdate mUpdate) {
-            if (mUpdate.getNom() != null) existing.setNom(mUpdate.getNom());
-            if (mUpdate.getDescription() != null) existing.setDescription(mUpdate.getDescription());
-        } else if (patrimoineUpdate instanceof com.pgvpt.dto.SiteNaturelUpdate sUpdate) {
-            if (sUpdate.getNom() != null) existing.setNom(sUpdate.getNom());
-            if (sUpdate.getDescription() != null) existing.setDescription(sUpdate.getDescription());
+        if (patrimoineUpdate instanceof com.pgvpt.dto.MuseeUpdate mUpdate && existing instanceof com.pgvpt.entities.MuseeEntity mEntity) {
+            patrimoineMapper.updateMuseeEntity(mUpdate, mEntity);
+        } else if (patrimoineUpdate instanceof com.pgvpt.dto.MonumentUpdate mUpdate && existing instanceof com.pgvpt.entities.MonumentEntity mEntity) {
+            patrimoineMapper.updateMonumentEntity(mUpdate, mEntity);
+        } else if (patrimoineUpdate instanceof com.pgvpt.dto.SiteNaturelUpdate sUpdate && existing instanceof com.pgvpt.entities.SiteNaturelEntity sEntity) {
+            patrimoineMapper.updateSiteNaturelEntity(sUpdate, sEntity);
+        } else {
+            throw new com.pgvpt.exception.InvalidRequestException("Incompatibilité de type ou type de patrimoine inconnu pour la mise à jour");
         }
         
         PatrimoineEntity updated = patrimoineRepository.save(existing);
@@ -72,9 +75,38 @@ public class PatrimoineServiceImpl implements PatrimoineService {
     }
 
     @Override
-    public PagePatrimoine getPatrimoines(Integer page, Integer size) {
-        Page<PatrimoineEntity> entityPage = patrimoineRepository.findAll(
-                PageRequest.of(page != null ? page : 0, size != null ? size : 20));
+    public PagePatrimoine getPatrimoines(Integer page, Integer size, String sort, 
+        com.pgvpt.dto.CategoriePatrimoine categorie, com.pgvpt.dto.TypePatrimoine type, String region, 
+        String departement, String commune, com.pgvpt.dto.StatutPatrimoine statut, 
+        com.pgvpt.dto.EtatConservation etatConservation, Boolean accessiblePublic, 
+        Boolean inscritUnesco, Boolean classePatrimoine, String q) {
+        int requestedPage = page == null ? 0 : page;
+        int requestedSize = size == null ? 20 : size;
+        if (requestedPage < 0 || requestedSize < 1) {
+            throw new InvalidRequestException("Les paramètres page et size doivent être positifs");
+        }
+        if (region != null || departement != null || commune != null) {
+            throw new InvalidRequestException("Les filtres de localisation ne sont pas disponibles tant que le modèle ne persiste pas la localisation");
+        }
+
+        Pageable pageable = PageRequest.of(requestedPage, requestedSize, parseSort(sort));
+        Specification<PatrimoineEntity> specification = (root, query, cb) -> cb.conjunction();
+        if (categorie != null) specification = specification.and((root, query, cb) -> cb.equal(root.get("categorie"), categorie.getValue()));
+        if (type != null) specification = specification.and((root, query, cb) -> cb.equal(root.get("type"), type.getValue()));
+        if (statut != null) specification = specification.and((root, query, cb) -> cb.equal(root.get("statut"), statut.getValue()));
+        if (etatConservation != null) specification = specification.and((root, query, cb) -> cb.equal(root.get("etatConservation"), etatConservation.getValue()));
+        if (inscritUnesco != null) specification = specification.and((root, query, cb) -> cb.equal(root.get("inscritUnesco"), inscritUnesco));
+        if (classePatrimoine != null) specification = specification.and((root, query, cb) -> cb.equal(root.get("classePatrimoine"), classePatrimoine));
+        if (accessiblePublic != null) specification = specification.and((root, query, cb) -> cb.equal(root.join("accessibilite", JoinType.LEFT).get("accessiblePublic"), accessiblePublic));
+        if (q != null && !q.isBlank()) {
+            String pattern = "%" + q.trim().toLowerCase(java.util.Locale.ROOT) + "%";
+            specification = specification.and((root, query, cb) -> cb.or(
+                    cb.like(cb.lower(root.get("nom")), pattern),
+                    cb.like(cb.lower(root.get("code")), pattern),
+                    cb.like(cb.lower(root.get("description")), pattern),
+                    cb.like(cb.lower(root.get("descriptionCourte")), pattern)));
+        }
+        Page<PatrimoineEntity> entityPage = patrimoineRepository.findAll(specification, pageable);
         
         PagePatrimoine result = new PagePatrimoine();
         result.setContent(entityPage.getContent().stream().map(patrimoineMapper::toDto).collect(Collectors.toList()));
@@ -86,5 +118,19 @@ public class PatrimoineServiceImpl implements PatrimoineService {
         result.setLast(entityPage.isLast());
         
         return result;
+    }
+
+    private Sort parseSort(String sort) {
+        if (sort == null || sort.isBlank()) return Sort.unsorted();
+        String[] parts = sort.split(",", -1);
+        String property = parts[0].trim();
+        if (!java.util.Set.of("code", "nom", "createdAt", "updatedAt", "dateOuverture", "statut", "etatConservation").contains(property)) {
+            throw new InvalidRequestException("Champ de tri non supporté : " + property);
+        }
+        Sort.Direction direction = parts.length > 1 && "desc".equalsIgnoreCase(parts[1].trim()) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        if (parts.length > 2 || (parts.length == 2 && !"asc".equalsIgnoreCase(parts[1].trim()) && !"desc".equalsIgnoreCase(parts[1].trim()))) {
+            throw new InvalidRequestException("Format de tri attendu : champ[,asc|desc]");
+        }
+        return Sort.by(direction, property);
     }
 }

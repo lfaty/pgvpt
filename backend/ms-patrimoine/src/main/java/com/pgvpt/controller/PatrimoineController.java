@@ -53,8 +53,7 @@ public class PatrimoineController implements PatrimoinesApi {
         EtatConservation etatConservation, Boolean accessiblePublic, 
         Boolean inscritUnesco, Boolean classePatrimoine, String q) {
         
-        // Passing only page and size for now to match the service method signature
-        PagePatrimoine result = patrimoineService.getPatrimoines(page, size);
+        PagePatrimoine result = patrimoineService.getPatrimoines(page, size, sort, categorie, type, region, departement, commune, statut, etatConservation, accessiblePublic, inscritUnesco, classePatrimoine, q);
         return ResponseEntity.ok(result);
     }
 }
