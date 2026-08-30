@@ -2,13 +2,24 @@ package com.pgvpt.service.impl;
 
 import com.pgvpt.dto.Patrimoine;
 import com.pgvpt.dto.PatrimoineCreate;
-import com.pgvpt.entities.PatrimoineEntity;
+import com.pgvpt.dto.PatrimoineUpdate;
+import com.pgvpt.dto.PagePatrimoine;
+import com.pgvpt.dto.CategoriePatrimoine;
+import com.pgvpt.dto.TypePatrimoine;
+import com.pgvpt.dto.StatutPatrimoine;
+import com.pgvpt.dto.EtatConservation;
+import com.pgvpt.dto.MuseeUpdate;
+import com.pgvpt.dto.MonumentUpdate;
+import com.pgvpt.dto.SiteNaturelUpdate;
+import com.pgvpt.exception.ResourceNotFoundException;
 import com.pgvpt.mapper.PatrimoineMapper;
+import com.pgvpt.model.MonumentEntity;
+import com.pgvpt.model.MuseeEntity;
+import com.pgvpt.model.PatrimoineEntity;
+import com.pgvpt.model.SiteNaturelEntity;
 import com.pgvpt.repository.PatrimoineRepository;
 import com.pgvpt.service.PatrimoineService;
 import lombok.RequiredArgsConstructor;
-import com.pgvpt.dto.PatrimoineUpdate;
-import com.pgvpt.dto.PagePatrimoine;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -44,30 +55,30 @@ public class PatrimoineServiceImpl implements PatrimoineService {
     @Override
     public Patrimoine getPatrimoine(UUID id) {
         PatrimoineEntity entity = patrimoineRepository.findById(id)
-                .orElseThrow(() -> new com.pgvpt.exception.ResourceNotFoundException("Patrimoine not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Patrimoine not found with id: " + id));
         return patrimoineMapper.toDto(entity);
     }
 
     @Override
     public void deletePatrimoine(UUID id) {
         PatrimoineEntity existing = patrimoineRepository.findById(id)
-                .orElseThrow(() -> new com.pgvpt.exception.ResourceNotFoundException("Patrimoine not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Patrimoine not found with id: " + id));
         patrimoineRepository.delete(existing);
     }
 
     @Override
     public Patrimoine updatePatrimoine(UUID id, PatrimoineUpdate patrimoineUpdate) {
         PatrimoineEntity existing = patrimoineRepository.findById(id)
-                .orElseThrow(() -> new com.pgvpt.exception.ResourceNotFoundException("Patrimoine not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Patrimoine not found with id: " + id));
         
-        if (patrimoineUpdate instanceof com.pgvpt.dto.MuseeUpdate mUpdate && existing instanceof com.pgvpt.entities.MuseeEntity mEntity) {
+        if (patrimoineUpdate instanceof MuseeUpdate mUpdate && existing instanceof MuseeEntity mEntity) {
             patrimoineMapper.updateMuseeEntity(mUpdate, mEntity);
-        } else if (patrimoineUpdate instanceof com.pgvpt.dto.MonumentUpdate mUpdate && existing instanceof com.pgvpt.entities.MonumentEntity mEntity) {
+        } else if (patrimoineUpdate instanceof MonumentUpdate mUpdate && existing instanceof MonumentEntity mEntity) {
             patrimoineMapper.updateMonumentEntity(mUpdate, mEntity);
-        } else if (patrimoineUpdate instanceof com.pgvpt.dto.SiteNaturelUpdate sUpdate && existing instanceof com.pgvpt.entities.SiteNaturelEntity sEntity) {
+        } else if (patrimoineUpdate instanceof SiteNaturelUpdate sUpdate && existing instanceof SiteNaturelEntity sEntity) {
             patrimoineMapper.updateSiteNaturelEntity(sUpdate, sEntity);
         } else {
-            throw new com.pgvpt.exception.InvalidRequestException("Incompatibilité de type ou type de patrimoine inconnu pour la mise à jour");
+            throw new InvalidRequestException("Incompatibilité de type ou type de patrimoine inconnu pour la mise à jour");
         }
         
         PatrimoineEntity updated = patrimoineRepository.save(existing);
@@ -76,9 +87,9 @@ public class PatrimoineServiceImpl implements PatrimoineService {
 
     @Override
     public PagePatrimoine getPatrimoines(Integer page, Integer size, String sort, 
-        com.pgvpt.dto.CategoriePatrimoine categorie, com.pgvpt.dto.TypePatrimoine type, String region, 
-        String departement, String commune, com.pgvpt.dto.StatutPatrimoine statut, 
-        com.pgvpt.dto.EtatConservation etatConservation, Boolean accessiblePublic, 
+        CategoriePatrimoine categorie, TypePatrimoine type, String region, 
+        String departement, String commune, StatutPatrimoine statut, 
+        EtatConservation etatConservation, Boolean accessiblePublic, 
         Boolean inscritUnesco, Boolean classePatrimoine, String q) {
         int requestedPage = page == null ? 0 : page;
         int requestedSize = size == null ? 20 : size;

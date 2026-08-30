@@ -2,11 +2,12 @@ package com.pgvpt.service.impl;
 
 import com.pgvpt.dto.Photo;
 import com.pgvpt.dto.PhotoCreate;
-import com.pgvpt.entities.PatrimoineEntity;
-import com.pgvpt.entities.PhotoEntity;
 import com.pgvpt.exception.ResourceNotFoundException;
 import com.pgvpt.mapper.PatrimoineMapper;
+import com.pgvpt.model.PatrimoineEntity;
+import com.pgvpt.model.PhotoEntity;
 import com.pgvpt.repository.PatrimoineRepository;
+import com.pgvpt.repository.PhotoRepository;
 import com.pgvpt.service.PhotoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 public class PhotoServiceImpl implements PhotoService {
 
     private final PatrimoineRepository patrimoineRepository;
-    private final com.pgvpt.repository.PhotoRepository photoRepository;
+    private final PhotoRepository photoRepository;
 
     @Override
     public Photo addPhoto(UUID id, PhotoCreate photoCreate) {

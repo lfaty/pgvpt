@@ -908,6 +908,20 @@ components:
               type: string
             natureMonument:
               $ref: '#/components/schemas/NatureMonument'
+            materiauxConstruction:
+              type: array
+              items:
+                type: string
+            dimensions:
+              type: string
+            commanditaire:
+              type: string
+            contexteHistorique:
+              type: string
+            personnagesAssocies:
+              type: array
+              items:
+                type: string
 
     SiteNaturelUpdate:
       allOf:
@@ -956,6 +970,20 @@ components:
               type: string
             natureMonument:
               $ref: '#/components/schemas/NatureMonument'
+            materiauxConstruction:
+              type: array
+              items:
+                type: string
+            dimensions:
+              type: string
+            commanditaire:
+              type: string
+            contexteHistorique:
+              type: string
+            personnagesAssocies:
+              type: array
+              items:
+                type: string
 
 
     # ============================================================

@@ -3,7 +3,7 @@ package com.pgvpt.service.impl;
 import com.pgvpt.dto.CategoriePatrimoine;
 import com.pgvpt.dto.PatrimoineSummary;
 import com.pgvpt.dto.TypePatrimoine;
-import com.pgvpt.entities.PatrimoineEntity;
+import com.pgvpt.model.PatrimoineEntity;
 import com.pgvpt.repository.PatrimoineRepository;
 import com.pgvpt.service.RechercheService;
 import lombok.RequiredArgsConstructor;

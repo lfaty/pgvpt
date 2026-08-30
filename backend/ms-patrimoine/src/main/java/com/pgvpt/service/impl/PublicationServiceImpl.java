@@ -1,9 +1,9 @@
 package com.pgvpt.service.impl;
 
 import com.pgvpt.dto.Patrimoine;
-import com.pgvpt.entities.PatrimoineEntity;
 import com.pgvpt.exception.ResourceNotFoundException;
 import com.pgvpt.mapper.PatrimoineMapper;
+import com.pgvpt.model.PatrimoineEntity;
 import com.pgvpt.repository.PatrimoineRepository;
 import com.pgvpt.service.PublicationService;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +29,7 @@ public class PublicationServiceImpl implements PublicationService {
         patrimoine.setStatut("BROUILLON"); // Or whatever default un-published state is. Let's assume BROUILLON.
         patrimoine.setPublishedAt(null);
 
-        PatrimoineEntity saved = patrimoineRepository.save(patrimoine);
-        return patrimoineMapper.toDto(saved);
+        return patrimoineMapper.toDto(patrimoine);
     }
 
     @Override
@@ -43,7 +42,6 @@ public class PublicationServiceImpl implements PublicationService {
             patrimoine.setPublishedAt(OffsetDateTime.now());
         }
 
-        PatrimoineEntity saved = patrimoineRepository.save(patrimoine);
-        return patrimoineMapper.toDto(saved);
+        return patrimoineMapper.toDto(patrimoine);
     }
 }

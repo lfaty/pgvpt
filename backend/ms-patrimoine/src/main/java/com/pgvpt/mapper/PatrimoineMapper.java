@@ -22,24 +22,32 @@ import com.pgvpt.dto.SiteNaturelCreate;
 import com.pgvpt.dto.SiteNaturelUpdate;
 import com.pgvpt.dto.PatrimoineUpdate;
 import com.pgvpt.dto.Tarification;
-
-import com.pgvpt.entities.AccessibiliteEntity;
-import com.pgvpt.entities.CollectionMuseeEntity;
-import com.pgvpt.entities.ConservationEntity;
-import com.pgvpt.entities.ContactEntity;
-import com.pgvpt.entities.EspeceProtegeeEntity;
-import com.pgvpt.entities.ExpositionEntity;
-import com.pgvpt.entities.HoraireOuvertureEntity;
-import com.pgvpt.entities.MediaEntity;
-import com.pgvpt.entities.MenaceValue;
-import com.pgvpt.entities.MonumentEntity;
-import com.pgvpt.entities.MuseeEntity;
-import com.pgvpt.entities.PatrimoineEntity;
-import com.pgvpt.entities.SiteNaturelEntity;
-import com.pgvpt.entities.TarificationEntity;
-import com.pgvpt.entities.PhotoEntity;
-
+import com.pgvpt.dto.Photo;
+import com.pgvpt.dto.NatureMonument;
+import com.pgvpt.dto.NatureSiteNaturel;
+import com.pgvpt.dto.CategoriePatrimoine;
+import com.pgvpt.dto.PeriodeHistorique;
+import com.pgvpt.dto.EtatConservation;
+import com.pgvpt.dto.StatutPatrimoine;
+import com.pgvpt.dto.JourSemaine;
+import com.pgvpt.dto.TypeMedia;
 import com.pgvpt.exception.InvalidRequestException;
+import com.pgvpt.model.AccessibiliteEntity;
+import com.pgvpt.model.CollectionMuseeEntity;
+import com.pgvpt.model.ConservationEntity;
+import com.pgvpt.model.ContactEntity;
+import com.pgvpt.model.EspeceProtegeeEntity;
+import com.pgvpt.model.ExpositionEntity;
+import com.pgvpt.model.HoraireOuvertureEntity;
+import com.pgvpt.model.MediaEntity;
+import com.pgvpt.model.MenaceValue;
+import com.pgvpt.model.MonumentEntity;
+import com.pgvpt.model.MuseeEntity;
+import com.pgvpt.model.PatrimoineEntity;
+import com.pgvpt.model.PhotoEntity;
+import com.pgvpt.model.SiteNaturelEntity;
+import com.pgvpt.model.TarificationEntity;
+
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -96,6 +104,22 @@ public class PatrimoineMapper {
                     dto.getNatureMonument().getValue()
             );
         }
+
+        entity.setDimensions(dto.getDimensions());
+        entity.setCommanditaire(dto.getCommanditaire());
+        entity.setContexteHistorique(dto.getContexteHistorique());
+
+        entity.setMateriauxConstruction(
+                dto.getMateriauxConstruction() != null
+                        ? new ArrayList<>(dto.getMateriauxConstruction())
+                        : new ArrayList<>()
+        );
+
+        entity.setPersonnagesAssocies(
+                dto.getPersonnagesAssocies() != null
+                        ? new ArrayList<>(dto.getPersonnagesAssocies())
+                        : new ArrayList<>()
+        );
 
         return entity;
     }
@@ -454,7 +478,7 @@ public class PatrimoineMapper {
         // Photos
         if (dto.getPhotos() != null) {
 
-            for (com.pgvpt.dto.Photo dtoPhoto
+            for (Photo dtoPhoto
                     : dto.getPhotos()) {
 
                 PhotoEntity photoEntity =
@@ -776,7 +800,7 @@ public class PatrimoineMapper {
     // ============================================================
 
     private PhotoEntity toPhotoEntity(
-            com.pgvpt.dto.Photo dto) {
+            Photo dto) {
 
         PhotoEntity entity = new PhotoEntity();
 
@@ -1003,11 +1027,10 @@ public class PatrimoineMapper {
 
         if (entity.getNatureMonument() != null) {
             dto.setNatureMonument(
-                    nullOnInvalid(() -> com.pgvpt.dto.NatureMonument.fromValue(entity.getNatureMonument()))
+                    nullOnInvalid(() -> NatureMonument.fromValue(entity.getNatureMonument()))
             );
         }
 
-        /*
         dto.setDimensions(entity.getDimensions());
         dto.setCommanditaire(entity.getCommanditaire());
         dto.setContexteHistorique(
@@ -1021,7 +1044,6 @@ public class PatrimoineMapper {
         dto.setPersonnagesAssocies(
                 entity.getPersonnagesAssocies()
         );
-        */
 
         return dto;
     }
@@ -1119,7 +1141,7 @@ public class PatrimoineMapper {
 
         if (entity.getNatureSite() != null) {
             dto.setNatureSite(
-                    nullOnInvalid(() -> com.pgvpt.dto.NatureSiteNaturel.fromValue(entity.getNatureSite()))
+                    nullOnInvalid(() -> NatureSiteNaturel.fromValue(entity.getNatureSite()))
             );
         }
 
@@ -1193,7 +1215,7 @@ public class PatrimoineMapper {
 
         if (entity.getCategorie() != null) {
             dto.setCategorie(
-                    nullOnInvalid(() -> com.pgvpt.dto.CategoriePatrimoine.fromValue(entity.getCategorie()))
+                    nullOnInvalid(() -> CategoriePatrimoine.fromValue(entity.getCategorie()))
             );
         }
 
@@ -1203,7 +1225,7 @@ public class PatrimoineMapper {
 
         if (entity.getPeriode() != null) {
             dto.setPeriode(
-                    nullOnInvalid(() -> com.pgvpt.dto.PeriodeHistorique.fromValue(entity.getPeriode()))
+                    nullOnInvalid(() -> PeriodeHistorique.fromValue(entity.getPeriode()))
             );
         }
 
@@ -1246,13 +1268,13 @@ public class PatrimoineMapper {
 
         if (entity.getEtatConservation() != null) {
             dto.setEtatConservation(
-                    nullOnInvalid(() -> com.pgvpt.dto.EtatConservation.fromValue(entity.getEtatConservation()))
+                    nullOnInvalid(() -> EtatConservation.fromValue(entity.getEtatConservation()))
             );
         }
 
         if (entity.getStatut() != null) {
             dto.setStatut(
-                    nullOnInvalid(() -> com.pgvpt.dto.StatutPatrimoine.fromValue(entity.getStatut()))
+                    nullOnInvalid(() -> StatutPatrimoine.fromValue(entity.getStatut()))
             );
         }
 
@@ -1377,7 +1399,7 @@ public class PatrimoineMapper {
         // Photos
         if (entity.getPhotos() != null) {
 
-            List<com.pgvpt.dto.Photo> photos =
+            List<Photo> photos =
                     new ArrayList<>();
 
             for (PhotoEntity photoEntity
@@ -1580,7 +1602,7 @@ public class PatrimoineMapper {
 
         if (entity.getEtat() != null) {
             dto.setEtat(
-                    nullOnInvalid(() -> com.pgvpt.dto.EtatConservation.fromValue(entity.getEtat()))
+                    nullOnInvalid(() -> EtatConservation.fromValue(entity.getEtat()))
             );
         }
 
@@ -1641,7 +1663,7 @@ public class PatrimoineMapper {
 
         if (entity.getJour() != null) {
             dto.setJour(
-                    nullOnInvalid(() -> com.pgvpt.dto.JourSemaine.fromValue(entity.getJour()))
+                    nullOnInvalid(() -> JourSemaine.fromValue(entity.getJour()))
             );
         }
 
@@ -1682,11 +1704,11 @@ public class PatrimoineMapper {
         return dto;
     }
 
-    private com.pgvpt.dto.Photo toPhotoDto(
+    private Photo toPhotoDto(
             PhotoEntity entity) {
 
-        com.pgvpt.dto.Photo dto =
-                new com.pgvpt.dto.Photo();
+        Photo dto =
+                new Photo();
 
         dto.setId(entity.getId());
 
@@ -1729,7 +1751,7 @@ public class PatrimoineMapper {
 
         if (entity.getType() != null) {
             dto.setType(
-                    nullOnInvalid(() -> com.pgvpt.dto.TypeMedia.fromValue(entity.getType()))
+                    nullOnInvalid(() -> TypeMedia.fromValue(entity.getType()))
             );
         }
 
@@ -1765,7 +1787,7 @@ public class PatrimoineMapper {
         Menace dto = new Menace();
 
         dto.setType(value.getType());
-        dto.setNiveau(value.getNiveau() != null ? nullOnInvalid(() -> com.pgvpt.dto.Menace.NiveauEnum.fromValue(value.getNiveau())) : null);
+        dto.setNiveau(value.getNiveau() != null ? nullOnInvalid(() -> Menace.NiveauEnum.fromValue(value.getNiveau())) : null);
         dto.setDescription(value.getDescription());
         dto.setMesuresPrevention(
                 value.getMesuresPrevention()
@@ -1847,7 +1869,7 @@ public class PatrimoineMapper {
         dto.setNomLocal(
                 entity.getNomLocal()
         );
-        dto.setType(entity.getType() != null ? nullOnInvalid(() -> com.pgvpt.dto.EspeceProtegee.TypeEnum.fromValue(entity.getType())) : null);
+        dto.setType(entity.getType() != null ? nullOnInvalid(() -> EspeceProtegee.TypeEnum.fromValue(entity.getType())) : null);
         dto.setStatutConservation(
                 entity.getStatutConservation()
         );
@@ -1872,16 +1894,21 @@ public class PatrimoineMapper {
     // LOGIQUE DE MISE À JOUR (UPDATE)
     // ============================================================
 
-    public void updateMonumentEntity(com.pgvpt.dto.MonumentUpdate dto, MonumentEntity entity) {
+    public void updateMonumentEntity(MonumentUpdate dto, MonumentEntity entity) {
         if (dto == null) return;
         updatePatrimoineFields(dto, entity);
         if (dto.getStyleArchitectural() != null) entity.setStyleArchitectural(dto.getStyleArchitectural());
         if (dto.getAnneeConstruction() != null) entity.setAnneeConstruction(dto.getAnneeConstruction());
         if (dto.getIdentiteArchitecte() != null) entity.setIdentiteArchitecte(dto.getIdentiteArchitecte());
         if (dto.getNatureMonument() != null) entity.setNatureMonument(dto.getNatureMonument().getValue());
+        if (dto.getDimensions() != null) entity.setDimensions(dto.getDimensions());
+        if (dto.getCommanditaire() != null) entity.setCommanditaire(dto.getCommanditaire());
+        if (dto.getContexteHistorique() != null) entity.setContexteHistorique(dto.getContexteHistorique());
+        if (dto.getMateriauxConstruction() != null) entity.setMateriauxConstruction(new ArrayList<>(dto.getMateriauxConstruction()));
+        if (dto.getPersonnagesAssocies() != null) entity.setPersonnagesAssocies(new ArrayList<>(dto.getPersonnagesAssocies()));
     }
 
-    public void updateMuseeEntity(com.pgvpt.dto.MuseeUpdate dto, MuseeEntity entity) {
+    public void updateMuseeEntity(MuseeUpdate dto, MuseeEntity entity) {
         if (dto == null) return;
         updatePatrimoineFields(dto, entity);
         if (dto.getNombreCollections() != null) entity.setNombreCollections(dto.getNombreCollections());
@@ -1889,7 +1916,7 @@ public class PatrimoineMapper {
         if (dto.getExpositions() != null) replaceExpositions(dto.getExpositions(), entity);
     }
 
-    public void updateSiteNaturelEntity(com.pgvpt.dto.SiteNaturelUpdate dto, SiteNaturelEntity entity) {
+    public void updateSiteNaturelEntity(SiteNaturelUpdate dto, SiteNaturelEntity entity) {
         if (dto == null) return;
         updatePatrimoineFields(dto, entity);
         if (dto.getSuperficie() != null) entity.setSuperficie(dto.getSuperficie());
@@ -1898,7 +1925,7 @@ public class PatrimoineMapper {
         if (dto.getEspecesProtegees() != null) replaceEspecesProtegees(dto.getEspecesProtegees(), entity);
     }
 
-    private void updatePatrimoineFields(com.pgvpt.dto.PatrimoineUpdate dto, PatrimoineEntity entity) {
+    private void updatePatrimoineFields(PatrimoineUpdate dto, PatrimoineEntity entity) {
         if (dto == null) return;
 
         if (dto.getCode() != null) entity.setCode(dto.getCode());
@@ -1960,9 +1987,9 @@ public class PatrimoineMapper {
         for (HoraireOuverture dto : dtos) { HoraireOuvertureEntity value = toHoraireEntity(dto); value.setPatrimoine(entity); entity.getHoraires().add(value); }
     }
 
-    private void replacePhotos(List<com.pgvpt.dto.Photo> dtos, PatrimoineEntity entity) {
+    private void replacePhotos(List<Photo> dtos, PatrimoineEntity entity) {
         entity.getPhotos().clear();
-        for (com.pgvpt.dto.Photo dto : dtos) { PhotoEntity value = toPhotoEntity(dto); value.setPatrimoine(entity); entity.getPhotos().add(value); }
+        for (Photo dto : dtos) { PhotoEntity value = toPhotoEntity(dto); value.setPatrimoine(entity); entity.getPhotos().add(value); }
     }
 
     private void replaceMedias(List<Media> dtos, PatrimoineEntity entity) {

@@ -1,8 +1,9 @@
 package com.pgvpt.repository;
 
-import com.pgvpt.entities.HoraireOuvertureEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import com.pgvpt.model.HoraireOuvertureEntity;
 
 import java.util.UUID;
 

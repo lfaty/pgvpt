@@ -4,6 +4,10 @@ import com.pgvpt.dto.Patrimoine;
 import com.pgvpt.dto.PatrimoineCreate;
 import com.pgvpt.dto.PatrimoineUpdate;
 import com.pgvpt.dto.PagePatrimoine;
+import com.pgvpt.dto.CategoriePatrimoine;
+import com.pgvpt.dto.TypePatrimoine;
+import com.pgvpt.dto.StatutPatrimoine;
+import com.pgvpt.dto.EtatConservation;
 import java.util.UUID;
 
 public interface PatrimoineService {
@@ -17,8 +21,8 @@ public interface PatrimoineService {
     Patrimoine updatePatrimoine(UUID id, PatrimoineUpdate patrimoineUpdate);
 
     PagePatrimoine getPatrimoines(Integer page, Integer size, String sort, 
-        com.pgvpt.dto.CategoriePatrimoine categorie, com.pgvpt.dto.TypePatrimoine type, String region, 
-        String departement, String commune, com.pgvpt.dto.StatutPatrimoine statut, 
-        com.pgvpt.dto.EtatConservation etatConservation, Boolean accessiblePublic, 
+        CategoriePatrimoine categorie, TypePatrimoine type, String region, 
+        String departement, String commune, StatutPatrimoine statut, 
+        EtatConservation etatConservation, Boolean accessiblePublic, 
         Boolean inscritUnesco, Boolean classePatrimoine, String q);
 }

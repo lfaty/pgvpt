@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.UUID;
 
 import com.pgvpt.dto.JourSemaine;
-import com.pgvpt.entities.HoraireOuvertureEntity;
-import com.pgvpt.entities.PatrimoineEntity;
 import com.pgvpt.exception.ResourceNotFoundException;
+import com.pgvpt.model.HoraireOuvertureEntity;
+import com.pgvpt.model.PatrimoineEntity;
 import com.pgvpt.repository.HoraireRepository;
 import com.pgvpt.repository.PatrimoineRepository;
 import java.util.stream.Collectors;

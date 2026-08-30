@@ -1,8 +1,9 @@
 package com.pgvpt.repository;
 
-import com.pgvpt.entities.PhotoEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import com.pgvpt.model.PhotoEntity;
 
 import java.util.UUID;
 

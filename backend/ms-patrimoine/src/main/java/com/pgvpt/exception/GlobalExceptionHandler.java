@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleUnreadableRequest(HttpMessageNotReadableException ex) {
         ApiError error = new ApiError();
         error.setCode(String.valueOf(HttpStatus.BAD_REQUEST.value()));
-        error.setMessage("Requête JSON invalide : le champ discriminant 'type' est obligatoire (MONUMENT, MUSEE ou SITE_NATUREL).");
+        error.setMessage("Requête JSON invalide : " + ex.getMostSpecificCause().getMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
