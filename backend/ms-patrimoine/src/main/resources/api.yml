@@ -244,7 +244,22 @@ paths:
           in: query
           schema:
             type: string
-
+        - name: latitude
+          in: query
+          schema:
+            type: number
+            format: double
+        - name: longitude
+          in: query
+          schema:
+            type: number
+            format: double
+        - name: rayonKm
+          in: query
+          schema:
+            type: number
+            format: double
+            minimum: 0
       responses:
         '200':
           description: Résultats de recherche
@@ -452,37 +467,32 @@ components:
     # ============================================================
 
     Patrimoine:
-      allOf:
-        - $ref: '#/components/schemas/PatrimoineBase'
-        - type: object
-          discriminator:
-            propertyName: type
-            mapping:
-              SITE_NATUREL: '#/components/schemas/SiteNaturel'
-              MUSEE: '#/components/schemas/Musee'
-              MONUMENT: '#/components/schemas/Monument'
+      oneOf:
+        - $ref: '#/components/schemas/SiteNaturel'
+        - $ref: '#/components/schemas/Musee'
+        - $ref: '#/components/schemas/Monument'
+      discriminator:
+        propertyName: type
+        mapping:
+          SITE_NATUREL: '#/components/schemas/SiteNaturel'
+          MUSEE: '#/components/schemas/Musee'
+          MONUMENT: '#/components/schemas/Monument'
 
     PatrimoineCreate:
-      allOf:
-        - $ref: '#/components/schemas/PatrimoineBase'
-        - type: object
-          discriminator:
-            propertyName: type
-            mapping:
-              SITE_NATUREL: '#/components/schemas/SiteNaturelCreate'
-              MUSEE: '#/components/schemas/MuseeCreate'
-              MONUMENT: '#/components/schemas/MonumentCreate'
+      oneOf:
+        - $ref: '#/components/schemas/SiteNaturelCreate'
+        - $ref: '#/components/schemas/MuseeCreate'
+        - $ref: '#/components/schemas/MonumentCreate'
+      discriminator:
+        propertyName: type
 
     PatrimoineUpdate:
-      allOf:
-        - $ref: '#/components/schemas/PatrimoineBase'
-        - type: object
-          discriminator:
-            propertyName: type
-            mapping:
-              SITE_NATUREL: '#/components/schemas/SiteNaturelUpdate'
-              MUSEE: '#/components/schemas/MuseeUpdate'
-              MONUMENT: '#/components/schemas/MonumentUpdate'
+      oneOf:
+        - $ref: '#/components/schemas/SiteNaturelUpdate'
+        - $ref: '#/components/schemas/MuseeUpdate'
+        - $ref: '#/components/schemas/MonumentUpdate'
+      discriminator:
+        propertyName: type
 
     PatrimoineBase:
       type: object
@@ -491,6 +501,7 @@ components:
         - type
         - categorie
         - description
+        - localisation
       properties:
 
         id:
@@ -519,7 +530,7 @@ components:
           maxLength: 255
 
         type:
-          type: string
+          $ref: '#/components/schemas/TypePatrimoine'
 
         categorie:
           $ref: '#/components/schemas/CategoriePatrimoine'
@@ -631,6 +642,8 @@ components:
         telephone:
           type: string
 
+        localisation:
+          $ref: '#/components/schemas/Localisation'
 
         accessibilite:
           $ref: '#/components/schemas/Accessibilite'
@@ -705,7 +718,7 @@ components:
 
     SiteNaturel:
       allOf:
-        - $ref: '#/components/schemas/Patrimoine'
+        - $ref: '#/components/schemas/PatrimoineBase'
         - type: object
           properties:
             superficie:
@@ -757,7 +770,7 @@ components:
 
     Musee:
       allOf:
-        - $ref: '#/components/schemas/Patrimoine'
+        - $ref: '#/components/schemas/PatrimoineBase'
         - type: object
           properties:
             nombreCollections:
@@ -802,7 +815,7 @@ components:
 
     Monument:
       allOf:
-        - $ref: '#/components/schemas/Patrimoine'
+        - $ref: '#/components/schemas/PatrimoineBase'
         - type: object
           properties:
             styleArchitectural:
@@ -851,7 +864,7 @@ components:
 
     SiteNaturelCreate:
       allOf:
-        - $ref: '#/components/schemas/PatrimoineCreate'
+        - $ref: '#/components/schemas/PatrimoineBase'
         - type: object
           required:
             - type
@@ -859,6 +872,10 @@ components:
             - natureSite
             - ecosysteme
           properties:
+            type:
+              type: string
+              enum:
+                - SITE_NATUREL
             superficie:
               type: number
               format: double
@@ -873,12 +890,16 @@ components:
 
     MuseeCreate:
       allOf:
-        - $ref: '#/components/schemas/PatrimoineCreate'
+        - $ref: '#/components/schemas/PatrimoineBase'
         - type: object
           required:
             - type
             - nombreCollections
           properties:
+            type:
+              type: string
+              enum:
+                - MUSEE
             nombreCollections:
               type: integer
               minimum: 0
@@ -893,13 +914,17 @@ components:
 
     MonumentCreate:
       allOf:
-        - $ref: '#/components/schemas/PatrimoineCreate'
+        - $ref: '#/components/schemas/PatrimoineBase'
         - type: object
           required:
             - type
             - styleArchitectural
             - natureMonument
           properties:
+            type:
+              type: string
+              enum:
+                - MONUMENT
             styleArchitectural:
               type: string
             anneeConstruction:
@@ -908,83 +933,90 @@ components:
               type: string
             natureMonument:
               $ref: '#/components/schemas/NatureMonument'
-            materiauxConstruction:
-              type: array
-              items:
-                type: string
-            dimensions:
-              type: string
-            commanditaire:
-              type: string
-            contexteHistorique:
-              type: string
-            personnagesAssocies:
-              type: array
-              items:
-                type: string
 
     SiteNaturelUpdate:
       allOf:
-        - $ref: '#/components/schemas/PatrimoineUpdate'
-        - type: object
-          properties:
-            superficie:
-              type: number
-              format: double
-            natureSite:
-              $ref: '#/components/schemas/NatureSiteNaturel'
-            ecosysteme:
-              type: string
-            especesProtegees:
-              type: array
-              items:
-                $ref: '#/components/schemas/EspeceProtegee'
+        - $ref: '#/components/schemas/SiteNaturelCreate'
 
     MuseeUpdate:
       allOf:
-        - $ref: '#/components/schemas/PatrimoineUpdate'
-        - type: object
-          properties:
-            nombreCollections:
-              type: integer
-              minimum: 0
-            collections:
-              type: array
-              items:
-                $ref: '#/components/schemas/CollectionMusee'
-            expositions:
-              type: array
-              items:
-                $ref: '#/components/schemas/Exposition'
+        - $ref: '#/components/schemas/MuseeCreate'
 
     MonumentUpdate:
       allOf:
-        - $ref: '#/components/schemas/PatrimoineUpdate'
-        - type: object
-          properties:
-            styleArchitectural:
-              type: string
-            anneeConstruction:
-              type: integer
-            identiteArchitecte:
-              type: string
-            natureMonument:
-              $ref: '#/components/schemas/NatureMonument'
-            materiauxConstruction:
-              type: array
-              items:
-                type: string
-            dimensions:
-              type: string
-            commanditaire:
-              type: string
-            contexteHistorique:
-              type: string
-            personnagesAssocies:
-              type: array
-              items:
-                type: string
+        - $ref: '#/components/schemas/MonumentCreate'
 
+    # ============================================================
+    # LOCALISATION
+    # ============================================================
+
+    Localisation:
+      type: object
+      required:
+        - latitude
+        - longitude
+      properties:
+        adresse:
+          type: string
+
+        region:
+          type: string
+          example: Dakar
+
+        departement:
+          type: string
+          example: Dakar
+
+        arrondissement:
+          type: string
+
+        commune:
+          type: string
+          example: Gorée
+
+        quartier:
+          type: string
+
+        village:
+          type: string
+
+        lieuDit:
+          type: string
+
+        latitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+
+        longitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+
+        altitude:
+          type: number
+          format: double
+
+        precision:
+          type: number
+          format: double
+          description: Précision de la géolocalisation en mètres
+
+        zoneGeographique:
+          type: string
+          example: Petite Côte
+
+        aireGeographique:
+          type: string
+
+        codePostal:
+          type: string
+
+        distanceCentreVilleKm:
+          type: number
+          format: double
 
     # ============================================================
     # ACCESSIBILITE
@@ -1559,6 +1591,8 @@ components:
           $ref: '#/components/schemas/CategoriePatrimoine'
         descriptionCourte:
           type: string
+        localisation:
+          $ref: '#/components/schemas/Localisation'
         photoPrincipale:
           type: string
           format: uri
