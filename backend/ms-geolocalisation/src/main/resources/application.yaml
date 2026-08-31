@@ -1,0 +1,30 @@
+server:
+  port: 3002
+
+spring:
+  application:
+    name: ms-geolocalisation
+
+  cloud:
+    config:
+      enabled: false
+    discovery:
+      enabled: false
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/geolocalisationdb
+    username: postgres
+    password: admin
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

@@ -5,6 +5,7 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/ms-patrimoine/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-geolocalisation/pom.xml" />
       </list>
     </option>
   </component>
