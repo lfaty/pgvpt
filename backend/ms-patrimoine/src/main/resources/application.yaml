@@ -8,6 +8,8 @@ spring:
     name: ms-patrimoine
   jackson:
     default-property-inclusion: non_null
+    deserialization:
+      fail-on-unknown-properties: false
 
   # --- Désactiver Spring Cloud Config et Eureka pour le dev local ---
   cloud:

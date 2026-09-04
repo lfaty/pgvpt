@@ -56,16 +56,16 @@ public class GeolocalisationEntity extends BaseEntity {
 
     private @Nullable NiveauFiabilite niveauFiabilite;
 
-    @JoinColumn(name = "zoneTouristique_id", nullable = false, unique = true)
+    @JoinColumn(name = "zoneTouristique_id")
     @ManyToOne
-    private ZoneGeographiqueEntity zoneTouristique;
+    private @Nullable ZoneTouristiqueEntity zoneTouristique = null;
 
-    @JoinColumn(name = "village_id", unique = true)
+    @JoinColumn(name = "village_id")
     @ManyToOne
     private @Nullable VillageEntity village= null;
 
 
-    @JoinColumn(name = "quartier_id", unique = true)
+    @JoinColumn(name = "quartier_id")
     @ManyToOne
     private @Nullable QuartierEntity quartier = null;
 

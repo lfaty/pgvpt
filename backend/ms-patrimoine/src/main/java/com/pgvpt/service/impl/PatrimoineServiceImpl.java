@@ -11,6 +11,8 @@ import com.pgvpt.dto.EtatConservation;
 import com.pgvpt.dto.MuseeUpdate;
 import com.pgvpt.dto.MonumentUpdate;
 import com.pgvpt.dto.SiteNaturelUpdate;
+import com.pgvpt.dto.GeolocalisationDTO;
+import com.pgvpt.client.GeolocalisationClient;
 import com.pgvpt.exception.ResourceNotFoundException;
 import com.pgvpt.mapper.PatrimoineMapper;
 import com.pgvpt.model.MonumentEntity;
@@ -39,6 +41,7 @@ public class PatrimoineServiceImpl implements PatrimoineService {
 
     private final PatrimoineRepository patrimoineRepository;
     private final PatrimoineMapper patrimoineMapper;
+    private final GeolocalisationClient geolocalisationClient;
 
     @Override
     public Patrimoine create(PatrimoineCreate patrimoineCreate) {
@@ -49,14 +52,34 @@ public class PatrimoineServiceImpl implements PatrimoineService {
         PatrimoineEntity saved = patrimoineRepository.save(entity);
 
         // 3. Convertir l'entité sauvegardée en DTO de réponse
-        return patrimoineMapper.toDto(saved);
+        Patrimoine dto = patrimoineMapper.toDto(saved);
+        
+        // 4. Créer la géolocalisation via ms-geo si fournie
+        if (patrimoineCreate.getGeolocalisation() != null) {
+            try {
+                GeolocalisationDTO geoDTO = patrimoineCreate.getGeolocalisation();
+                geoDTO.setPatrimoineId(saved.getId());
+                GeolocalisationDTO savedGeo = geolocalisationClient.createGeolocalisation(geoDTO);
+                dto.setGeolocalisation(savedGeo);
+            } catch (Exception e) {
+                throw new RuntimeException("Erreur de communication avec ms-geo lors de la création de la géolocalisation: " + e.getMessage(), e);
+            }
+        }
+        return dto;
     }
 
     @Override
     public Patrimoine getPatrimoine(UUID id) {
         PatrimoineEntity entity = patrimoineRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Patrimoine not found with id: " + id));
-        return patrimoineMapper.toDto(entity);
+        Patrimoine dto = patrimoineMapper.toDto(entity);
+        try {
+            GeolocalisationDTO geoDTO = geolocalisationClient.getPatrimoineGeolocalisation(dto.getId());
+            dto.setGeolocalisation(geoDTO);
+        } catch (Exception e) {
+            // Ignore si non trouvée
+        }
+        return dto;
     }
 
     @Override
@@ -82,7 +105,27 @@ public class PatrimoineServiceImpl implements PatrimoineService {
         }
         
         PatrimoineEntity updated = patrimoineRepository.save(existing);
-        return patrimoineMapper.toDto(updated);
+        Patrimoine dto = patrimoineMapper.toDto(updated);
+        
+        // Mise à jour de la géolocalisation via ms-geo si fournie
+        if (patrimoineUpdate.getGeolocalisation() != null) {
+            try {
+                GeolocalisationDTO geoDTO = patrimoineUpdate.getGeolocalisation();
+                GeolocalisationDTO updatedGeo = geolocalisationClient.updatePatrimoineGeolocalisation(updated.getId(), geoDTO);
+                dto.setGeolocalisation(updatedGeo);
+            } catch (Exception e) {
+                throw new RuntimeException("Erreur de communication avec ms-geo lors de la mise à jour de la géolocalisation: " + e.getMessage(), e);
+            }
+        } else {
+            // Récupérer la géolocalisation existante car elle n'a pas été fournie/modifiée
+            try {
+                GeolocalisationDTO geoDTO = geolocalisationClient.getPatrimoineGeolocalisation(dto.getId());
+                dto.setGeolocalisation(geoDTO);
+            } catch (Exception e) {
+                // Ignore si non trouvée
+            }
+        }
+        return dto;
     }
 
     @Override
@@ -120,7 +163,16 @@ public class PatrimoineServiceImpl implements PatrimoineService {
         Page<PatrimoineEntity> entityPage = patrimoineRepository.findAll(specification, pageable);
         
         PagePatrimoine result = new PagePatrimoine();
-        result.setContent(entityPage.getContent().stream().map(patrimoineMapper::toDto).collect(Collectors.toList()));
+        result.setContent(entityPage.getContent().stream().map(entity -> {
+            Patrimoine dto = patrimoineMapper.toDto(entity);
+            try {
+                GeolocalisationDTO geoDTO = geolocalisationClient.getPatrimoineGeolocalisation(dto.getId());
+                dto.setGeolocalisation(geoDTO);
+            } catch (Exception e) {
+                // Ignore si non trouvée
+            }
+            return dto;
+        }).collect(Collectors.toList()));
         result.setPage(entityPage.getNumber());
         result.setSize(entityPage.getSize());
         result.setTotalElements(entityPage.getTotalElements());

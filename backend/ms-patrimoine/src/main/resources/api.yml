@@ -656,6 +656,9 @@ components:
         conservation:
           $ref: '#/components/schemas/Conservation'
 
+        geolocalisation:
+          $ref: '#/components/schemas/GeolocalisationDTO'
+
         menaces:
           type: array
           items:
@@ -1624,3 +1627,69 @@ components:
           type: array
           items:
             type: string
+
+    # ============================================================
+    # GEOLOCALISATION DTO (Communication avec ms-geolocalisation)
+    # ============================================================
+
+    GeolocalisationDTO:
+      type: object
+      required:
+        - latitude
+        - longitude
+        - zoneTouristiqueId
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        patrimoineId:
+          type: string
+          format: uuid
+        latitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        longitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+        altitude:
+          type: number
+          format: double
+        precisionMetres:
+          type: number
+          format: double
+          minimum: 0
+        adresse:
+          type: string
+        lieuDit:
+          type: string
+        repere:
+          type: string
+        systemeReference:
+          type: string
+          default: "WGS84"
+        codeEpsg:
+          type: integer
+          default: 4326
+        source:
+          type: string
+          enum: [GPS, ADMINISTRATION, SIG, OPEN_DATA, IMPORT, AUTRE]
+        dateAcquisition:
+          type: string
+          format: date
+        methodeAcquisition:
+          type: string
+          enum: [GPS, RELEVE_TERRAIN, SATELLITE, DRONE, GEOCODAGE, IMPORT_SIG, AUTRE]
+        niveauFiabilite:
+          type: string
+          enum: [FAIBLE, MOYEN, ELEVE, TRES_ELEVE]
+        zoneTouristiqueId:
+          type: string
+          format: uuid
+        villageId:
+          type: string
+          format: uuid

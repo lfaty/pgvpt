@@ -1,11 +1,12 @@
 package com.pgvpt.repository;
 
-
 import com.pgvpt.model.GeolocalisationEntity;
-import com.pgvpt.model.ZoneTouristiqueEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,27 +18,16 @@ public interface GeolocalisationRepository extends JpaRepository<Geolocalisation
 
     boolean existsByPatrimoineId(UUID patrimoineId);
 
-//    List<GeolocalisationEntity> findByRegionIgnoreCase(String region);
-//
-//    List<GeolocalisationEntity> findByDepartementIgnoreCase(String departement);
-//
-//    List<GeolocalisationEntity> findByCommuneIgnoreCase(String commune);
-//
-//    List<GeolocalisationEntity> findByRegionIgnoreCaseAndCommuneIgnoreCase(String region, String commune);
-//    List<GeolocalisationEntity> findByRegionIgnoreCaseAndDepartementIgnoreCase(String region, String departement);
-//    List<GeolocalisationEntity> findByDepartementIgnoreCaseAndCommuneIgnoreCase(String departement, String commune);
-
-//    @Query("SELECT g FROM GeolocalisationEntity g WHERE " +
-//            "(6371 * acos(cos(radians(:lat)) * cos(radians(g.latitude)) * " +
-//            "cos(radians(g.longitude) - radians(:lng)) + " +
-//            "sin(radians(:lat)) * sin(radians(g.latitude)))) <= :radius " +
-//            "ORDER BY (6371 * acos(cos(radians(:lat)) * cos(radians(g.latitude)) * " +
-//            "cos(radians(g.longitude) - radians(:lng)) + " +
-//            "sin(radians(:lat)) * sin(radians(g.latitude)))) ASC")
-//    List<GeolocalisationEntity> findNearby(
-//            @Param("lat") double latitude,
-//            @Param("lng") double longitude,
-//            @Param("radius") double radiusInKm);
-
-
+    /**
+     * Recherche par emprise géographique (bounding box).
+     */
+    @Query("SELECT g FROM GeolocalisationEntity g WHERE " +
+           "g.latitude BETWEEN :minLat AND :maxLat AND " +
+           "g.longitude BETWEEN :minLon AND :maxLon")
+    Page<GeolocalisationEntity> findInBoundingBox(
+        @Param("minLat") double minLat,
+        @Param("minLon") double minLon,
+        @Param("maxLat") double maxLat,
+        @Param("maxLon") double maxLon,
+        Pageable pageable);
 }

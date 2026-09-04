@@ -40,9 +40,14 @@ public class RegionEntity extends BaseEntity {
     private PaysEntity paysEntity;
 
 
+    /**
+     * Relation inverse vers les entités de jointure.
+     * Permet de savoir à quelle(s) ZoneGeographique une région est rattachée.
+     */
     @JsonIgnore
-    @ManyToMany(mappedBy = "regions")
-    private List<ZoneGeographiqueEntity> zonesGeographiques = new ArrayList<>();
+    @OneToMany(mappedBy = "region")
+    private List<ZoneGeographiqueRegionEntity> zoneLinks = new ArrayList<>();
+
 
 }
 

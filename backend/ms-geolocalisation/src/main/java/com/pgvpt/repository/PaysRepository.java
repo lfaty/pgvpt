@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
 public interface PaysRepository extends JpaRepository<PaysEntity, UUID> {
+    boolean existsByCode(String code);
 }

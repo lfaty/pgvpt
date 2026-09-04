@@ -23,12 +23,10 @@ import java.util.UUID;
 public class ReferentielAdministratifController implements ReferentielAdministratifApi {
 
     private final ReferentielAdministratifService referentielAdministratifService;
-
     private final ReferentielAdministratifApiMapper mapper;
 
     @Override
     public ResponseEntity<Commune> createCommune(CommuneCreate communeCreate) {
-
         var entity = mapper.toEntity(communeCreate);
         var created = referentielAdministratifService.createCommune(entity);
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toApi(created));
@@ -36,7 +34,6 @@ public class ReferentielAdministratifController implements ReferentielAdministra
 
     @Override
     public ResponseEntity<Departement> createDepartement(DepartementCreate departementCreate) {
-
         var entity = mapper.toEntity(departementCreate);
         var created = referentielAdministratifService.createDepartement(entity);
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toApi(created));
@@ -44,7 +41,6 @@ public class ReferentielAdministratifController implements ReferentielAdministra
 
     @Override
     public ResponseEntity<Pays> createPays(PaysCreate paysCreate) {
-
         var entity = mapper.toEntity(paysCreate);
         var created = referentielAdministratifService.createPays(entity);
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toApi(created));
@@ -52,7 +48,6 @@ public class ReferentielAdministratifController implements ReferentielAdministra
 
     @Override
     public ResponseEntity<Quartier> createQuartier(QuartierCreate quartierCreate) {
-
         var entity = mapper.toEntity(quartierCreate);
         var created = referentielAdministratifService.createQuartier(entity);
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toApi(created));
@@ -60,7 +55,6 @@ public class ReferentielAdministratifController implements ReferentielAdministra
 
     @Override
     public ResponseEntity<Region> createRegion(RegionCreate regionCreate) {
-
         var entity = mapper.toEntity(regionCreate);
         var created = referentielAdministratifService.createRegion(entity);
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toApi(created));
@@ -68,7 +62,6 @@ public class ReferentielAdministratifController implements ReferentielAdministra
 
     @Override
     public ResponseEntity<Village> createVillage(VillageCreate villageCreate) {
-
         var entity = mapper.toEntity(villageCreate);
         var created = referentielAdministratifService.createVillage(entity);
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toApi(created));
@@ -76,47 +69,72 @@ public class ReferentielAdministratifController implements ReferentielAdministra
 
     @Override
     public ResponseEntity<Void> deleteCommune(UUID id) {
-        return null;
+        referentielAdministratifService.deleteCommune(id);
+        return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> deleteDepartement(UUID id) {
-        return null;
+        referentielAdministratifService.deleteDepartement(id);
+        return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> deletePays(UUID id) {
-        return null;
+        referentielAdministratifService.deletePays(id);
+        return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> deleteQuartier(UUID id) {
-        return null;
+        referentielAdministratifService.deleteQuartier(id);
+        return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> deleteRegion(UUID id) {
-        return null;
+        referentielAdministratifService.deleteRegion(id);
+        return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> deleteVillage(UUID id) {
-        return null;
+        referentielAdministratifService.deleteVillage(id);
+        return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<PagePays> getAllPays(Integer page, Integer size) {
-        return null;
+        int pageIndex = (page != null) ? page : 0;
+        int pageSize = (size != null) ? size : 20;
+        Pageable pageable = PageRequest.of(pageIndex, pageSize, Sort.by("nom").ascending());
+
+        Page<PaysEntity> pageEntity = referentielAdministratifService.getPays(pageable);
+        List<Pays> dtos = pageEntity.getContent().stream().map(mapper::toApi).toList();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Total-Count", String.valueOf(pageEntity.getTotalElements()));
+        headers.add("X-Total-Pages", String.valueOf(pageEntity.getTotalPages()));
+
+        PagePays pageResponse = new PagePays();
+        pageResponse.setContent(dtos);
+        pageResponse.setPage(pageEntity.getNumber());
+        pageResponse.setSize(pageEntity.getSize());
+        pageResponse.setTotalElements(pageEntity.getTotalElements());
+        pageResponse.setTotalPages(pageEntity.getTotalPages());
+        pageResponse.setFirst(pageEntity.isFirst());
+        pageResponse.setLast(pageEntity.isLast());
+
+        return ResponseEntity.ok().headers(headers).body(pageResponse);
     }
 
     @Override
     public ResponseEntity<Commune> getCommune(UUID id) {
-        return null;
+        return ResponseEntity.ok(mapper.toApi(referentielAdministratifService.getCommuneById(id)));
     }
 
     @Override
     public ResponseEntity<PageCommune> getCommunes(Integer page, Integer size) {
-
         int pageIndex = (page != null) ? page : 0;
         int pageSize = (size != null) ? size : 20;
 
@@ -129,68 +147,61 @@ public class ReferentielAdministratifController implements ReferentielAdministra
         headers.add("X-Total-Count", String.valueOf(pageEntity.getTotalElements()));
         headers.add("X-Total-Pages", String.valueOf(pageEntity.getTotalPages()));
 
-        return ResponseEntity.ok().headers(headers).body((PageCommune) dtos);
+        PageCommune pageResponse = new PageCommune();
+        pageResponse.setContent(dtos);
+        pageResponse.setPage(pageEntity.getNumber());
+        pageResponse.setSize(pageEntity.getSize());
+        pageResponse.setTotalElements(pageEntity.getTotalElements());
+        pageResponse.setTotalPages(pageEntity.getTotalPages());
+        pageResponse.setFirst(pageEntity.isFirst());
+        pageResponse.setLast(pageEntity.isLast());
+
+        return ResponseEntity.ok().headers(headers).body(pageResponse);
     }
 
     @Override
     public ResponseEntity<Departement> getDepartement(UUID id) {
-        return null;
+        return ResponseEntity.ok(mapper.toApi(referentielAdministratifService.getDepartementById(id)));
     }
 
     @Override
     public ResponseEntity<PageDepartement> getDepartements(Integer page, Integer size) {
-        return null;
-    }
-
-    @Override
-    public ResponseEntity<Pays> getPays(UUID id) {
-        return null;
-    }
-
-    @Override
-    public ResponseEntity<Quartier> getQuartier(UUID id) {
-        return null;
-    }
-
-    @Override
-    public ResponseEntity<List<Departement>> getDpartements(Integer page, Integer size) {
-
         int pageIndex = (page != null) ? page : 0;
         int pageSize = (size != null) ? size : 20;
 
         Pageable pageable = PageRequest.of(pageIndex, pageSize, Sort.by("nom").ascending());
 
-        Page<DepartementEntity> pageEntity = referentielAdministratifService.getDpartements(pageable);
+        Page<DepartementEntity> pageEntity = referentielAdministratifService.getDepartements(pageable);
         List<Departement> dtos = pageEntity.getContent().stream().map(mapper::toApi).toList();
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Total-Count", String.valueOf(pageEntity.getTotalElements()));
         headers.add("X-Total-Pages", String.valueOf(pageEntity.getTotalPages()));
 
-        return ResponseEntity.ok().headers(headers).body(dtos);
+        PageDepartement pageResponse = new PageDepartement();
+        pageResponse.setContent(dtos);
+        pageResponse.setPage(pageEntity.getNumber());
+        pageResponse.setSize(pageEntity.getSize());
+        pageResponse.setTotalElements(pageEntity.getTotalElements());
+        pageResponse.setTotalPages(pageEntity.getTotalPages());
+        pageResponse.setFirst(pageEntity.isFirst());
+        pageResponse.setLast(pageEntity.isLast());
+
+        return ResponseEntity.ok().headers(headers).body(pageResponse);
     }
 
     @Override
-    public ResponseEntity<List<Pays>> getPays(Integer page, Integer size) {
+    public ResponseEntity<Pays> getPays(UUID id) {
+        return ResponseEntity.ok(mapper.toApi(referentielAdministratifService.getPaysById(id)));
+    }
 
-        int pageIndex = (page != null) ? page : 0;
-        int pageSize = (size != null) ? size : 20;
-
-        Pageable pageable = PageRequest.of(pageIndex, pageSize, Sort.by("nom").ascending());
-
-        Page<PaysEntity> pageEntity = referentielAdministratifService.getPays(pageable);
-        List<Pays> dtos = pageEntity.getContent().stream().map(mapper::toApi).toList();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(pageEntity.getTotalElements()));
-        headers.add("X-Total-Pages", String.valueOf(pageEntity.getTotalPages()));
-
-        return ResponseEntity.ok().headers(headers).body(dtos);
+    @Override
+    public ResponseEntity<Quartier> getQuartier(UUID id) {
+        return ResponseEntity.ok(mapper.toApi(referentielAdministratifService.getQuartierById(id)));
     }
 
     @Override
     public ResponseEntity<PageQuartier> getQuartiers(Integer page, Integer size) {
-
         int pageIndex = (page != null) ? page : 0;
         int pageSize = (size != null) ? size : 20;
 
@@ -203,45 +214,56 @@ public class ReferentielAdministratifController implements ReferentielAdministra
         headers.add("X-Total-Count", String.valueOf(pageEntity.getTotalElements()));
         headers.add("X-Total-Pages", String.valueOf(pageEntity.getTotalPages()));
 
-        return ResponseEntity.ok().headers(headers).body((PageQuartier) dtos);
+        PageQuartier pageResponse = new PageQuartier();
+        pageResponse.setContent(dtos);
+        pageResponse.setPage(pageEntity.getNumber());
+        pageResponse.setSize(pageEntity.getSize());
+        pageResponse.setTotalElements(pageEntity.getTotalElements());
+        pageResponse.setTotalPages(pageEntity.getTotalPages());
+        pageResponse.setFirst(pageEntity.isFirst());
+        pageResponse.setLast(pageEntity.isLast());
+
+        return ResponseEntity.ok().headers(headers).body(pageResponse);
     }
 
     @Override
     public ResponseEntity<Region> getRegion(UUID id) {
-        return null;
+        return ResponseEntity.ok(mapper.toApi(referentielAdministratifService.getRegionById(id)));
     }
 
     @Override
     public ResponseEntity<PageRegion> getRegions(Integer page, Integer size) {
-        return null;
-    }
-
-    @Override
-    public ResponseEntity<Village> getVillage(UUID id) {
-        return null;
-    }
-
-    @Override
-    public ResponseEntity<List<Region>> getRgions(Integer page, Integer size) {
-
         int pageIndex = (page != null) ? page : 0;
         int pageSize = (size != null) ? size : 20;
 
         Pageable pageable = PageRequest.of(pageIndex, pageSize, Sort.by("nom").ascending());
 
-        Page<RegionEntity> pageEntity = referentielAdministratifService.getRgions(pageable);
+        Page<RegionEntity> pageEntity = referentielAdministratifService.getRegions(pageable);
         List<Region> dtos = pageEntity.getContent().stream().map(mapper::toApi).toList();
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Total-Count", String.valueOf(pageEntity.getTotalElements()));
         headers.add("X-Total-Pages", String.valueOf(pageEntity.getTotalPages()));
 
-        return ResponseEntity.ok().headers(headers).body(dtos);
+        PageRegion pageResponse = new PageRegion();
+        pageResponse.setContent(dtos);
+        pageResponse.setPage(pageEntity.getNumber());
+        pageResponse.setSize(pageEntity.getSize());
+        pageResponse.setTotalElements(pageEntity.getTotalElements());
+        pageResponse.setTotalPages(pageEntity.getTotalPages());
+        pageResponse.setFirst(pageEntity.isFirst());
+        pageResponse.setLast(pageEntity.isLast());
+
+        return ResponseEntity.ok().headers(headers).body(pageResponse);
+    }
+
+    @Override
+    public ResponseEntity<Village> getVillage(UUID id) {
+        return ResponseEntity.ok(mapper.toApi(referentielAdministratifService.getVillageById(id)));
     }
 
     @Override
     public ResponseEntity<PageVillage> getVillages(Integer page, Integer size) {
-
         int pageIndex = (page != null) ? page : 0;
         int pageSize = (size != null) ? size : 20;
 
@@ -254,36 +276,51 @@ public class ReferentielAdministratifController implements ReferentielAdministra
         headers.add("X-Total-Count", String.valueOf(pageEntity.getTotalElements()));
         headers.add("X-Total-Pages", String.valueOf(pageEntity.getTotalPages()));
 
-        return ResponseEntity.ok().headers(headers).body((PageVillage) dtos);
+        PageVillage pageResponse = new PageVillage();
+        pageResponse.setContent(dtos);
+        pageResponse.setPage(pageEntity.getNumber());
+        pageResponse.setSize(pageEntity.getSize());
+        pageResponse.setTotalElements(pageEntity.getTotalElements());
+        pageResponse.setTotalPages(pageEntity.getTotalPages());
+        pageResponse.setFirst(pageEntity.isFirst());
+        pageResponse.setLast(pageEntity.isLast());
+
+        return ResponseEntity.ok().headers(headers).body(pageResponse);
     }
 
     @Override
     public ResponseEntity<Commune> updateCommune(UUID id, CommuneUpdate communeUpdate) {
-        return null;
+        var updated = referentielAdministratifService.updateCommune(id, mapper.toEntity(communeUpdate));
+        return ResponseEntity.ok(mapper.toApi(updated));
     }
 
     @Override
     public ResponseEntity<Departement> updateDepartement(UUID id, DepartementUpdate departementUpdate) {
-        return null;
+        var updated = referentielAdministratifService.updateDepartement(id, mapper.toEntity(departementUpdate));
+        return ResponseEntity.ok(mapper.toApi(updated));
     }
 
     @Override
     public ResponseEntity<Pays> updatePays(UUID id, PaysUpdate paysUpdate) {
-        return null;
+        var updated = referentielAdministratifService.updatePays(id, mapper.toEntity(paysUpdate));
+        return ResponseEntity.ok(mapper.toApi(updated));
     }
 
     @Override
     public ResponseEntity<Quartier> updateQuartier(UUID id, QuartierUpdate quartierUpdate) {
-        return null;
+        var updated = referentielAdministratifService.updateQuartier(id, mapper.toEntity(quartierUpdate));
+        return ResponseEntity.ok(mapper.toApi(updated));
     }
 
     @Override
     public ResponseEntity<Region> updateRegion(UUID id, RegionUpdate regionUpdate) {
-        return null;
+        var updated = referentielAdministratifService.updateRegion(id, mapper.toEntity(regionUpdate));
+        return ResponseEntity.ok(mapper.toApi(updated));
     }
 
     @Override
     public ResponseEntity<Village> updateVillage(UUID id, VillageUpdate villageUpdate) {
-        return null;
+        var updated = referentielAdministratifService.updateVillage(id, mapper.toEntity(villageUpdate));
+        return ResponseEntity.ok(mapper.toApi(updated));
     }
 }

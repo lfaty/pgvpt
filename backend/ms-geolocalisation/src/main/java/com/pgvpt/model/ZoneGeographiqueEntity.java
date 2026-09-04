@@ -32,18 +32,15 @@ public class ZoneGeographiqueEntity extends BaseEntity {
 
     private @Nullable Double longitudeCentre;
 
+    @Builder.Default
     private Boolean actif = true;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-            name = "zone_geographique_region",
-            joinColumns = @JoinColumn(name = "zone_geographique_id"),
-            inverseJoinColumns = @JoinColumn(name = "region_id"),
-            uniqueConstraints = {
-                    @UniqueConstraint(name = "uk_zone_geo_region_id", columnNames = {"region_id"})
-            }
-    )
-    private List<RegionEntity> regions = new ArrayList<>();
+    /**
+     * Relation vers l'entité de jointure ZoneGeographiqueRegionEntity.
+     * Remplace l'ancien @ManyToMany pour exposer id, createdAt, updatedAt sur chaque lien zone-région.
+     */
+    @OneToMany(mappedBy = "zoneGeographique", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ZoneGeographiqueRegionEntity> regionLinks = new ArrayList<>();
 
 }
-

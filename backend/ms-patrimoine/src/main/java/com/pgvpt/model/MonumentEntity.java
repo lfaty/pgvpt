@@ -28,6 +28,10 @@ public class MonumentEntity extends PatrimoineEntity {
 
     private String commanditaire;
 
+    private Integer anneeRenovation;
+
+    private String architecte;
+
     @Column(columnDefinition = "TEXT")
     private String contexteHistorique;
 
@@ -64,6 +68,12 @@ public class MonumentEntity extends PatrimoineEntity {
 
     public String getCommanditaire() { return commanditaire; }
     public void setCommanditaire(String commanditaire) { this.commanditaire = commanditaire; }
+
+    public Integer getAnneeRenovation() { return anneeRenovation; }
+    public void setAnneeRenovation(Integer anneeRenovation) { this.anneeRenovation = anneeRenovation; }
+
+    public String getArchitecte() { return architecte; }
+    public void setArchitecte(String architecte) { this.architecte = architecte; }
 
     public String getContexteHistorique() { return contexteHistorique; }
     public void setContexteHistorique(String contexteHistorique) { this.contexteHistorique = contexteHistorique; }

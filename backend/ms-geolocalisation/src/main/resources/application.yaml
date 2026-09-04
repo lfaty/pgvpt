@@ -2,19 +2,25 @@ server:
   port: 3002
 
 spring:
+  jackson:
+    default-property-inclusion: non_null
   application:
     name: ms-geolocalisation
 
+  config:
+    import: "optional:configserver:"
   cloud:
     config:
       enabled: false
+      import-check:
+        enabled: false
     discovery:
       enabled: false
 
   datasource:
     url: jdbc:postgresql://localhost:5432/geolocalisationdb
     username: postgres
-    password: admin
+    password: "Thies@#1521"
     driver-class-name: org.postgresql.Driver
 
   jpa:

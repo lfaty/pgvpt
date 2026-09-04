@@ -161,6 +161,9 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>com.pgvpt.MsGeolocalisationApplication</mainClass>
+				</configuration>
 			</plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -186,7 +189,7 @@
                         <path>
                             <groupId>org.mapstruct</groupId>
                             <artifactId>mapstruct-processor</artifactId>
-                            <version>1.5.5.Final</version> <!-- Adaptez selon votre version -->
+                            <version>1.6.3</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
@@ -195,7 +198,7 @@
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>7.25.0</version>
+                <version>7.10.0</version>
                 <executions>
                     <execution>
                         <id>generate-geolocalisationEntity-api</id>
@@ -208,7 +211,7 @@
                         <configuration>
 
                             <inputSpec>
-                                ${project.basedir}/src/main/resources/openapi/api.yml
+                                ${project.basedir}/src/main/resources/openapi/ms-geolocalisation.yml
                             </inputSpec>
 
                             <generatorName>spring</generatorName>
@@ -255,7 +258,10 @@
                                 <documentationProvider>none</documentationProvider>
 
                             </configOptions>
-
+                            
+                            <importMappings>
+                                <importMapping>JsonValue=com.fasterxml.jackson.annotation.JsonValue</importMapping>
+                            </importMappings>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
                             <skipValidateSpec>true</skipValidateSpec>
@@ -263,6 +269,33 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            
+            <plugin>
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>replacer</artifactId>
+                <version>1.5.3</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <basedir>${project.build.directory}/generated-sources/openapi/src/main/java/com/dev/pgvpt/api/model</basedir>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                    <replacements>
+                        <replacement>
+                            <token>import com\.fasterxml\.jackson\.annotation\.JsonCreator;</token>
+                            <value>import com.fasterxml.jackson.annotation.JsonCreator;&#10;import com.fasterxml.jackson.annotation.JsonValue;</value>
+                        </replacement>
+                    </replacements>
+                    <regex>true</regex>
+                </configuration>
             </plugin>
         </plugins>
 	</build>

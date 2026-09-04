@@ -132,6 +132,32 @@ paths:
           $ref: '#/components/responses/Forbidden'
       security:
       - bearerAuth: []
+    patch:
+      tags:
+      - Geolocalisations
+      summary: Mise à jour partielle d'une géolocalisation
+      operationId: patchGeolocalisation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeolocalisationUpdate'
+      responses:
+        '200':
+          description: Géolocalisation modifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Geolocalisation'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
     delete:
       tags:
       - Geolocalisations
@@ -172,6 +198,32 @@ paths:
       - Geolocalisations
       summary: Mettre à jour la géolocalisation d'un patrimoine
       operationId: updatePatrimoineGeolocalisation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeolocalisationUpdate'
+      responses:
+        '200':
+          description: Géolocalisation mise à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Geolocalisation'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    patch:
+      tags:
+      - Geolocalisations
+      summary: Mise à jour partielle de la géolocalisation d'un patrimoine
+      operationId: patchPatrimoineGeolocalisation
       requestBody:
         required: true
         content:
@@ -1812,10 +1864,6 @@ components:
       description: 'Une géolocalisation doit référencer exactement une ressource : un patrimoine ou une entreprise.'
     GeolocalisationUpdate:
       type: object
-      required:
-      - zoneTouristiqueId
-      - latitude
-      - longitude
       properties:
         latitude:
           type: number
@@ -2129,12 +2177,18 @@ components:
           type: number
           format: double
           minimum: 0
+        latitudeCentre:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        longitudeCentre:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
     ZoneGeographiqueUpdate:
       type: object
-      required:
-      - code
-      - nom
-      - regionIds
       properties:
         code:
           type: string
@@ -2146,7 +2200,6 @@ components:
           type: string
         regionIds:
           type: array
-          minItems: 1
           uniqueItems: true
           items:
             type: string
@@ -2155,6 +2208,16 @@ components:
           type: number
           format: double
           minimum: 0
+        latitudeCentre:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        longitudeCentre:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
     FeaturePatrimoine:
       allOf:
       - $ref: '#/components/schemas/BaseEntity'
@@ -2483,13 +2546,9 @@ components:
       - $ref: '#/components/schemas/BaseEntity'
       required:
       - id
-      - paysId
       - code
       - nom
       properties:
-        paysId:
-          type: string
-          format: uuid
         pays:
           $ref: '#/components/schemas/PaysReference'
         code:
@@ -2550,13 +2609,9 @@ components:
       - $ref: '#/components/schemas/BaseEntity'
       required:
       - id
-      - regionId
       - code
       - nom
       properties:
-        regionId:
-          type: string
-          format: uuid
         region:
           $ref: '#/components/schemas/RegionReference'
         code:
@@ -2608,13 +2663,9 @@ components:
       - $ref: '#/components/schemas/BaseEntity'
       required:
       - id
-      - departementId
       - code
       - nom
       properties:
-        departementId:
-          type: string
-          format: uuid
         departement:
           $ref: '#/components/schemas/DepartementReference'
         code:
@@ -2666,13 +2717,9 @@ components:
       - $ref: '#/components/schemas/BaseEntity'
       required:
       - id
-      - communeId
       - code
       - nom
       properties:
-        communeId:
-          type: string
-          format: uuid
         commune:
           $ref: '#/components/schemas/CommuneReference'
         code:
@@ -2724,19 +2771,11 @@ components:
       - $ref: '#/components/schemas/BaseEntity'
       required:
       - id
-      - communeId
       - code
       - nom
       properties:
-        communeId:
-          type: string
-          format: uuid
         commune:
           $ref: '#/components/schemas/CommuneReference'
-        villageId:
-          type: string
-          format: uuid
-          nullable: true
         village:
           $ref: '#/components/schemas/VillageReference'
         code:
@@ -2827,14 +2866,10 @@ components:
       type: object
       required:
       - id
-      - regionId
       - code
       - nom
       properties:
         id:
-          type: string
-          format: uuid
-        regionId:
           type: string
           format: uuid
         code:
@@ -2847,14 +2882,10 @@ components:
       type: object
       required:
       - id
-      - departementId
       - code
       - nom
       properties:
         id:
-          type: string
-          format: uuid
-        departementId:
           type: string
           format: uuid
         code:
@@ -2867,14 +2898,10 @@ components:
       type: object
       required:
       - id
-      - communeId
       - code
       - nom
       properties:
         id:
-          type: string
-          format: uuid
-        communeId:
           type: string
           format: uuid
         code:
@@ -2887,20 +2914,12 @@ components:
       type: object
       required:
       - id
-      - communeId
       - code
       - nom
       properties:
         id:
           type: string
           format: uuid
-        communeId:
-          type: string
-          format: uuid
-        villageId:
-          type: string
-          format: uuid
-          nullable: true
         code:
           type: string
           example: Q001
@@ -3026,6 +3045,16 @@ components:
           type: string
           format: uuid
           nullable: true
+        latitudeCentre:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        longitudeCentre:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
       oneOf:
       - required:
         - departementId
@@ -3055,10 +3084,6 @@ components:
         Elle est rattachée à exactement un seul niveau territorial : département, commune ou village.'
     ZoneTouristiqueUpdate:
       type: object
-      required:
-      - code
-      - nom
-      - zoneGeographiqueId
       properties:
         code:
           type: string
@@ -3089,31 +3114,16 @@ components:
           type: string
           format: uuid
           nullable: true
-      oneOf:
-      - required:
-        - departementId
-        not:
-          anyOf:
-          - required:
-            - communeId
-          - required:
-            - villageId
-      - required:
-        - communeId
-        not:
-          anyOf:
-          - required:
-            - departementId
-          - required:
-            - villageId
-      - required:
-        - villageId
-        not:
-          anyOf:
-          - required:
-            - departementId
-          - required:
-            - communeId
+        latitudeCentre:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        longitudeCentre:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
       description: 'Création d’une zone touristique. Décrit une zone touristique rattachée à une seule zone géographique.
         Elle est rattachée à exactement un seul niveau territorial : département, commune ou village.'
     ZoneGeographiqueReference:

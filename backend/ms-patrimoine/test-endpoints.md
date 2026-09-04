@@ -514,6 +514,112 @@ Content-Type: application/json
 
 ---
 
+### 1.4 Créer un Musée (Théodore Monod)
+
+```
+POST /patrimoines
+Content-Type: application/json
+```
+
+```json
+{
+  "type": "MUSEE",
+  "code": "MUS-DKR-001",
+  "nom": "Musée Théodore Monod",
+  "nomLocal": "IFAN",
+  "nomHistorique": "Musée de l'IFAN",
+  "categorie": "PATRIMOINE_CULTUREL",
+  "sousCategorie": "Musée d'Art",
+  "periode": "CONTEMPORAINE",
+  "siecle": "XXe",
+  "dateOuverture": "1936-01-01",
+  "description": "Un des plus anciens musées d'art d'Afrique de l'Ouest.",
+  "descriptionCourte": "Musée d'art africain classique.",
+  "historique": "Créé en 1936.",
+  "importanceHistorique": "Élevée",
+  "importanceCulturelle": "Majeure",
+  "importanceTouristique": "Très visité",
+  "valeurPatrimoniale": "Inestimable",
+  "valeurSpirituelle": "Néant",
+  "traditionsAssociees": [
+    "Expositions"
+  ],
+  "langues": ["Français"],
+  "etatConservation": "BON",
+  "statut": "PUBLIE",
+  "classePatrimoine": true,
+  "referenceClassement": "SN-PAT-1936",
+  "dateClassement": "1936-05-10",
+  "inscritUnesco": false,
+  "protectionJuridique": "Domaine public",
+  "organismeGestionnaire": "UCAD",
+  "proprietaire": "État du Sénégal",
+  "gestionnaire": "IFAN",
+  "siteWeb": "http://ifan.ucad.sn",
+  "email": "contact@ifan.sn",
+  "telephone": "+221338231010",
+  "accessibilite": {
+    "accessiblePublic": true,
+    "accessibilitePMR": true,
+    "accesFauteuilRoulant": true,
+    "accesTransportPublic": true,
+    "accesEnfant": true,
+    "parking": true,
+    "guideDisponible": true,
+    "guideAudio": false,
+    "langueVisite": ["Français"],
+    "conditionsAcces": "Billet requis",
+    "restrictions": ["Pas de flash"]
+  },
+  "tarification": {
+    "gratuit": false,
+    "tarifNormal": 2000.0,
+    "tarifEnfant": 500.0,
+    "tarifEtudiant": 1000.0,
+    "tarifGroupe": 1500.0,
+    "devise": "XOF",
+    "conditionsTarifaires": "Gratuit mercredi"
+  },
+  "geolocalisation": { 
+    "id": "REMPLACER_PAR_ID_GEOLOCALISATION_ICI" 
+  },
+  "horaires": [
+    { "jour": "LUNDI", "ouvert": false, "commentaire": "Fermé le lundi" },
+    { "jour": "MARDI", "ouvert": true, "heureOuverture": "09:00:00", "heureFermeture": "17:00:00", "surReservation": false },
+    { "jour": "MERCREDI", "ouvert": true, "heureOuverture": "09:00:00", "heureFermeture": "17:00:00", "surReservation": false },
+    { "jour": "JEUDI", "ouvert": true, "heureOuverture": "09:00:00", "heureFermeture": "17:00:00", "surReservation": false },
+    { "jour": "VENDREDI", "ouvert": true, "heureOuverture": "09:00:00", "heureFermeture": "17:00:00", "surReservation": false },
+    { "jour": "SAMEDI", "ouvert": true, "heureOuverture": "09:00:00", "heureFermeture": "17:00:00", "surReservation": false },
+    { "jour": "DIMANCHE", "ouvert": true, "heureOuverture": "09:00:00", "heureFermeture": "17:00:00", "surReservation": false }
+  ],
+  "photos": [
+    {
+      "url": "http://example.com/photo.jpg",
+      "legende": "Façade",
+      "credit": "IFAN",
+      "estPrincipale": true
+    }
+  ],
+  "conservation": {
+    "dateEvaluation": "2023-01-15",
+    "etat": "BON",
+    "descriptionEtat": "Rénové",
+    "degradations": ["Infiltrations"],
+    "causesDegradation": ["Pluie"],
+    "travauxNecessaires": ["Réfection"]
+  },
+  "nombreOeuvres": 9500,
+  "capaciteAccueil": 500,
+  "typesCollections": ["Masques", "Statues"],
+  "servicesMusee": ["Boutique"],
+  "museographie": "Parcours thématique"
+}
+```
+
+**Réponse attendue** : `201 Created`
+
+---
+
 ### 1.4 Obtenir un patrimoine par ID
 
 ```

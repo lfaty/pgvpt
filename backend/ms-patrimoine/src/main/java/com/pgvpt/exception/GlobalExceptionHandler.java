@@ -50,7 +50,7 @@ public class GlobalExceptionHandler {
         ex.printStackTrace(); // ADDED FOR DEBUGGING
         ApiError error = new ApiError();
         error.setCode(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
-        error.setMessage("Une erreur interne s'est produite.");
+        error.setMessage("Une erreur interne s'est produite: " + ex.getMessage() + (ex.getCause() != null ? " | Cause: " + ex.getCause().getMessage() : ""));
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

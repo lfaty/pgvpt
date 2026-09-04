@@ -47,23 +47,24 @@ public class ZoneTouristiqueEntity extends BaseEntity {
 
     private @Nullable Double longitudeCentre;
 
+    @Builder.Default
     private Boolean actif = true;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "zone_geographique_id", nullable = false)
     private ZoneGeographiqueEntity zoneGeographique;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "departement_id")
-    private @Nullable DepartementEntity departement = null;
+    private @Nullable DepartementEntity departement;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "commune_id")
-    private @Nullable CommuneEntity commune = null;
+    private @Nullable CommuneEntity commune;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "village_id")
-    private @Nullable VillageEntity village = null;
+    private @Nullable VillageEntity village;
 
 
 }

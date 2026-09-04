@@ -45,12 +45,6 @@ public class PaysEntity extends BaseEntity {
 
     private Boolean actif = true;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private @Nullable OffsetDateTime createdAt;
-
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private @Nullable OffsetDateTime updatedAt;
-
 //    @OneToMany
 //    private List<RegionReference> regionReferences;
 
