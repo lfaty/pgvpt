@@ -3,16 +3,7 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
-      <profile name="Annotation profile for ms-patrimoine" enabled="true">
-        <sourceOutputDir name="../generated-sources/annotations" />
-        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
-        </processorPath>
-        <module name="ms-patrimoine.test" />
-        <module name="ms-patrimoine.main" />
-      </profile>
-      <profile name="Annotation profile for ms-geolocalisationEntity" enabled="true">
+      <profile name="Annotation profile for ms-tourisme" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -22,7 +13,16 @@
           <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.5.5.Final/mapstruct-1.5.5.Final.jar" />
         </processorPath>
+        <module name="ms-circuit" />
+        <module name="ms-tourisme" />
+        <module name="ms-patrimoine.main" />
+        <module name="ms-patrimoine" />
+        <module name="ms-patrimoine.test" />
         <module name="ms-geolocalisation" />
+        <module name="ms-media" />
+        <module name="ms-contenu" />
+        <module name="ms-evenement" />
+        <module name="ms-reservation" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -32,12 +32,18 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="ms-circuit" options="-parameters" />
+      <module name="ms-contenu" options="-parameters" />
+      <module name="ms-evenement" options="-parameters" />
       <module name="ms-geolocalisation" options="-parameters" />
       <module name="ms-geolocalisation.main" options="-parameters" />
       <module name="ms-geolocalisation.test" options="-parameters" />
+      <module name="ms-media" options="-parameters" />
       <module name="ms-patrimoine" options="-parameters" />
       <module name="ms-patrimoine.main" options="-parameters" />
       <module name="ms-patrimoine.test" options="-parameters" />
+      <module name="ms-reservation" options="-parameters" />
+      <module name="ms-tourisme" options="-parameters" />
     </option>
   </component>
 </project>

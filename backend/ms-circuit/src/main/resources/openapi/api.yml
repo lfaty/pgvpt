@@ -1,0 +1,1422 @@
+openapi: 3.0.3
+
+info:
+  title: PGVPT - Microservice Circuits Touristiques
+  description: |
+    API Contract-First du microservice de gestion des circuits touristiques
+    de la Plateforme numérique intégrée de Gestion et de Valorisation du
+    Patrimoine Touristique du Sénégal (PGVPT).
+
+    Le microservice assure :
+      - la gestion des circuits touristiques ;
+      - la gestion des Etapes des circuits ;
+      - l'association d'un patrimoine à une étape ;
+      - l'association d'une activité à une étape ;
+      - la gestion des Activites touristiques ;
+      - l'optimisation des itinéraires ;
+      - le calcul de la distance et de la durée du circuit ;
+      - le calcul du coût indicatif des Activites ;
+      - la gestion du cycle de vie des circuits ;
+      - le calcul de la durée, de la distance et du prix total des circuits.
+
+    Les références vers les patrimoines sont réalisées par patrimoineId
+    provenant de ms-patrimoine. Les relations inter-microservices sont
+    représentées par des UUID et ne sont pas des relations JPA.
+
+  version: 3.0.0
+
+servers:
+  - url: http://localhost:3006/api/v1
+    description: Environnement local
+
+  - url: https://api.pgvpt.sn/circuit/api/v1
+    description: Environnement de production
+
+tags:
+  - name: Circuits
+    description: Gestion des circuits touristiques
+
+  - name: Etapes
+    description: Gestion des Etapes des circuits
+
+  - name: Activites
+    description: Gestion des Activites touristiques
+
+  - name: Optimisation
+    description: Optimisation des itinéraires touristiques
+
+paths:
+
+  # ============================================================
+  # CIRCUITS
+  # ============================================================
+
+  /circuits:
+
+    get:
+      tags:
+        - Circuits
+      summary: Lister les circuits
+      operationId: listCircuits
+
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Search'
+        - name: zoneTouristiqueId
+          in: query
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+
+        '200':
+          description: Liste des circuits
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Circuit'
+
+    post:
+      tags:
+        - Circuits
+      summary: Créer un circuit
+      operationId: createCircuit
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CircuitCreateRequest'
+
+      responses:
+
+        '201':
+          description: Circuit créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Circuit'
+
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /circuits/{id}:
+
+    get:
+      tags:
+        - Circuits
+      summary: Consulter un circuit
+      operationId: getCircuit
+
+      parameters:
+        - $ref: '#/components/parameters/Id'
+
+      responses:
+
+        '200':
+          description: Circuit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Circuit'
+
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Circuits
+      summary: Modifier un circuit
+      operationId: updateCircuit
+
+      parameters:
+        - $ref: '#/components/parameters/Id'
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CircuitUpdateRequest'
+
+      responses:
+
+        '200':
+          description: Circuit modifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Circuit'
+
+    delete:
+      tags:
+        - Circuits
+      summary: Supprimer un circuit
+      operationId: deleteCircuit
+
+      parameters:
+        - $ref: '#/components/parameters/Id'
+
+      responses:
+
+        '204':
+          description: Circuit supprimé
+
+
+  # ============================================================
+  # CYCLE DE VIE ET CALCULS DU CIRCUIT
+  # ============================================================
+
+  /circuits/{id}/publier:
+    patch:
+      tags:
+        - Circuits
+      summary: Publier un circuit
+      description: Publie un circuit après validation de ses données et de ses Etapes.
+      operationId: publierCircuit
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Circuit publié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Circuit'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /circuits/{id}/depublier:
+    patch:
+      tags:
+        - Circuits
+      summary: Dépublier un circuit
+      description: Retire un circuit de la publication sans le supprimer.
+      operationId: depublierCircuit
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Circuit dépublié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Circuit'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /circuits/{id}/archiver:
+    patch:
+      tags:
+        - Circuits
+      summary: Archiver un circuit
+      description: Archive un circuit qui ne doit plus être proposé à la commercialisation ou à la consultation active.
+      operationId: archiverCircuit
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Circuit archivé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Circuit'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /circuits/{id}/duree:
+    get:
+      tags:
+        - Circuits
+      summary: Calculer la durée totale d'un circuit
+      operationId: calculerDureeCircuit
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Durée totale du circuit en minutes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculDureeCircuitResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /circuits/{id}/distance:
+    get:
+      tags:
+        - Circuits
+      summary: Calculer la distance totale d'un circuit
+      operationId: calculerDistanceCircuit
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Distance totale du circuit en kilomètres
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculDistanceCircuitResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /circuits/{id}/prix:
+    get:
+      tags:
+        - Circuits
+      summary: Calculer le prix total d'un circuit
+      operationId: calculerPrixCircuit
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Prix total du circuit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculPrixCircuitResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+
+  # ============================================================
+  # ETAPES CIRCUIT
+  # ============================================================
+
+  /circuits/{circuitId}/etapes:
+    get:
+      tags:
+        - Etapes
+      summary: Lister les Etapes d'un circuit
+      operationId: listCircuitSteps
+      parameters:
+        - $ref: '#/components/parameters/CircuitId'
+      responses:
+        '200':
+          description: Liste des Etapes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EtapeCircuit'
+
+    post:
+      tags:
+        - Etapes
+      summary: Ajouter une étape à un circuit
+      operationId: createCircuitStep
+      parameters:
+        - $ref: '#/components/parameters/CircuitId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EtapeCircuitCreateRequest'
+      responses:
+        '201':
+          description: Étape créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EtapeCircuit'
+                
+  /etapes/{id}:
+    get:
+      tags:
+        - Etapes
+      summary: Consulter une étape
+      operationId: getCircuitStep
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Étape
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EtapeCircuit'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Etapes
+      summary: Modifier une étape
+      operationId: updateCircuitStep
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EtapeCircuitUpdateRequest'
+      responses:
+        '200':
+          description: Étape modifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EtapeCircuit'
+
+    delete:
+      tags:
+        - Etapes
+      summary: Supprimer une étape
+      operationId: deleteCircuitStep
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Étape supprimée
+          
+  /circuits/{circuitId}/etapes/reordonner:
+    put:
+      tags:
+        - Etapes
+      summary: Réordonner les Etapes d'un circuit
+      operationId: reordonnerEtapes
+      parameters:
+        - $ref: '#/components/parameters/CircuitId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReordonnerEtapesRequest'
+      responses:
+        '200':
+          description: Etapes réordonnées
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EtapeCircuit'
+
+  # ============================================================
+  # ACTIVITES
+  # ============================================================
+
+  /activites:
+
+    get:
+      tags:
+        - Activites
+      summary: Lister les Activites
+      operationId: listActivites
+
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - name: code
+          in: query
+          schema:
+            type: string
+
+        - name: libelle
+          in: query
+          schema:
+            type: string
+
+      responses:
+
+        '200':
+          description: Liste des Activites
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Activite'
+
+    post:
+      tags:
+        - Activites
+      summary: Créer une activité
+      operationId: createActivite
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActiviteCreateRequest'
+
+      responses:
+
+        '201':
+          description: Activité créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activite'
+
+
+  /activites/{id}:
+
+    get:
+      tags:
+        - Activites
+      summary: Consulter une activité
+      operationId: getActivite
+
+      parameters:
+        - $ref: '#/components/parameters/Id'
+
+      responses:
+
+        '200':
+          description: Activité
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activite'
+
+    put:
+      tags:
+        - Activites
+      summary: Modifier une activité
+      operationId: updateActivite
+
+      parameters:
+        - $ref: '#/components/parameters/Id'
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActiviteUpdateRequest'
+
+      responses:
+
+        '200':
+          description: Activité modifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activite'
+
+    delete:
+      tags:
+        - Activites
+      summary: Supprimer une activité
+      operationId: deleteActivite
+
+      parameters:
+        - $ref: '#/components/parameters/Id'
+
+      responses:
+
+        '204':
+          description: Activité supprimée
+
+
+  # ============================================================
+  # CYCLE DE VIE DES ACTIVITES
+  # ============================================================
+
+  /activites/{id}/activer:
+    patch:
+      tags:
+        - Activites
+      summary: Activer une activité
+      description: Rend l'activité disponible pour être associée à de nouvelles Etapes.
+      operationId: activerActivite
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Activité activée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activite'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /activites/{id}/desactiver:
+    patch:
+      tags:
+        - Activites
+      summary: Désactiver une activité
+      description: Rend l'activité indisponible pour de nouvelles associations tout en conservant son historique.
+      operationId: desactiverActivite
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Activité désactivée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activite'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+
+  # ============================================================
+  # OPTIMISATION
+  # ============================================================
+
+  /circuits/{circuitId}/itineraire/optimiser:
+
+    post:
+      tags:
+        - Optimisation
+      summary: Optimiser l'itinéraire d'un circuit
+      description: |
+        Calcule un ordre optimisé des Etapes du circuit.
+
+        L'optimisation peut prendre en compte :
+          - la position géographique des patrimoines ;
+          - la distance entre les Etapes ;
+          - la durée des Activites ;
+          - le niveau de difficulté ;
+          - le temps maximal disponible ;
+          - le coût des Activites.
+
+        Le calcul géographique peut utiliser les coordonnées provenant
+        de ms-gis.
+
+      operationId: optimizeCircuitRoute
+
+      parameters:
+        - $ref: '#/components/parameters/CircuitId'
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OptimisationItineraireRequest'
+
+      responses:
+
+        '200':
+          description: Itinéraire optimisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItineraireOptimise'
+
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+        '422':
+          description: Impossible d'optimiser le circuit
+
+
+components:
+
+  # ============================================================
+  # PARAMETERS
+  # ============================================================
+
+  parameters:
+
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    CircuitId:
+      name: circuitId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    Page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+
+    Size:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+    Search:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
+
+
+  # ============================================================
+  # SCHEMAS
+  # ============================================================
+
+  schemas:
+
+    # ----------------------------------------------------------
+    # BASE ENTITY
+    # ----------------------------------------------------------
+
+    BaseEntity:
+
+      type: object
+
+      properties:
+
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+
+
+    # ----------------------------------------------------------
+    # CIRCUIT
+    # ----------------------------------------------------------
+
+    Circuit:
+
+      allOf:
+
+        - $ref: '#/components/schemas/BaseEntity'
+
+        - type: object
+
+          required:
+            - nom
+            - type
+            - zoneTouristiqueId
+
+          properties:
+
+            nom:
+              type: string
+              minLength: 2
+              maxLength: 200
+
+            description:
+              type: string
+
+            type:
+              $ref: '#/components/schemas/TypeCircuit'
+
+            zoneTouristiqueId:
+              type: string
+              format: uuid
+
+            dateDebut:
+              type: string
+              format: date
+              nullable: true
+              description: Date de début de validité ou de programmation du circuit
+
+            dateFin:
+              type: string
+              format: date
+              nullable: true
+              description: Date de fin de validité ou de programmation du circuit. Doit être supérieure ou égale à dateDebut.
+
+            statut:
+              allOf:
+                - $ref: '#/components/schemas/StatutCircuit'
+              default: BROUILLON
+              readOnly: true
+
+            dureeMinutes:
+              type: integer
+              minimum: 0
+
+            distanceKm:
+              type: number
+              format: double
+              minimum: 0
+
+            niveauDifficulte:
+              $ref: '#/components/schemas/NiveauDifficulte'
+
+            actif:
+              type: boolean
+              default: true
+
+            nombreEtapes:
+              type: integer
+              minimum: 0
+              readOnly: true
+
+            coutTotal:
+              type: number
+              format: double
+              minimum: 0
+              readOnly: true
+
+
+    CircuitCreateRequest:
+
+      type: object
+
+      required:
+        - nom
+        - type
+        - zoneTouristiqueId
+
+      properties:
+
+        nom:
+          type: string
+          minLength: 2
+          maxLength: 200
+
+        description:
+          type: string
+
+        type:
+          $ref: '#/components/schemas/TypeCircuit'
+
+        zoneTouristiqueId:
+          type: string
+          format: uuid
+
+        dateDebut:
+          type: string
+          format: date
+          nullable: true
+
+        dateFin:
+          type: string
+          format: date
+          nullable: true
+          description: Doit être supérieure ou égale à dateDebut.
+
+        niveauDifficulte:
+          $ref: '#/components/schemas/NiveauDifficulte'
+
+        actif:
+          type: boolean
+          default: true
+
+
+    CircuitUpdateRequest:
+
+      allOf:
+
+        - $ref: '#/components/schemas/CircuitCreateRequest'
+
+
+    # ----------------------------------------------------------
+    # ACTIVITE
+    # ----------------------------------------------------------
+
+    Activite:
+
+      allOf:
+
+        - $ref: '#/components/schemas/BaseEntity'
+
+        - type: object
+
+          required:
+            - code
+            - libelle
+            - prixInitial
+
+          properties:
+
+            code:
+              type: string
+              minLength: 2
+              maxLength: 50
+              pattern: '^[A-Z0-9_-]+$'
+              description: Code unique de l'activité
+
+            libelle:
+              type: string
+              minLength: 2
+              maxLength: 150
+              description: Libellé de l'activité
+
+            description:
+              type: string
+              maxLength: 1000
+
+            prixInitial:
+              type: number
+              format: double
+              minimum: 0
+              description: Prix initial de référence de l'activité
+
+            actif:
+              type: boolean
+              default: true
+              description: Indique si l'activité est active
+
+
+    ActiviteCreateRequest:
+
+      type: object
+
+      required:
+        - code
+        - libelle
+        - prixInitial
+
+      properties:
+
+        code:
+          type: string
+          minLength: 2
+          maxLength: 50
+          pattern: '^[A-Z0-9_-]+$'
+
+        libelle:
+          type: string
+          minLength: 2
+          maxLength: 150
+
+        description:
+          type: string
+          maxLength: 1000
+
+        prixInitial:
+          type: number
+          format: double
+          minimum: 0
+
+        actif:
+          type: boolean
+          default: true
+
+
+    ActiviteUpdateRequest:
+
+      allOf:
+
+        - $ref: '#/components/schemas/ActiviteCreateRequest'
+
+
+    # ----------------------------------------------------------
+    # ETAPE CIRCUIT
+    # ----------------------------------------------------------
+
+    EtapeCircuit:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntity'
+        - type: object
+          required:
+            - circuitId
+            - patrimoineId
+            - activiteId
+            - ordre
+            - prix
+          properties:
+            circuitId:
+              type: string
+              format: uuid
+              description: Identifiant du circuit
+
+            patrimoineId:
+              type: string
+              format: uuid
+              description: Identifiant du patrimoine provenant de ms-patrimoine
+
+            activiteId:
+              type: string
+              format: uuid
+              description: Identifiant de l'activité gérée par ms-circuit
+
+            ordre:
+              type: integer
+              minimum: 1
+              description: Position de l'étape dans le circuit
+
+            dureeMinutes:
+              type: integer
+              minimum: 0
+              description: Durée prévue pour l'étape
+
+            distanceDepuisPrecedenteKm:
+              type: number
+              format: double
+              minimum: 0
+              description: Distance depuis l'étape précédente
+
+            prix:
+              type: number
+              format: double
+              minimum: 0
+              description: Prix appliqué à cette étape
+
+            devise:
+              type: string
+              minLength: 3
+              maxLength: 3
+              default: XOF
+              description: Devise du prix
+
+            description:
+              type: string
+              maxLength: 1000
+
+            obligatoire:
+              type: boolean
+              default: true
+              description: Indique si l'étape est obligatoire
+
+            actif:
+              type: boolean
+              default: true
+
+    EtapeCircuitCreateRequest:
+      type: object
+      required:
+        - patrimoineId
+        - activiteId
+        - ordre
+        - prix
+      properties:
+
+        patrimoineId:
+          type: string
+          format: uuid
+
+        activiteId:
+          type: string
+          format: uuid
+
+        ordre:
+          type: integer
+          minimum: 1
+
+        dureeMinutes:
+          type: integer
+          minimum: 0
+
+        distanceDepuisPrecedenteKm:
+          type: number
+          format: double
+          minimum: 0
+
+        prix:
+          type: number
+          format: double
+          minimum: 0
+
+        devise:
+          type: string
+          minLength: 3
+          maxLength: 3
+          default: XOF
+
+        description:
+          type: string
+          maxLength: 1000
+
+        obligatoire:
+          type: boolean
+          default: true
+
+        actif:
+          type: boolean
+          default: true
+
+    EtapeCircuitUpdateRequest:
+      type: object
+      properties:
+
+        patrimoineId:
+          type: string
+          format: uuid
+
+        activiteId:
+          type: string
+          format: uuid
+
+        ordre:
+          type: integer
+          minimum: 1
+
+        dureeMinutes:
+          type: integer
+          minimum: 0
+
+        distanceDepuisPrecedenteKm:
+          type: number
+          format: double
+          minimum: 0
+
+        prix:
+          type: number
+          format: double
+          minimum: 0
+
+        devise:
+          type: string
+          minLength: 3
+          maxLength: 3
+
+        description:
+          type: string
+          maxLength: 1000
+
+        obligatoire:
+          type: boolean
+
+        actif:
+          type: boolean
+          
+
+    ReordonnerEtapesRequest: 
+      type: object
+      required:
+        - etapes
+      properties:
+        etapes:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/OrdreEtape'
+
+    OrdreEtape:
+      type: object
+      required:
+        - etapeId
+        - ordre
+      properties:
+        etapeId:
+          type: string
+          format: uuid
+
+        ordre:
+          type: integer
+          minimum: 1
+              
+
+    # ----------------------------------------------------------
+    # OPTIMISATION
+    # ----------------------------------------------------------
+
+    OptimisationItineraireRequest:
+
+      type: object
+
+      properties:
+
+        methode:
+          type: string
+          enum:
+            - DISTANCE_MINIMALE
+            - DUREE_MINIMALE
+            - COUT_MINIMAL
+            - MULTICRITERE
+          default: MULTICRITERE
+
+        latitudeDepart:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+
+        longitudeDepart:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+
+        latitudeArrivee:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+
+        longitudeArrivee:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+
+        dureeMaxMinutes:
+          type: integer
+          minimum: 1
+
+        poidsDistance:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+          default: 0.5
+
+        poidsDuree:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+          default: 0.3
+
+        poidsCout:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+          default: 0.2
+
+
+    ItineraireOptimise:
+
+      type: object
+
+      properties:
+
+        circuitId:
+          type: string
+          format: uuid
+
+        methode:
+          type: string
+
+        distanceTotaleKm:
+          type: number
+          format: double
+          minimum: 0
+
+        dureeTotaleMinutes:
+          type: integer
+          minimum: 0
+
+        coutTotal:
+          type: number
+          format: double
+          minimum: 0
+
+        scoreOptimisation:
+          type: number
+          format: double
+
+        etapes:
+
+          type: array
+
+          items:
+            $ref: '#/components/schemas/EtapeOptimisee'
+
+
+    EtapeOptimisee:
+
+      type: object
+
+      required:
+        - ordre
+        - patrimoineId
+        - activiteId
+
+      properties:
+
+        ordre:
+          type: integer
+          minimum: 1
+
+        patrimoineId:
+          type: string
+          format: uuid
+
+        activiteId:
+          type: string
+          format: uuid
+
+        distanceDepuisPrecedenteKm:
+          type: number
+          format: double
+          minimum: 0
+
+        dureeMinutes:
+          type: integer
+          minimum: 0
+
+        cout:
+          type: number
+          format: double
+          minimum: 0
+
+
+    CalculDureeCircuitResponse:
+      type: object
+      required:
+        - circuitId
+        - dureeTotaleMinutes
+      properties:
+        circuitId:
+          type: string
+          format: uuid
+        dureeTotaleMinutes:
+          type: integer
+          minimum: 0
+          description: Durée totale calculée du circuit en minutes
+        calculeLe:
+          type: string
+          format: date-time
+          readOnly: true
+
+    CalculDistanceCircuitResponse:
+      type: object
+      required:
+        - circuitId
+        - distanceTotaleKm
+      properties:
+        circuitId:
+          type: string
+          format: uuid
+        distanceTotaleKm:
+          type: number
+          format: double
+          minimum: 0
+          description: Distance totale calculée du circuit en kilomètres
+        calculeLe:
+          type: string
+          format: date-time
+          readOnly: true
+
+    CalculPrixCircuitResponse:
+      type: object
+      required:
+        - circuitId
+        - prixTotal
+        - devise
+      properties:
+        circuitId:
+          type: string
+          format: uuid
+        prixTotal:
+          type: number
+          format: double
+          minimum: 0
+          description: Prix total calculé à partir des prix des Etapes actives
+        devise:
+          type: string
+          minLength: 3
+          maxLength: 3
+          default: XOF
+        calculeLe:
+          type: string
+          format: date-time
+          readOnly: true
+
+    # ----------------------------------------------------------
+    # ENUMS
+    # ----------------------------------------------------------
+
+    StatutCircuit:
+      type: string
+      description: État du cycle de vie du circuit
+      enum:
+        - BROUILLON
+        - PUBLIE
+        - DEPUBLIE
+        - ARCHIVE
+
+    TypeCircuit:
+
+      type: string
+
+      enum:
+        - CULTUREL
+        - HISTORIQUE
+        - NATURE
+        - RELIGIEUX
+        - GASTRONOMIQUE
+        - ARTISANAL
+        - MIXTE
+
+
+    NiveauDifficulte:
+
+      type: string
+
+      enum:
+        - FACILE
+        - MOYEN
+        - DIFFICILE
+
+
+    # ----------------------------------------------------------
+    # ERROR
+    # ----------------------------------------------------------
+
+    ApiError:
+
+      type: object
+
+      properties:
+
+        timestamp:
+          type: string
+          format: date-time
+
+        status:
+          type: integer
+
+        code:
+          type: string
+
+        message:
+          type: string
+
+        path:
+          type: string
+
+
+  # ============================================================
+  # RESPONSES
+  # ============================================================
+
+  responses:
+
+    BadRequest:
+      description: Requête invalide
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+
+    NotFound:
+      description: Ressource introuvable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+
+    Conflict:
+      description: Conflit métier
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'

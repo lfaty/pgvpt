@@ -1,10 +1,10 @@
 package com.pgvpt.controller;
 
-import com.dev.pgvpt.api.GeolocalisationsApi;
-import com.dev.pgvpt.api.model.Geolocalisation;
-import com.dev.pgvpt.api.model.GeolocalisationCreate;
-import com.dev.pgvpt.api.model.GeolocalisationUpdate;
-import com.dev.pgvpt.api.model.PageGeolocalisation;
+import com.pgvpt.api.GeolocalisationsApi;
+import com.pgvpt.dto.Geolocalisation;
+import com.pgvpt.dto.GeolocalisationCreate;
+import com.pgvpt.dto.GeolocalisationUpdate;
+import com.pgvpt.dto.PageGeolocalisation;
 import com.pgvpt.mapper.GeolocalisationApiMapper;
 import com.pgvpt.model.GeolocalisationEntity;
 import com.pgvpt.service.GeolocalisationService;

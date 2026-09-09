@@ -1,0 +1,689 @@
+openapi: 3.0.3
+info:
+  title: PGVPT - API Réservations
+  version: 3.0.0
+  description: API Contract-First du microservice ms-reservation du PGVPT. Orchestre
+    les réservations de circuits, activités, offres touristiques et événements, vérifie
+    la disponibilité auprès du microservice propriétaire, calcule le montant et gère
+    le cycle de vie et les participants. Les références inter-microservices sont des
+    UUID.
+servers:
+- url: /api/v1
+tags:
+- name: Reservations
+- name: Disponibilite
+paths:
+  /reservations:
+    post:
+      tags:
+      - Reservations
+      operationId: createReservation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationCreate'
+      responses:
+        '201':
+          description: Réservation créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        '409':
+          description: Disponibilité insuffisante
+        '422':
+          description: Données métier invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurResponse'
+        '400':
+          description: Requête invalide
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: false
+        description: Clé unique pour rendre la création idempotente.
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 100
+    get:
+      tags:
+      - Reservations
+      operationId: searchReservations
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+      - name: size
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: utilisateurId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: statut
+        in: query
+        schema:
+          $ref: '#/components/schemas/StatutReservation'
+      - name: typeRessource
+        in: query
+        schema:
+          $ref: '#/components/schemas/TypeRessource'
+      - name: ressourceId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: dateDebut
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: dateFin
+        in: query
+        schema:
+          type: string
+          format: date-time
+      responses:
+        '200':
+          description: Réservations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationPage'
+  /reservations/{id}:
+    get:
+      tags:
+      - Reservations
+      operationId: getReservation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Réservation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+    put:
+      tags:
+      - Reservations
+      operationId: updateReservation
+      parameters:
+      - &id001
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationUpdate'
+      responses:
+        '200':
+          description: Réservation mise à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        '404':
+          description: Réservation introuvable
+        '409':
+          description: Modification impossible
+        '400':
+          description: Requête invalide
+    delete:
+      tags:
+      - Reservations
+      operationId: deleteReservation
+      parameters:
+      - *id001
+      responses:
+        '204':
+          description: Réservation supprimée
+        '404':
+          description: Réservation introuvable
+        '409':
+          description: Suppression impossible
+  /reservations/{id}/confirmer:
+    post:
+      tags:
+      - Reservations
+      operationId: confirmReservation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Réservation confirmée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        '400':
+          description: Requête invalide
+        '409':
+          description: Erreur métier
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurResponse'
+  /reservations/{id}/annuler:
+    post:
+      tags:
+      - Reservations
+      operationId: cancelReservation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnnulationRequest'
+      responses:
+        '200':
+          description: Réservation annulée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        '400':
+          description: Requête invalide
+        '409':
+          description: Erreur métier
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurResponse'
+  /reservations/{id}/participants:
+    post:
+      tags:
+      - Reservations
+      operationId: addParticipant
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParticipantCreate'
+      responses:
+        '201':
+          description: Participant ajouté
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Participant'
+        '400':
+          description: Requête invalide
+        '409':
+          description: Erreur métier
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurResponse'
+    get:
+      tags:
+      - Reservations
+      operationId: getReservationParticipants
+      parameters:
+      - *id001
+      responses:
+        '200':
+          description: Participants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Participant'
+        '404':
+          description: Réservation introuvable
+  /disponibilites:
+    get:
+      tags:
+      - Disponibilite
+      operationId: checkAvailability
+      parameters:
+      - name: typeRessource
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/TypeRessource'
+      - name: ressourceId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: date
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: nombrePersonnes
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Disponibilité
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DisponibiliteResponse'
+        '400':
+          description: Paramètres invalides
+        '404':
+          description: Ressource introuvable
+        '503':
+          description: Service propriétaire indisponible
+  /reservations/{id}/terminer:
+    post:
+      tags:
+      - Reservations
+      operationId: completeReservation
+      parameters:
+      - *id001
+      responses:
+        '200':
+          description: Réservation terminée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        '404':
+          description: Réservation introuvable
+        '409':
+          description: Erreur métier
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurResponse'
+        '400':
+          description: Requête invalide
+  /participants/{participantId}:
+    put:
+      tags:
+      - Reservations
+      operationId: updateParticipant
+      parameters:
+      - name: participantId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParticipantUpdate'
+      responses:
+        '200':
+          description: Participant modifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Participant'
+        '404':
+          description: Participant introuvable
+        '400':
+          description: Requête invalide
+        '409':
+          description: Erreur métier
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurResponse'
+    delete:
+      tags:
+      - Reservations
+      operationId: deleteParticipant
+      parameters:
+      - name: participantId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Participant supprimé
+        '404':
+          description: Participant introuvable
+        '409':
+          description: Erreur métier
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErreurResponse'
+components:
+  schemas:
+    BaseEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    ReservationCreate:
+      type: object
+      required:
+      - utilisateurId
+      - typeRessource
+      - ressourceId
+      - dateReservation
+      - nombrePersonnes
+      properties:
+        utilisateurId:
+          type: string
+          format: uuid
+        typeRessource:
+          $ref: '#/components/schemas/TypeRessource'
+        ressourceId:
+          type: string
+          format: uuid
+        dateReservation:
+          type: string
+          format: date-time
+        nombrePersonnes:
+          type: integer
+          minimum: 1
+        commentaire:
+          type: string
+          maxLength: 2000
+    Reservation:
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      - type: object
+        required:
+        - numero
+        - utilisateurId
+        - typeRessource
+        - ressourceId
+        - dateReservation
+        - nombrePersonnes
+        - montantTotal
+        - devise
+        - statut
+        properties:
+          numero:
+            type: string
+            readOnly: true
+          utilisateurId:
+            type: string
+            format: uuid
+            readOnly: true
+          typeRessource:
+            $ref: '#/components/schemas/TypeRessource'
+            readOnly: true
+          ressourceId:
+            type: string
+            format: uuid
+            readOnly: true
+          dateReservation:
+            type: string
+            format: date-time
+          nombrePersonnes:
+            type: integer
+            minimum: 1
+          montantTotal:
+            type: number
+            format: double
+            minimum: 0
+            readOnly: true
+          devise:
+            type: string
+            minLength: 3
+            maxLength: 3
+            readOnly: true
+          statut:
+            $ref: '#/components/schemas/StatutReservation'
+            readOnly: true
+          dateConfirmation:
+            type: string
+            format: date-time
+            readOnly: true
+          dateAnnulation:
+            type: string
+            format: date-time
+            readOnly: true
+          motifAnnulation:
+            type: string
+            maxLength: 1000
+            readOnly: true
+          commentaire:
+            type: string
+            maxLength: 2000
+    ParticipantCreate:
+      type: object
+      required:
+      - nom
+      - prenom
+      properties:
+        nom:
+          type: string
+          minLength: 1
+          maxLength: 100
+        prenom:
+          type: string
+          minLength: 1
+          maxLength: 100
+        telephone:
+          type: string
+          maxLength: 30
+        email:
+          type: string
+          format: email
+        age:
+          type: integer
+          minimum: 0
+    Participant:
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      - type: object
+        required:
+        - reservationId
+        - nom
+        - prenom
+        properties:
+          reservationId:
+            type: string
+            format: uuid
+            readOnly: true
+          nom:
+            type: string
+            minLength: 1
+            maxLength: 100
+          prenom:
+            type: string
+            minLength: 1
+            maxLength: 100
+          telephone:
+            type: string
+            maxLength: 30
+          email:
+            type: string
+            format: email
+          age:
+            type: integer
+            minimum: 0
+    AnnulationRequest:
+      type: object
+      properties:
+        motif:
+          type: string
+          maxLength: 1000
+    DisponibiliteResponse:
+      type: object
+      required:
+      - disponible
+      - capaciteDisponible
+      properties:
+        disponible:
+          type: boolean
+        capaciteDisponible:
+          type: integer
+          minimum: 0
+        capaciteMax:
+          type: integer
+          minimum: 0
+        message:
+          type: string
+    TypeRessource:
+      type: string
+      enum:
+      - CIRCUIT
+      - ACTIVITE
+      - OFFRE_TOURISTIQUE
+      - EVENEMENT
+    StatutReservation:
+      type: string
+      enum:
+      - EN_ATTENTE
+      - CONFIRMEE
+      - ANNULEE
+      - EXPIREE
+      - TERMINEE
+    ReservationPage:
+      type: object
+      required:
+      - content
+      - page
+      - size
+      - totalElements
+      - totalPages
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reservation'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+        totalElements:
+          type: integer
+          format: int64
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+    ReservationUpdate:
+      type: object
+      properties:
+        dateReservation:
+          type: string
+          format: date-time
+          description: Nouvelle date/heure de la réservation, si la modification est
+            autorisée.
+        nombrePersonnes:
+          type: integer
+          minimum: 1
+        commentaire:
+          type: string
+          maxLength: 2000
+    ParticipantUpdate:
+      type: object
+      properties:
+        nom:
+          type: string
+          minLength: 1
+          maxLength: 100
+        prenom:
+          type: string
+          minLength: 1
+          maxLength: 100
+        telephone:
+          type: string
+          maxLength: 30
+        email:
+          type: string
+          format: email
+        age:
+          type: integer
+          minimum: 0
+    ErreurResponse:
+      type: object
+      required:
+      - status
+      - title
+      - detail
+      properties:
+        status:
+          type: integer
+        title:
+          type: string
+        detail:
+          type: string
+        code:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        path:
+          type: string
+x-architecture:
+  principes:
+  - BaseEntity est la racine des entités persistantes ; les DTO OpenAPI n'en héritent
+    pas côté Java.
+  - 'Aucune relation JPA inter-microservices : les ressources externes sont référencées
+    par UUID.'
+  - ms-reservation orchestre ms-circuit, ms-tourisme et ms-evenement sans dupliquer
+    leurs règles métier.
+  - Le montantTotal est calculé côté serveur à partir du service propriétaire.
+  - La disponibilité est vérifiée avant création et, si nécessaire, avant modification.
+  - Les transitions de statut sont contrôlées dans le service métier.
+  - MapStruct assure la conversion DTO OpenAPI <-> entités JPA.

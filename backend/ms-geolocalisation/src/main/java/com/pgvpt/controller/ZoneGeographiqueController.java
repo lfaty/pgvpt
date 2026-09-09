@@ -1,10 +1,7 @@
 package com.pgvpt.controller;
 
-import com.dev.pgvpt.api.ZoneGeographiqueApi;
-import com.dev.pgvpt.api.model.PageZoneGeographique;
-import com.dev.pgvpt.api.model.ZoneGeographique;
-import com.dev.pgvpt.api.model.ZoneGeographiqueCreate;
-import com.dev.pgvpt.api.model.ZoneGeographiqueUpdate;
+import com.pgvpt.api.*;
+import com.pgvpt.dto.*;
 import com.pgvpt.mapper.ZoneGeographiqueApiMapper;
 import com.pgvpt.model.ZoneGeographiqueEntity;
 import com.pgvpt.service.ZoneGeographiqueService;

@@ -6,6 +6,12 @@
       <list>
         <option value="$PROJECT_DIR$/ms-patrimoine/pom.xml" />
         <option value="$PROJECT_DIR$/ms-geolocalisation/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-contenu/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-media/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-circuit/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-evenement/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-tourisme/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-reservation/pom.xml" />
       </list>
     </option>
   </component>

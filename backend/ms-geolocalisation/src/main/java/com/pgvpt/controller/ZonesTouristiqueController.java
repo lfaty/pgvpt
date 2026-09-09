@@ -1,7 +1,7 @@
 package com.pgvpt.controller;
 
-import com.dev.pgvpt.api.ZoneTouristiqueApi;
-import com.dev.pgvpt.api.model.*;
+import com.pgvpt.api.*;
+import com.pgvpt.dto.*;
 import com.pgvpt.mapper.ZoneTouristiqueApiMapper;
 import com.pgvpt.model.ZoneTouristiqueEntity;
 import com.pgvpt.service.ZoneTouristiqueService;

@@ -1,7 +1,7 @@
 package com.pgvpt.controller;
 
-import com.dev.pgvpt.api.ReferentielAdministratifApi;
-import com.dev.pgvpt.api.model.*;
+import com.pgvpt.api.*;
+import com.pgvpt.dto.*;
 import com.pgvpt.mapper.ReferentielAdministratifApiMapper;
 import com.pgvpt.model.*;
 import com.pgvpt.service.ReferentielAdministratifService;

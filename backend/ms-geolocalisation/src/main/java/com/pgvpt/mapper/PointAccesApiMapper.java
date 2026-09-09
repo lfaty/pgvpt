@@ -1,7 +1,6 @@
 package com.pgvpt.mapper;
 
-import com.dev.pgvpt.api.model.PointAcces;
-import com.dev.pgvpt.api.model.PointAccesCreate;
+import com.pgvpt.dto.*;
 import com.pgvpt.model.PointAccesEntity;
 import org.mapstruct.*;
 

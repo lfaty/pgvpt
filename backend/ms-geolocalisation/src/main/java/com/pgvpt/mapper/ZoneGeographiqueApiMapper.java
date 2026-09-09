@@ -1,10 +1,6 @@
 package com.pgvpt.mapper;
 
-import com.dev.pgvpt.api.model.ZoneGeographique;
-import com.dev.pgvpt.api.model.ZoneGeographiqueCreate;
-import com.dev.pgvpt.api.model.ZoneGeographiqueReference;
-import com.dev.pgvpt.api.model.ZoneGeographiqueRegion;
-import com.dev.pgvpt.api.model.ZoneGeographiqueUpdate;
+import com.pgvpt.dto.*;
 import com.pgvpt.model.ZoneGeographiqueEntity;
 import com.pgvpt.model.ZoneGeographiqueRegionEntity;
 import org.mapstruct.*;

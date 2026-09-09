@@ -1,0 +1,62 @@
+openapi: 3.0.3
+info:
+  title: PGVPT - MS Media API
+  version: 1.0.0
+  description: Gestion des photographies, vidéos, audios, documents, panoramas 360 et ressources 3D du patrimoine.
+servers: [{url: http://localhost:3007/api/v1, description: Local}]
+security: [{bearerAuth: []}]
+tags: [{name: Médias}]
+paths:
+  /medias:
+    get:
+      tags: [Médias]
+      operationId: listMedias
+      parameters: [{name: patrimoineId, in: query, schema: {type: string, format: uuid}}, {name: type, in: query, schema: {$ref: '#/components/schemas/TypeMedia'}}]
+      responses: {'200': {description: Médias, content: {application/json: {schema: {type: array, items: {$ref: '#/components/schemas/Media'}}}}}}
+    post:
+      tags: [Médias]
+      operationId: createMedia
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/MediaCreate'}}}}
+      responses: {'201': {description: Média enregistré, content: {application/json: {schema: {$ref: '#/components/schemas/Media'}}}}}
+  /medias/{id}:
+    get:
+      tags: [Médias]
+      operationId: getMedia
+      parameters: [{name: id, in: path, required: true, schema: {type: string, format: uuid}}]
+      responses: {'200': {description: Média, content: {application/json: {schema: {$ref: '#/components/schemas/Media'}}}}}
+    delete:
+      tags: [Médias]
+      operationId: deleteMedia
+      parameters: [{name: id, in: path, required: true, schema: {type: string, format: uuid}}]
+      responses: {'204': {description: Supprimé}}
+components:
+  securitySchemes: {bearerAuth: {type: http, scheme: bearer, bearerFormat: JWT}}
+  schemas:
+    BaseEntity:
+      type: object
+      properties:
+        id: {type: string, format: uuid, readOnly: true}
+        createdAt: {type: string, format: date-time, readOnly: true}
+        updatedAt: {type: string, format: date-time, readOnly: true}
+    TypeMedia: {type: string, enum: [PHOTO, VIDEO, AUDIO, DOCUMENT, PANORAMA_360, MODELE_3D, CARTE, ARCHIVE_NUMERISEE]}
+    MediaCreate:
+      type: object
+      required: [patrimoineId, type, nom, url]
+      properties:
+        patrimoineId: {type: string, format: uuid}
+        type: {$ref: '#/components/schemas/TypeMedia'}
+        nom: {type: string}
+        description: {type: string}
+        url: {type: string, format: uri}
+        mimeType: {type: string}
+        tailleOctets: {type: integer, format: int64, minimum: 0}
+        langue: {type: string}
+        auteur: {type: string}
+        droitsUtilisation: {type: string}
+        credit: {type: string}
+        latitude: {type: number, format: double}
+        longitude: {type: number, format: double}
+    Media:
+      allOf:
+        - {$ref: '#/components/schemas/BaseEntity'}
+        - {$ref: '#/components/schemas/MediaCreate'}

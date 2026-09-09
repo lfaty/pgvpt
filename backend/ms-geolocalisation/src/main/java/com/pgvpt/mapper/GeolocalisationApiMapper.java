@@ -1,8 +1,8 @@
 package com.pgvpt.mapper;
 
-import com.dev.pgvpt.api.model.GeolocalisationCreate;
-import com.dev.pgvpt.api.model.Geolocalisation;
-import com.dev.pgvpt.api.model.GeolocalisationUpdate;
+import com.pgvpt.dto.GeolocalisationCreate;
+import com.pgvpt.dto.Geolocalisation;
+import com.pgvpt.dto.GeolocalisationUpdate;
 import com.pgvpt.model.GeolocalisationEntity;
 import org.mapstruct.*;
 

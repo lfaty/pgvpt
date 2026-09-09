@@ -1,7 +1,7 @@
 package com.pgvpt.controller;
 
-import com.dev.pgvpt.api.GeospatialApi;
-import com.dev.pgvpt.api.model.*;
+import com.pgvpt.api.GeospatialApi;
+import com.pgvpt.dto.*;
 import com.pgvpt.mapper.GeolocalisationApiMapper;
 import com.pgvpt.mapper.PointAccesApiMapper;
 import com.pgvpt.model.GeolocalisationEntity;

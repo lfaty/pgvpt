@@ -1,6 +1,7 @@
 package com.pgvpt.mapper;
 
-import com.dev.pgvpt.api.model.*;
+import com.pgvpt.api.*;
+import com.pgvpt.dto.*;
 import com.pgvpt.model.*;
 import org.mapstruct.*;
 
