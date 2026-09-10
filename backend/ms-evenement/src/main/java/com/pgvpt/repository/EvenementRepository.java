@@ -6,12 +6,13 @@ import com.pgvpt.model.EvenementEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
 @Repository
-public interface EvenementRepository extends JpaRepository<EvenementEntity, UUID> {
+public interface EvenementRepository extends JpaRepository<EvenementEntity, UUID>, JpaSpecificationExecutor<EvenementEntity> {
 
     Page<EvenementEntity> findByZoneTouristiqueId(UUID zoneTouristiqueId, Pageable pageable);
 

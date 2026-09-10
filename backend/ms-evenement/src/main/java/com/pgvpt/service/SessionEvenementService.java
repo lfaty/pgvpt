@@ -13,7 +13,7 @@ public interface SessionEvenementService {
 
     SessionEvenementEntity create(UUID evenementId, SessionEvenementEntity request);
 
-    SessionEvenementEntity update(UUID id, SessionEvenementEntity request);
+    SessionEvenementEntity update(UUID id, com.pgvpt.dto.SessionEvenementUpdate request);
 
     void delete(UUID id);
 }

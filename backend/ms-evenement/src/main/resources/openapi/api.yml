@@ -100,7 +100,7 @@ paths:
                 $ref: '#/components/schemas/Evenement'
         '404':
           $ref: '#/components/responses/NotFound'
-    put:
+    patch:
       tags:
       - Evenements
       operationId: updateEvenement
@@ -263,7 +263,7 @@ paths:
                 $ref: '#/components/schemas/SessionEvenement'
         '404':
           $ref: '#/components/responses/NotFound'
-    put:
+    patch:
       tags:
       - Sessions
       operationId: updateSession
@@ -381,8 +381,47 @@ components:
             minLength: 2
             maxLength: 10
     EvenementUpdate:
-      allOf:
-      - $ref: '#/components/schemas/EvenementCreate'
+      type: object
+      properties:
+        titre:
+          type: string
+          minLength: 2
+          maxLength: 250
+        description:
+          type: string
+          maxLength: 5000
+        type:
+          $ref: '#/components/schemas/TypeEvenement'
+        zoneTouristiqueId:
+          type: string
+          format: uuid
+        patrimoineId:
+          type: string
+          format: uuid
+          nullable: true
+        organisateurActeurId:
+          type: string
+          format: uuid
+        capaciteMax:
+          type: integer
+          minimum: 1
+        tarif:
+          type: number
+          format: double
+          minimum: 0
+        devise:
+          type: string
+          minLength: 3
+          maxLength: 3
+        reservationRequise:
+          type: boolean
+        langues:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            minLength: 2
+            maxLength: 10
     Evenement:
       allOf:
       - $ref: '#/components/schemas/BaseEntity'
@@ -410,8 +449,24 @@ components:
           format: uuid
           nullable: true
     SessionEvenementUpdate:
-      allOf:
-      - $ref: '#/components/schemas/SessionEvenementCreate'
+      type: object
+      properties:
+        dateDebut:
+          type: string
+          format: date-time
+        dateFin:
+          type: string
+          format: date-time
+        capacite:
+          type: integer
+          minimum: 1
+        lieu:
+          type: string
+          maxLength: 500
+        patrimoineId:
+          type: string
+          format: uuid
+          nullable: true
     SessionEvenement:
       allOf:
       - $ref: '#/components/schemas/BaseEntity'

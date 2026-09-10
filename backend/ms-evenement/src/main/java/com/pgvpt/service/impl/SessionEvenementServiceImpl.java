@@ -1,7 +1,9 @@
 package com.pgvpt.service.impl;
 
+import com.pgvpt.enums.StatutEvenement;
 import com.pgvpt.exception.BusinessException;
 import com.pgvpt.exception.ResourceNotFoundException;
+import com.pgvpt.model.EvenementEntity;
 import com.pgvpt.model.SessionEvenementEntity;
 import com.pgvpt.repository.EvenementRepository;
 import com.pgvpt.repository.SessionEvenementRepository;
@@ -32,6 +34,7 @@ public class SessionEvenementServiceImpl implements SessionEvenementService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public SessionEvenementEntity getById(UUID id) {
 
         return repository.findById(id)
@@ -41,53 +44,85 @@ public class SessionEvenementServiceImpl implements SessionEvenementService {
     @Override
     public SessionEvenementEntity create(UUID evenementId, SessionEvenementEntity request) {
 
-        verifierEvenement(evenementId);
+        EvenementEntity evenement = getEvenement(evenementId);
+
+        verifierEvenementModifiable(evenement);
 
         if (!request.getDateFin().isAfter(request.getDateDebut())) {
-
             throw new BusinessException("La date de fin doit être postérieure à la date de début.");
         }
 
-        boolean chevauchement = repository.existsByEvenementIdAndDateDebutLessThanAndDateFinGreaterThan(evenementId, request.getDateFin(), request.getDateDebut());
+        boolean chevauchement = repository.existsByEvenementIdAndDateDebutLessThanAndDateFinGreaterThan(
+                evenementId, request.getDateFin(), request.getDateDebut());
 
         if (chevauchement) {
             throw new BusinessException("La session chevauche une autre session de l'événement.");
         }
+
+        request.setEvenementId(evenementId);
 
         return repository.save(request);
     }
 
     @Override
-    public SessionEvenementEntity update(UUID id, SessionEvenementEntity request) {
+    public SessionEvenementEntity update(UUID id, com.pgvpt.dto.SessionEvenementUpdate request) {
 
-        getById(id);
+        SessionEvenementEntity existing = getById(id);
 
-        verifierEvenement(request.getEvenementId());
+        EvenementEntity evenement = getEvenement(existing.getEvenementId());
 
-        if (!request.getDateFin().isAfter(request.getDateDebut())) {
+        verifierEvenementModifiable(evenement);
+
+        // Appliquer les champs non-null (mise à jour partielle)
+        if (request.getDateDebut() != null) {
+            existing.setDateDebut(request.getDateDebut().toInstant());
+        }
+        if (request.getDateFin() != null) {
+            existing.setDateFin(request.getDateFin().toInstant());
+        }
+        if (request.getCapacite() != null) {
+            existing.setCapacite(request.getCapacite());
+        }
+        if (request.getLieu() != null) {
+            existing.setLieu(request.getLieu());
+        }
+        if (request.getPatrimoineId() != null) {
+            existing.setPatrimoineId(request.getPatrimoineId());
+        }
+
+        // Valider les dates après le merge
+        if (!existing.getDateFin().isAfter(existing.getDateDebut())) {
             throw new BusinessException("La date de fin doit être postérieure à la date de début.");
         }
 
-        boolean chevauchement = repository.existsByEvenementIdAndDateDebutLessThanAndDateFinGreaterThan(request.getEvenementId(), request.getDateFin(), request.getDateDebut());
-
-        if (chevauchement) {
-            throw new BusinessException("La session chevauche une autre session de l'événement.");
+        // Vérifier le chevauchement en excluant la session courante
+        List<SessionEvenementEntity> autresSessions = repository.findByEvenementIdOrderByDateDebutAsc(existing.getEvenementId());
+        for (SessionEvenementEntity autre : autresSessions) {
+            if (autre.getId().equals(id)) continue;
+            if (existing.getDateDebut().isBefore(autre.getDateFin()) && existing.getDateFin().isAfter(autre.getDateDebut())) {
+                throw new BusinessException("La session chevauche une autre session de l'événement.");
+            }
         }
 
-        SessionEvenementEntity entity = new SessionEvenementEntity();
-        entity.setEvenementId(request.getEvenementId());
-        entity.setLieu(request.getLieu());
-        entity.setCapacite(request.getCapacite());
-        entity.setDateFin(request.getDateFin());
-        entity.setDateDebut(request.getDateDebut());
-        entity.setPatrimoineId(request.getPatrimoineId());
-
-        return repository.save(entity);
+        return repository.save(existing);
     }
 
     @Override
     public void delete(UUID id) {
 
+        SessionEvenementEntity session = getById(id);
+
+        EvenementEntity evenement = getEvenement(session.getEvenementId());
+
+        verifierEvenementModifiable(evenement);
+
+        repository.delete(session);
+    }
+
+    private EvenementEntity getEvenement(UUID id) {
+
+        return evenementRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Événement introuvable : " + id));
     }
 
     private void verifierEvenement(UUID id) {
@@ -97,4 +132,14 @@ public class SessionEvenementServiceImpl implements SessionEvenementService {
         }
     }
 
+    private void verifierEvenementModifiable(EvenementEntity evenement) {
+
+        if (evenement.getStatut() == StatutEvenement.ANNULE) {
+            throw new BusinessException("Impossible de modifier les sessions d'un événement annulé.");
+        }
+
+        if (evenement.getStatut() == StatutEvenement.TERMINE) {
+            throw new BusinessException("Impossible de modifier les sessions d'un événement terminé.");
+        }
+    }
 }

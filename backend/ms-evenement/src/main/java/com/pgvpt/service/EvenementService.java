@@ -17,7 +17,7 @@ public interface EvenementService {
 
     Page<EvenementEntity> search(UUID zoneTouristiqueId, TypeEvenement type, StatutEvenement statut, Instant dateDebut, Instant dateFin, String search, Pageable pageable);
 
-    EvenementEntity update(UUID id, EvenementEntity request);
+    EvenementEntity update(UUID id, com.pgvpt.dto.EvenementUpdate request);
 
     void delete(UUID id);
 
