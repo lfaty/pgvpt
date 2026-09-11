@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api")
 public class ContenuController implements ContenusApi{
 
     private final ContenuService service;
@@ -43,8 +42,9 @@ public class ContenuController implements ContenusApi{
 
     @Override
     public ResponseEntity<List<Contenu>> listContenus(UUID patrimoineId, String langue, StatutContenu statut) {
+        com.pgvpt.contenu.enums.Statut entityStatut = mapper.toEntityEnum(statut);
         return ResponseEntity.ok(
-                mapper.toApi(service.findByPatrimoineIdLangueAndStatut(patrimoineId, langue, statut))
+                mapper.toApi(service.findByFilters(patrimoineId, langue, entityStatut))
         );
     }
 

@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Gets or Sets StatutContenu
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-05T09:51:25.206125500Z[Africa/Dakar]", comments = "Generator version: 7.25.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-11T17:00:04.820143400Z[Atlantic/Reykjavik]", comments = "Generator version: 7.25.0")
 public enum StatutContenu {
   
   BROUILLON("BROUILLON"),

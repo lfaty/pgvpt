@@ -1,0 +1,68 @@
+openapi: 3.0.3
+info:
+  title: PGVPT - MS Contenu API
+  version: 1.0.0
+  description: Gestion éditoriale des contenus patrimoniaux, historiques, culturels et multilingues.
+servers: [{url: http://localhost:3006/api/v1, description: Local}]
+security: [{bearerAuth: []}]
+tags: [{name: Contenus}, {name: Traductions}]
+paths:
+  /contenus:
+    get:
+      tags: [Contenus]
+      operationId: listContenus
+      parameters: [{name: patrimoineId, in: query, schema: {type: string, format: uuid}}, {name: langue, in: query, schema: {type: string}}, {name: statut, in: query, schema: {$ref: '#/components/schemas/StatutContenu'}}]
+      responses: {'200': {description: Contenus, content: {application/json: {schema: {type: array, items: {$ref: '#/components/schemas/Contenu'}}}}}}
+    post:
+      tags: [Contenus]
+      operationId: createContenu
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/ContenuCreate'}}}}
+      responses: {'201': {description: Créé, content: {application/json: {schema: {$ref: '#/components/schemas/Contenu'}}}}}
+  /contenus/{id}:
+    get:
+      tags: [Contenus]
+      operationId: getContenu
+      parameters: [{name: id, in: path, required: true, schema: {type: string, format: uuid}}]
+      responses: {'200': {description: Contenu, content: {application/json: {schema: {$ref: '#/components/schemas/Contenu'}}}}}
+    put:
+      tags: [Contenus]
+      operationId: updateContenu
+      parameters: [{name: id, in: path, required: true, schema: {type: string, format: uuid}}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/ContenuUpdate'}}}}
+      responses: {'200': {description: Mis à jour, content: {application/json: {schema: {$ref: '#/components/schemas/Contenu'}}}}}
+    delete:
+      tags: [Contenus]
+      operationId: deleteContenu
+      parameters: [{name: id, in: path, required: true, schema: {type: string, format: uuid}}]
+      responses: {'204': {description: Supprimé}}
+components:
+  securitySchemes: {bearerAuth: {type: http, scheme: bearer, bearerFormat: JWT}}
+  schemas:
+    BaseEntity:
+      type: object
+      properties:
+        id: {type: string, format: uuid, readOnly: true}
+        createdAt: {type: string, format: date-time, readOnly: true}
+        updatedAt: {type: string, format: date-time, readOnly: true}
+    StatutContenu: {type: string, enum: [BROUILLON, EN_REVISION, VALIDE, PUBLIE, ARCHIVE]}
+    TypeContenu: {type: string, enum: [ARTICLE, DESCRIPTION, HISTORIQUE, RECIT, TEMOIGNAGE, GUIDE_VISITE, ACTUALITE]}
+    ContenuCreate:
+      type: object
+      required: [patrimoineId, type, langue, titre, corps]
+      properties:
+        patrimoineId: {type: string, format: uuid}
+        type: {$ref: '#/components/schemas/TypeContenu'}
+        langue: {type: string, minLength: 2}
+        titre: {type: string}
+        resume: {type: string}
+        corps: {type: string}
+        auteurActeurId: {type: string, format: uuid}
+        motsCles: {type: array, items: {type: string}}
+    ContenuUpdate:
+      allOf: [{$ref: '#/components/schemas/ContenuCreate'}]
+    Contenu:
+      allOf:
+        - {$ref: '#/components/schemas/BaseEntity'}
+        - {$ref: '#/components/schemas/ContenuCreate'}
+        - type: object
+          properties: {statut: {$ref: '#/components/schemas/StatutContenu'}, datePublication: {type: string, format: date-time}}

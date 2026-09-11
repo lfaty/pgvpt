@@ -19,7 +19,9 @@ public class ContenuEntity extends BaseEntity {
     private String type;
     private String langue;
     private String titre;
+    @Column(columnDefinition = "TEXT")
     private String resume;
+    @Column(columnDefinition = "TEXT")
     private String corps;
     private UUID patrimoineId;
     private UUID auteurActeurId;
