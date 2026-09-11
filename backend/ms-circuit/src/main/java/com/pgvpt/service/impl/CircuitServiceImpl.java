@@ -11,6 +11,8 @@ import com.pgvpt.service.CircuitService;
 import com.pgvpt.viewModel.CalculDistanceCircuitResponseViewModel;
 import com.pgvpt.viewModel.CalculDureeCircuitResponseViewModel;
 import com.pgvpt.viewModel.CalculPrixCircuitResponseViewModel;
+import com.pgvpt.client.ZoneTouristiqueClient;
+import feign.FeignException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,7 +20,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -31,6 +32,7 @@ public class CircuitServiceImpl implements CircuitService {
 
     private final CircuitRepository circuitRepository;
     private final EtapeCircuitRepository etapeRepository;
+    private final ZoneTouristiqueClient zoneTouristiqueClient;
 
 
     private CircuitEntity getEntity(UUID id) {
@@ -64,6 +66,7 @@ public class CircuitServiceImpl implements CircuitService {
     @Override
     public CircuitEntity creer(CircuitEntity request) {
 
+        verifierZoneTouristique(request.getZoneTouristiqueId());
         verifierDates(request.getDateDebut(), request.getDateFin());
 
         if (circuitRepository.existsByNomIgnoreCase(request.getNom())) {
@@ -74,16 +77,29 @@ public class CircuitServiceImpl implements CircuitService {
         return circuitRepository.save(request);
     }
 
-    private void verifierDates(LocalDate dateDebut, LocalDate dateFin) {
+    private void verifierDates(java.time.LocalDate dateDebut, java.time.LocalDate dateFin) {
 
         if (dateDebut != null && dateFin != null && dateFin.isBefore(dateDebut)) {
             throw new BusinessException("La date de fin doit être supérieure ou égale à la date de début");
         }
     }
 
+    private void verifierZoneTouristique(UUID zoneTouristiqueId) {
+        if (zoneTouristiqueId == null) {
+            return;
+        }
+        try {
+            zoneTouristiqueClient.getById(zoneTouristiqueId);
+        } catch (FeignException.NotFound e) {
+            throw new ResourceNotFoundException("La zone touristique spécifiée n'existe pas : " + zoneTouristiqueId);
+        } catch (FeignException e) {
+            throw new BusinessException("Erreur lors de la vérification de la zone touristique : " + e.getMessage());
+        }
+    }
+
     @Override
     public CircuitEntity rechercherParId(UUID id) {
-        return null;
+        return getEntity(id);
     }
 
     @Override
@@ -94,7 +110,18 @@ public class CircuitServiceImpl implements CircuitService {
             throw new BusinessException("Un circuit archivé ne peut plus être modifié");
         }
 
+        verifierZoneTouristique(request.getZoneTouristiqueId());
         verifierDates(request.getDateDebut(), request.getDateFin());
+
+        // Appliquer les champs modifiables
+        entity.setNom(request.getNom());
+        entity.setDescription(request.getDescription());
+        entity.setType(request.getType());
+        entity.setZoneTouristiqueId(request.getZoneTouristiqueId());
+        entity.setNiveauDifficulte(request.getNiveauDifficulte());
+        entity.setActif(request.isActif());
+        entity.setDateDebut(request.getDateDebut());
+        entity.setDateFin(request.getDateFin());
 
         return circuitRepository.save(entity);
     }

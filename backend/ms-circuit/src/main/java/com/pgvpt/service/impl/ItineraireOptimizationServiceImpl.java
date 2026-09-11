@@ -12,7 +12,9 @@ import com.pgvpt.viewModel.EtapeAvecCoordonneesViewModel;
 import com.pgvpt.viewModel.EtapeOptimiseeViewModel;
 import com.pgvpt.viewModel.ItineraireOptimiseViewModel;
 import com.pgvpt.viewModel.OptimisationItineraireRequestViewModel;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,7 @@ import java.util.*;
 
 import static com.pgvpt.enums.MethodeEnum.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ItineraireOptimizationServiceImpl implements ItineraireOptimizationService {
@@ -148,7 +151,19 @@ public class ItineraireOptimizationServiceImpl implements ItineraireOptimization
         return etapes.stream()
                 .map(etape -> {
 
-                    GeolocalisationResponse geo = geolocalisationClient.getByPatrimoine(etape.getPatrimoineId());
+                    GeolocalisationResponse geo;
+                    try {
+                        geo = geolocalisationClient.getByPatrimoine(etape.getPatrimoineId());
+                    } catch (FeignException.NotFound e) {
+                        log.warn("Géolocalisation introuvable pour le patrimoine : {}", etape.getPatrimoineId());
+                        throw new BusinessException(
+                                "Aucune géolocalisation enregistrée pour le patrimoine : " + etape.getPatrimoineId()
+                                + ". Veuillez d'abord créer une géolocalisation via POST /api/v1/geolocalisations.");
+                    } catch (FeignException e) {
+                        log.error("Erreur lors de l'appel au service de géolocalisation pour le patrimoine : {}", etape.getPatrimoineId(), e);
+                        throw new BusinessException(
+                                "Erreur de communication avec le service de géolocalisation pour le patrimoine : " + etape.getPatrimoineId());
+                    }
 
                     if (geo == null || geo.latitude() == null || geo.longitude() == null) {
 

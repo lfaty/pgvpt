@@ -1,6 +1,7 @@
 package com.pgvpt.service;
 
 import com.pgvpt.model.EtapeCircuitEntity;
+import com.pgvpt.viewModel.OrdreEtapeViewModel;
 
 import java.util.List;
 import java.util.UUID;
@@ -8,8 +9,6 @@ import java.util.UUID;
 public interface EtapeCircuitService {
 
     List<EtapeCircuitEntity> getEtapes(UUID circuitId);
-
-    List<EtapeCircuitEntity> rechercherParCircuit(UUID circuitId);
 
     EtapeCircuitEntity creer(UUID circuitId, EtapeCircuitEntity request);
 
@@ -19,5 +18,5 @@ public interface EtapeCircuitService {
 
     void supprimer(UUID id);
 
-    List<EtapeCircuitEntity> reordonner(UUID circuitId, EtapeCircuitEntity request);
+    List<EtapeCircuitEntity> reordonner(UUID circuitId, List<OrdreEtapeViewModel> ordres);
 }
