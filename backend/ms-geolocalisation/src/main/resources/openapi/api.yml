@@ -1661,7 +1661,6 @@ components:
       - type: object
         required:
         - id
-        - zoneTouristiqueId
         - latitude
         - longitude
         properties:
@@ -1764,7 +1763,6 @@ components:
     GeolocalisationCreate:
       type: object
       required:
-      - zoneTouristiqueId
       - latitude
       - longitude
       properties:

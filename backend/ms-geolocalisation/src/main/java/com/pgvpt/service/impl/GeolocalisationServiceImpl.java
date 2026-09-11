@@ -8,6 +8,8 @@ import com.pgvpt.repository.VillageRepository;
 import com.pgvpt.repository.VillageRepository;
 import com.pgvpt.repository.ZoneTouristiqueRepository;
 import com.pgvpt.service.GeolocalisationService;
+import com.pgvpt.client.PatrimoineClient;
+import feign.FeignException;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,12 +33,22 @@ public class GeolocalisationServiceImpl implements GeolocalisationService {
     private final ZoneTouristiqueRepository zoneTouristiqueRepository;
     private final VillageRepository villageRepository;
     private final QuartierRepository quartierRepository;
+    private final PatrimoineClient patrimoineClient;
 
     @Override
     public GeolocalisationEntity create(GeolocalisationEntity geolocalisationEntity) {
-        if (geolocalisationEntity.getPatrimoineId() != null
-            && repository.existsByPatrimoineId(geolocalisationEntity.getPatrimoineId())) {
-            throw new IllegalArgumentException("Le patrimoine possède déjà une géolocalisation");
+        if (geolocalisationEntity.getPatrimoineId() != null) {
+            if (repository.existsByPatrimoineId(geolocalisationEntity.getPatrimoineId())) {
+                throw new IllegalArgumentException("Le patrimoine possède déjà une géolocalisation");
+            }
+            
+            try {
+                patrimoineClient.getPatrimoineById(geolocalisationEntity.getPatrimoineId());
+            } catch (FeignException.NotFound e) {
+                throw new ResourceNotFoundException("Le patrimoine avec l'ID " + geolocalisationEntity.getPatrimoineId() + " est introuvable dans ms-patrimoine");
+            } catch (Exception e) {
+                throw new RuntimeException("Erreur lors de la vérification du patrimoine: " + e.getMessage(), e);
+            }
         }
 
         // Résolution des relations JPA (squelettes MapStruct → entités managées)

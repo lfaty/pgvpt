@@ -18,9 +18,9 @@ spring:
       enabled: false
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/geolocalisation_db
+    url: jdbc:postgresql://localhost:5432/geolocalisationdb
     username: postgres
-    password: "admin"
+    password: "Thies@#1521"
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -34,3 +34,7 @@ management:
     web:
       exposure:
         include: '*'
+
+eureka:
+  client:
+    enabled: false

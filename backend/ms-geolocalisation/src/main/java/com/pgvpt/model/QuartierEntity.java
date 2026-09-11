@@ -1,7 +1,5 @@
 package com.pgvpt.model;
 
-import com.dev.pgvpt.api.model.CommuneReference;
-import com.dev.pgvpt.api.model.VillageReference;
 import com.pgvpt.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
