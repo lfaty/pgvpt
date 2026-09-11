@@ -5,7 +5,6 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.pgvpt.dto.TypeMedia;
 import java.net.URI;
 import java.time.OffsetDateTime;
@@ -26,7 +25,7 @@ import jakarta.annotation.Generated;
  * Media
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-05T09:55:45.031775700Z[Africa/Dakar]", comments = "Generator version: 7.25.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-11T15:43:53.256279100Z[Atlantic/Reykjavik]", comments = "Generator version: 7.25.0")
 public class Media {
 
   private @Nullable UUID id;

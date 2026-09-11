@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api")
 public class MediaController implements MdiasApi{
     private final MediaService service;
     private final MediaApiMapper mapper;

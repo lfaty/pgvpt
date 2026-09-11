@@ -1,0 +1,14 @@
+com\pgvpt\media\exception\GlobalExceptionHandler$ApiError.class
+com\pgvpt\media\client\PatrimoineClient.class
+com\pgvpt\media\common\BaseEntity.class
+com\pgvpt\media\service\impl\MediaServiceImpl.class
+com\pgvpt\media\service\MediaService.class
+com\pgvpt\media\MsMediaApplication.class
+com\pgvpt\media\mapper\MediaApiMapperImpl$1.class
+com\pgvpt\media\mapper\MediaApiMapperImpl.class
+com\pgvpt\media\repository\MediaRepository.class
+com\pgvpt\media\exception\BusinessException.class
+com\pgvpt\media\enums\TypeMedia.class
+com\pgvpt\media\exception\GlobalExceptionHandler.class
+com\pgvpt\media\exception\ResourceNotFoundException.class
+com\pgvpt\media\model\MediaEntity.class

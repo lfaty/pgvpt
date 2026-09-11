@@ -9,4 +9,6 @@ import java.util.UUID;
 
 public interface MediaRepository extends JpaRepository<MediaEntity, UUID> {
     List<MediaEntity> findByPatrimoineIdAndType(UUID patrimoineId, TypeMedia typeMedia);
+    List<MediaEntity> findByPatrimoineId(UUID patrimoineId);
+    List<MediaEntity> findByType(TypeMedia typeMedia);
 }
