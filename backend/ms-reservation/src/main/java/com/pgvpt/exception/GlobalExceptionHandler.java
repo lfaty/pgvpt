@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
+    @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiError> handleBusiness(BusinessException exception) {
 
         ApiError error = new ApiError(LocalDateTime.now(), 409, "BUSINESS_ERROR", exception.getMessage());

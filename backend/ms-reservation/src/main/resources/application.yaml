@@ -1,3 +1,37 @@
+server:
+  port: 3008
+  servlet:
+    context-path: /api/v1
+
 spring:
   application:
     name: ms-reservation
+  jackson:
+    default-property-inclusion: non_null
+    deserialization:
+      fail-on-unknown-properties: false
+
+  cloud:
+    config:
+      enabled: false
+    discovery:
+      enabled: false
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/reservation_db
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: "Thies@#1521"
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+eureka:
+  client:
+    enabled: false

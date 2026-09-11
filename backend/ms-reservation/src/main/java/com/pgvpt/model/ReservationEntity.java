@@ -39,6 +39,9 @@ public class ReservationEntity extends BaseEntity {
      @Column(nullable=false,length=3)
      private String devise="XOF";
 
+     @Column(name="montant_total")
+     private Double montantTotal;
+
      @Enumerated(EnumType.STRING) @Column(nullable=false,length=20)
      private StatutReservation statut=StatutReservation.EN_ATTENTE;
 

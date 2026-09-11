@@ -10,22 +10,24 @@ import org.springframework.data.repository.query.Param;
 import java.time.Instant;
 import java.util.*;
 
-public interface ReservationRepository extends JpaRepository<ReservationEntity,UUID> {
+import jakarta.persistence.criteria.Predicate;
+
+public interface ReservationRepository extends JpaRepository<ReservationEntity,UUID>, JpaSpecificationExecutor<ReservationEntity> {
 
     Optional<ReservationEntity> findByNumero(String numero);
 
-    @Query("select r from ReservationEntity r where (:utilisateurId is null or r.utilisateurId=:utilisateurId) " +
-            "and (:statut is null or r.statut=:statut) " +
-            "and (:typeRessource is null or r.typeRessource=:typeRessource) " +
-            "and (:ressourceId is null or r.ressourceId=:ressourceId) " +
-            "and (:dateDebut is null or r.dateReservation>=:dateDebut) " +
-            "and (:dateFin is null or r.dateReservation<=:dateFin)")
-    Page<ReservationEntity> rechercher(@Param("utilisateurId") UUID u,
-                                       @Param("statut") StatutReservation s,
-                                       @Param("typeRessource") TypeRessource t,
-                                       @Param("ressourceId") UUID r,
-                                       @Param("dateDebut") Instant d1,
-                                       @Param("dateFin") Instant d2, Pageable p);
+    default Page<ReservationEntity> rechercher(UUID u, StatutReservation s, TypeRessource t, UUID r, Instant d1, Instant d2, Pageable p) {
+        return findAll((root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (u != null) predicates.add(cb.equal(root.get("utilisateurId"), u));
+            if (s != null) predicates.add(cb.equal(root.get("statut"), s));
+            if (t != null) predicates.add(cb.equal(root.get("typeRessource"), t));
+            if (r != null) predicates.add(cb.equal(root.get("ressourceId"), r));
+            if (d1 != null) predicates.add(cb.greaterThanOrEqualTo(root.get("dateReservation"), d1));
+            if (d2 != null) predicates.add(cb.lessThanOrEqualTo(root.get("dateReservation"), d2));
+            return cb.and(predicates.toArray(new Predicate[0]));
+        }, p);
+    }
 
     @Query("select coalesce(sum(r.nombrePersonnes),0) from ReservationEntity r where r.typeRessource=:typeRessource " +
             "and r.ressourceId=:ressourceId and r.dateReservation=:dateReservation " +
