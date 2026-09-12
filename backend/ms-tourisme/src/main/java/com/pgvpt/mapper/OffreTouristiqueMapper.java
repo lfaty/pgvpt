@@ -13,5 +13,11 @@ public interface OffreTouristiqueMapper {
 
     OffreTouristiqueEntity toEntity(OffreCreate request);
 
-   // void updateEntity(OffreUpdate request, @MappingTarget OffreTouristiqueEntity entity);
+    default java.time.OffsetDateTime map(java.time.Instant value) {
+        return value != null ? java.time.OffsetDateTime.ofInstant(value, java.time.ZoneOffset.UTC) : null;
+    }
+
+    default java.time.Instant map(java.time.OffsetDateTime value) {
+        return value != null ? value.toInstant() : null;
+    }
 }

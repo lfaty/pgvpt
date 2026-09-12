@@ -15,6 +15,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import com.pgvpt.client.CircuitClient;
+import com.pgvpt.client.ZoneTouristiqueClient;
+import feign.FeignException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +32,8 @@ public class OffreTouristiqueServiceImpl implements OffreTouristiqueService {
 
     private final OffreTouristiqueRepository repository;
     private final PrestationRepository prestationRepository;
+    private final CircuitClient circuitClient;
+    private final ZoneTouristiqueClient zoneTouristiqueClient;
 
     @Override
     @Transactional(readOnly = true)
@@ -57,6 +62,7 @@ public class OffreTouristiqueServiceImpl implements OffreTouristiqueService {
         }
 
         validerPeriode(request.getDateDebutValidite(), request.getDateFinValidite());
+        validerRessourcesExternes(request.getZoneTouristiqueId(), request.getCircuitId());
 
         request.setStatut(StatutOffre.BROUILLON);
         request.setActif(true);
@@ -84,6 +90,7 @@ public class OffreTouristiqueServiceImpl implements OffreTouristiqueService {
         }
 
         validerPeriode(request.getDateDebutValidite(), request.getDateFinValidite());
+        validerRessourcesExternes(request.getZoneTouristiqueId(), request.getCircuitId());
 
         entity.setActeurId(request.getActeurId());
         entity.setActif(request.isActif());
@@ -137,7 +144,14 @@ public class OffreTouristiqueServiceImpl implements OffreTouristiqueService {
 
     @Override
     public OffreTouristiqueEntity depublier(UUID id) {
-        return null;
+        OffreTouristiqueEntity entity = getEntity(id);
+        if (entity.getStatut() == StatutOffre.ARCHIVEE) {
+            throw new BusinessException("Une offre archivée ne peut pas être dépubliée.");
+        }
+        if (entity.getStatut() == StatutOffre.PUBLIEE) {
+            entity.setStatut(StatutOffre.DEPUBLIEE);
+        }
+        return repository.save(entity);
     }
 
     @Override
@@ -170,12 +184,24 @@ public class OffreTouristiqueServiceImpl implements OffreTouristiqueService {
 
     @Override
     public OffreTouristiqueEntity archiver(UUID id) {
-        return null;
+        OffreTouristiqueEntity entity = getEntity(id);
+        entity.setStatut(StatutOffre.ARCHIVEE);
+        entity.setActif(false);
+        return repository.save(entity);
     }
 
     @Override
     public BigDecimal calculerPrix(UUID id) {
-        return null;
+        OffreTouristiqueEntity entity = getEntity(id);
+        BigDecimal total = entity.getPrix() != null ? entity.getPrix() : BigDecimal.ZERO;
+        
+        for (com.pgvpt.model.PrestationEntity prestation : prestationRepository.findByOffreIdOrderByCreatedAtAsc(id)) {
+            if (prestation.getPrix() != null) {
+                total = total.add(prestation.getPrix());
+            }
+        }
+        
+        return total;
     }
 
     private OffreTouristiqueEntity getEntity(UUID id) {
@@ -187,6 +213,28 @@ public class OffreTouristiqueServiceImpl implements OffreTouristiqueService {
 
         if (debut != null && fin != null && fin.isBefore(debut)) {
             throw new BusinessException("La date de fin de validité doit être postérieure ou égale à la date de début.");
+        }
+    }
+
+    private void validerRessourcesExternes(UUID zoneTouristiqueId, UUID circuitId) {
+        try {
+            if (zoneTouristiqueId != null) {
+                zoneTouristiqueClient.getById(zoneTouristiqueId);
+            }
+        } catch (FeignException.NotFound e) {
+            throw new BusinessException("La zone touristique spécifiée n'existe pas.");
+        } catch (FeignException e) {
+            throw new BusinessException("Impossible de vérifier la zone touristique : " + e.getMessage());
+        }
+
+        try {
+            if (circuitId != null) {
+                circuitClient.getById(circuitId);
+            }
+        } catch (FeignException.NotFound e) {
+            throw new BusinessException("Le circuit spécifié n'existe pas.");
+        } catch (FeignException e) {
+            throw new BusinessException("Impossible de vérifier le circuit : " + e.getMessage());
         }
     }
 

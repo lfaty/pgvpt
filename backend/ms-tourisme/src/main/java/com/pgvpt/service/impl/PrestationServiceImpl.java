@@ -23,12 +23,13 @@ public class PrestationServiceImpl implements PrestationService {
 
     @Override
     public List<PrestationEntity> findByOffreId(UUID offreId) {
-        return List.of();
+        return prestationRepository.findByOffreIdOrderByCreatedAtAsc(offreId);
     }
 
     @Override
     public PrestationEntity getById(UUID id) {
-        return null;
+        return prestationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Prestation introuvable : " + id));
     }
 
     @Override
@@ -48,21 +49,35 @@ public class PrestationServiceImpl implements PrestationService {
 
     @Override
     public PrestationEntity update(UUID id, PrestationEntity request) {
-        return null;
+        PrestationEntity existing = getById(id);
+        existing.setNom(request.getNom());
+        existing.setType(request.getType());
+        existing.setDescription(request.getDescription());
+        existing.setPrix(request.getPrix());
+        existing.setDevise(request.getDevise());
+        existing.setActif(request.isActif());
+        return prestationRepository.save(existing);
     }
 
     @Override
     public void delete(UUID id) {
-
+        if (!prestationRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Prestation introuvable : " + id);
+        }
+        prestationRepository.deleteById(id);
     }
 
     @Override
     public PrestationEntity activer(UUID id) {
-        return null;
+        PrestationEntity existing = getById(id);
+        existing.setActif(true);
+        return prestationRepository.save(existing);
     }
 
     @Override
     public PrestationEntity desactiver(UUID id) {
-        return null;
+        PrestationEntity existing = getById(id);
+        existing.setActif(false);
+        return prestationRepository.save(existing);
     }
 }
