@@ -60,7 +60,7 @@ public class ItineraireOptimizationServiceImpl implements ItineraireOptimization
         List<EtapeAvecCoordonneesViewModel> etapesOptimisees = appliquerStrategie(points, distances, request);
 
         // 6. Recalculer ordre, distances et coûts
-        recalculerEtapes(etapesOptimisees, distances);
+        recalculerEtapes(etapesOptimisees, distances, request);
 
         // 7. Persister le nouvel ordre
         sauvegarderNouvelOrdre(etapesOptimisees);
@@ -220,7 +220,7 @@ public class ItineraireOptimizationServiceImpl implements ItineraireOptimization
 
         return switch (request.getMethode()) {
 
-            case DISTANCE_MINIMALE -> optimiserParDistance(points, distances);
+            case DISTANCE_MINIMALE -> optimiserParDistance(points, distances, request);
 
             case DUREE_MINIMALE -> optimiserParDuree(points, distances);
 
@@ -232,13 +232,22 @@ public class ItineraireOptimizationServiceImpl implements ItineraireOptimization
 
     private List<EtapeAvecCoordonneesViewModel> optimiserParDistance(
             List<EtapeAvecCoordonneesViewModel> points,
-            Map<UUID, Map<UUID, Double>> distances) {
+            Map<UUID, Map<UUID, Double>> distances,
+            OptimisationItineraireRequestViewModel request) {
 
         List<EtapeAvecCoordonneesViewModel> resultat = new ArrayList<>();
 
         Set<UUID> visites = new HashSet<>();
 
-        EtapeAvecCoordonneesViewModel courant = points.get(0);
+        EtapeAvecCoordonneesViewModel courant;
+
+        if (request.getLatitudeDepart() != null && request.getLongitudeDepart() != null) {
+            courant = points.stream()
+                    .min(Comparator.comparingDouble(p -> haversine(request.getLatitudeDepart(), request.getLongitudeDepart(), p.getLatitude(), p.getLongitude())))
+                    .orElseThrow();
+        } else {
+            courant = points.get(0);
+        }
 
         resultat.add(courant);
 
@@ -293,26 +302,48 @@ public class ItineraireOptimizationServiceImpl implements ItineraireOptimization
             OptimisationItineraireRequestViewModel request) {
 
         double poidsDistance = valeur(request.getPoidsDistance(), 1.0);
-
         double poidsDuree = valeur(request.getPoidsDuree(), 1.0);
-
         double poidsCout = valeur(request.getPoidsCout(), 1.0);
 
-        return points.stream()
-                .sorted(Comparator.comparingDouble(
-                                point -> {
-                                    EtapeCircuitEntity etape = point.getEtape();
+        List<EtapeAvecCoordonneesViewModel> resultat = new ArrayList<>();
+        Set<UUID> visites = new HashSet<>();
+        EtapeAvecCoordonneesViewModel courant;
 
-                                    double distance = Optional.ofNullable(etape.getDistanceDepuisPrecedenteKm()).orElse(0.0);
+        if (request.getLatitudeDepart() != null && request.getLongitudeDepart() != null) {
+            courant = points.stream()
+                    .min(Comparator.comparingDouble(p -> {
+                        double distance = haversine(request.getLatitudeDepart(), request.getLongitudeDepart(), p.getLatitude(), p.getLongitude());
+                        double duree = Optional.ofNullable(p.getEtape().getDureeMinutes()).orElse(0);
+                        double cout = Optional.ofNullable(p.getEtape().getPrix()).orElse(0.0);
+                        return poidsDistance * distance + poidsDuree * duree + poidsCout * cout;
+                    }))
+                    .orElseThrow();
+        } else {
+            courant = points.get(0);
+        }
 
-                                    double duree = Optional.ofNullable(etape.getDureeMinutes()).orElse(0);
+        resultat.add(courant);
+        visites.add(courant.getEtape().getPatrimoineId());
 
-                                    double cout = Optional.ofNullable(etape.getPrix()).orElse(0.0);
+        while (resultat.size() < points.size()) {
+            UUID courantId = courant.getEtape().getPatrimoineId();
 
-                                    return poidsDistance * distance + poidsDuree * duree + poidsCout * cout;
-                                }
-                        )
-                ).toList();
+            EtapeAvecCoordonneesViewModel prochaine = points.stream()
+                    .filter(point -> !visites.contains(point.getEtape().getPatrimoineId()))
+                    .min(Comparator.comparingDouble(point -> {
+                        double distance = distances.get(courantId).get(point.getEtape().getPatrimoineId());
+                        double duree = Optional.ofNullable(point.getEtape().getDureeMinutes()).orElse(0);
+                        double cout = Optional.ofNullable(point.getEtape().getPrix()).orElse(0.0);
+                        return poidsDistance * distance + poidsDuree * duree + poidsCout * cout;
+                    }))
+                    .orElseThrow();
+
+            resultat.add(prochaine);
+            visites.add(prochaine.getEtape().getPatrimoineId());
+            courant = prochaine;
+        }
+
+        return resultat;
     }
 
     private double valeur(Double valeur, double valeurParDefaut) {
@@ -322,14 +353,19 @@ public class ItineraireOptimizationServiceImpl implements ItineraireOptimization
                 : valeur;
     }
 
-    private void recalculerEtapes(List<EtapeAvecCoordonneesViewModel> etapes, Map<UUID, Map<UUID, Double>> distances) {
+    private void recalculerEtapes(List<EtapeAvecCoordonneesViewModel> etapes, Map<UUID, Map<UUID, Double>> distances, OptimisationItineraireRequestViewModel request) {
 
         for (int i = 0; i < etapes.size(); i++) {
             EtapeCircuitEntity etape = etapes.get(i).getEtape();
             etape.setOrdre(i + 1);
 
             if (i == 0) {
-                etape.setDistanceDepuisPrecedenteKm(0.0);
+                if (request.getLatitudeDepart() != null && request.getLongitudeDepart() != null) {
+                    double distance = haversine(request.getLatitudeDepart(), request.getLongitudeDepart(), etapes.get(0).getLatitude(), etapes.get(0).getLongitude());
+                    etape.setDistanceDepuisPrecedenteKm(distance);
+                } else {
+                    etape.setDistanceDepuisPrecedenteKm(0.0);
+                }
                 continue;
             }
 
