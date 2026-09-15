@@ -51,6 +51,18 @@ public abstract class PatrimoineMapper {
         if (entity.getMedias() != null) {
             entity.getMedias().forEach(m -> m.setPatrimoine(entity));
         }
+        if (entity instanceof MuseeEntity musee) {
+            if (musee.getCollections() != null) {
+                musee.getCollections().forEach(c -> c.setMusee(musee));
+            }
+            if (musee.getExpositions() != null) {
+                musee.getExpositions().forEach(e -> e.setMusee(musee));
+            }
+        } else if (entity instanceof SiteNaturelEntity site) {
+            if (site.getEspecesProtegees() != null) {
+                site.getEspecesProtegees().forEach(e -> e.setSiteNaturel(site));
+            }
+        }
     }
 
     // ============================================================

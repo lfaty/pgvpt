@@ -23,7 +23,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/patrimoine_db
     driver-class-name: org.postgresql.Driver
     username: postgres
-    password: "admin"
+    password: "Thies@#1521"
 
   jpa:
     hibernate:
