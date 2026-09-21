@@ -1,0 +1,357 @@
+<div class="home-page">
+
+  <!-- 1. HERO -->
+  <section class="hero">
+    <div class="hero-bg">
+      <ng-container *ngFor="let img of heroImages; let i = index">
+        <img [src]="img" [alt]="'Sénégal ' + i"
+          class="hero-bg-img"
+          [class.hero-bg-img--active]="currentHeroIndex === i">
+      </ng-container>
+      <div class="hero-gradient-overlay"></div>
+    </div>
+
+    <div class="hero-content">
+      <span class="hero-badge">🌍 Plateforme du Patrimoine Sénégalais</span>
+      <h1 class="hero-title">Découvrez l'âme du Sénégal</h1>
+      <p class="hero-subtitle">
+        Partez à la découverte des trésors cachés de la Teranga. Patrimoines, circuits et événements exceptionnels vous
+        attendent.
+      </p>
+
+      <!-- Search Bar -->
+      <div class="hero-search">
+        <div class="search-field">
+          <svg class="search-field-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input type="text" placeholder="Que voulez-vous visiter ?" class="search-field-input">
+        </div>
+        <div class="search-divider"></div>
+        <div class="search-field">
+          <svg class="search-field-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <input type="date" class="search-field-input search-field-input--date">
+        </div>
+        <button class="search-button">Rechercher</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. CATEGORIES BAR -->
+  <section class="categories-section">
+    <div class="categories-container">
+      <div class="categories-bar">
+
+        <a routerLink="/patrimoines" [queryParams]="{category: 'historique'}" class="category-item">
+          <div class="category-icon category-icon--blue">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+          </div>
+          <span class="category-label">Historique</span>
+        </a>
+
+        <a routerLink="/patrimoines" [queryParams]="{category: 'naturel'}" class="category-item">
+          <div class="category-icon category-icon--green">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+            </svg>
+          </div>
+          <span class="category-label">Naturel</span>
+        </a>
+
+        <a routerLink="/patrimoines" [queryParams]="{category: 'culturel'}" class="category-item">
+          <div class="category-icon category-icon--amber">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+            </svg>
+          </div>
+          <span class="category-label">Culturel</span>
+        </a>
+
+        <a routerLink="/patrimoines" class="category-item">
+          <div class="category-icon category-icon--blue">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <span class="category-label">Immatériel</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. PATRIMOINES À DÉCOUVRIR -->
+  <section class="section section--sand">
+    <div class="section-container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Patrimoines à découvrir</h2>
+          <p class="section-subtitle">Les sites historiques et naturels incontournables.</p>
+        </div>
+        <a routerLink="/patrimoines" class="section-link">
+          Voir tout
+          <svg class="link-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
+      </div>
+
+      <div class="patrimoines-grid-4">
+        <div *ngFor="let item of patrimoines" class="patrimoine-mini-card" [routerLink]="['/patrimoines', item.id]">
+          <div class="mini-card-image">
+            <img [src]="item.images[0]" [alt]="item.nom">
+            <div class="mini-card-type-badge"
+                 [class.badge--red]="item.type === 'HISTORIQUE'"
+                 [class.badge--green]="item.type === 'NATUREL'"
+                 [class.badge--amber]="item.type === 'CULTUREL'">
+              {{ item.type }}
+            </div>
+          </div>
+          <div class="mini-card-body">
+            <h3 class="mini-card-title">{{ item.nom }}</h3>
+            <p class="mini-card-location">
+              <svg class="mini-loc-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              {{ item.localisation.region }}
+            </p>
+            <p class="mini-card-desc">{{ item.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. CARTE INTERACTIVE -->
+  <section class="section section--light">
+    <div class="section-container">
+      <div class="section-header section-header--center">
+        <div class="map-section-badge">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+          </svg>
+          Carte Interactive
+        </div>
+        <h2 class="section-title">Explorer le Sénégal</h2>
+        <p class="section-subtitle">Naviguez à travers les régions et découvrez les patrimoines de chaque localité.</p>
+      </div>
+
+      <div class="map-wrapper">
+        <div class="map-layout">
+
+          <!-- Filters panel -->
+          <div class="map-filters-panel">
+            <h3 class="filters-title">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              Filtres
+            </h3>
+
+            <div class="filter-group">
+              <h4 class="filter-group-label">Catégories</h4>
+              <label class="filter-checkbox">
+                <input type="checkbox" [(ngModel)]="filterCategories['CULTUREL']" (change)="onFilterChange()">
+                <span class="filter-dot filter-dot--amber"></span> Culturel
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" [(ngModel)]="filterCategories['NATUREL']" (change)="onFilterChange()">
+                <span class="filter-dot filter-dot--green"></span> Naturel
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" [(ngModel)]="filterCategories['HISTORIQUE']" (change)="onFilterChange()">
+                <span class="filter-dot filter-dot--red"></span> Historique
+              </label>
+            </div>
+
+            <div class="filter-group filter-group--border">
+              <h4 class="filter-group-label">Régions</h4>
+              <select [(ngModel)]="filterRegion" (change)="onFilterChange()" class="filter-region-select">
+                <option value="Toutes">Toutes</option>
+                <option *ngFor="let region of regions" [value]="region">{{ region }}</option>
+              </select>
+            </div>
+
+            <!-- Legend -->
+            <div class="map-legend">
+              <p class="legend-title">Légende</p>
+              <div class="legend-items">
+                <div class="legend-item"><span class="legend-dot legend-dot--amber"></span> Culturel</div>
+                <div class="legend-item"><span class="legend-dot legend-dot--green"></span> Naturel</div>
+                <div class="legend-item"><span class="legend-dot legend-dot--red"></span> Historique</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Map -->
+          <div class="map-container">
+            <div id="senegal-map" class="leaflet-map"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. CIRCUITS TOURISTIQUES -->
+  <section class="section section--light">
+    <div class="section-container">
+      <div class="section-header section-header--center">
+        <h2 class="section-title">Circuits Touristiques</h2>
+        <p class="section-subtitle">Embarquez pour des voyages itinérants soigneusement conçus pour vous
+          faire vivre le Sénégal de l'intérieur.</p>
+      </div>
+
+      <div class="circuits-grid">
+        <div *ngFor="let circuit of circuits" class="circuit-card">
+          <div class="circuit-image">
+            <img [src]="circuit.imageCouverture" [alt]="circuit.nom">
+            <div class="circuit-image-overlay">
+              <span class="circuit-duration-badge">{{ circuit.dureeJours }} Jours</span>
+              <h3 class="circuit-name">{{ circuit.nom }}</h3>
+            </div>
+          </div>
+          <div class="circuit-body">
+            <p class="circuit-desc">{{ circuit.description }}</p>
+            <div class="circuit-footer">
+              <span class="circuit-difficulty">{{ circuit.difficulte }}</span>
+              <span class="circuit-price">{{ circuit.prixBase | number }} FCFA</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. EXPÉRIENCES & OFFRES -->
+  <section class="section section--sand">
+    <div class="section-container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Expériences & Offres</h2>
+          <p class="section-subtitle">Des activités uniques pour pimenter votre séjour.</p>
+        </div>
+        <a routerLink="/offres" class="section-link">
+          Toutes les offres
+          <svg class="link-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
+      </div>
+
+      <div class="offres-grid">
+        <div *ngFor="let offre of offres" class="offre-card">
+          <div class="offre-image">
+            <img [src]="offre.image" [alt]="offre.titre">
+            <div class="offre-duration-badge">{{ offre.duree }}</div>
+          </div>
+          <div class="offre-body">
+            <span class="offre-type">{{ offre.type }}</span>
+            <h3 class="offre-title">{{ offre.titre }}</h3>
+            <p class="offre-desc">{{ offre.description }}</p>
+            <div class="offre-footer">
+              <span class="offre-price">{{ offre.prix | number }} FCFA</span>
+              <button class="offre-btn">Réserver</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. ÉVÉNEMENTS -->
+  <section class="section section--light">
+    <div class="section-container">
+      <div class="section-header section-header--center">
+        <h2 class="section-title">Événements à venir</h2>
+      </div>
+
+      <div class="events-list">
+        <div *ngFor="let evt of evenements" class="event-card">
+          <div class="event-date-box">
+            <span class="event-month">{{ evt.dateDebut | date:'MMM' }}</span>
+            <span class="event-day">{{ evt.dateDebut | date:'dd' }}</span>
+          </div>
+
+          <img [src]="evt.image" [alt]="evt.titre" class="event-image">
+
+          <div class="event-content">
+            <span class="event-type">{{ evt.typeEvenement }}</span>
+            <h3 class="event-title">{{ evt.titre }}</h3>
+            <p class="event-desc">{{ evt.description }}</p>
+            <div class="event-location">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              {{ evt.lieu }}
+            </div>
+          </div>
+
+          <div class="event-action">
+            <button class="event-btn">Billets</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. STORYTELLING -->
+  <section class="storytelling">
+    <div class="storytelling-layout">
+      <div class="storytelling-image">
+        <img src="assets/images/storytelling.jpg" alt="La Teranga">
+        <div class="storytelling-image-overlay"></div>
+      </div>
+      <div class="storytelling-content">
+        <div class="storytelling-bg-pattern"></div>
+        <div class="storytelling-text">
+          <span class="storytelling-label">L'Esprit du Sénégal</span>
+          <h2 class="storytelling-title">Vivez la vraie Teranga</h2>
+          <p class="storytelling-desc">
+            Bien plus qu'une simple hospitalité, la Teranga est l'âme du Sénégal. C'est ce sentiment d'être accueilli
+            comme un membre de la famille, cette chaleur humaine qui transforme un simple voyage en une aventure
+            inoubliable. Sur notre plateforme, chaque expérience est pensée pour vous plonger au cœur de cette tradition
+            ancestrale.
+          </p>
+          <a routerLink="/a-propos" class="storytelling-link">
+            Découvrir notre histoire
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. CTA FINAL -->
+  <section class="cta-section">
+    <div class="cta-bg-shape"></div>
+    <div class="cta-content">
+      <h2 class="cta-title">Prêt pour l'aventure ?</h2>
+      <p class="cta-subtitle">Créez votre compte gratuitement pour enregistrer vos lieux favoris,
+        réserver vos circuits et préparer votre voyage au Sénégal.</p>
+      <div class="cta-buttons">
+        <button class="cta-btn cta-btn--primary">Créer un compte</button>
+        <button routerLink="/patrimoines" class="cta-btn cta-btn--outline">Parcourir le catalogue</button>
+      </div>
+    </div>
+  </section>
+
+</div>

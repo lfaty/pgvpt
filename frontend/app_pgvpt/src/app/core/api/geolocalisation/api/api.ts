@@ -1,0 +1,11 @@
+export * from './geolocalisations.service';
+import { GeolocalisationsService } from './geolocalisations.service';
+export * from './geospatial.service';
+import { GeospatialService } from './geospatial.service';
+export * from './referentiel-administratif.service';
+import { ReferentielAdministratifService } from './referentiel-administratif.service';
+export * from './zone-geographique.service';
+import { ZoneGeographiqueService } from './zone-geographique.service';
+export * from './zone-touristique.service';
+import { ZoneTouristiqueService } from './zone-touristique.service';
+export const APIS = [GeolocalisationsService, GeospatialService, ReferentielAdministratifService, ZoneGeographiqueService, ZoneTouristiqueService];

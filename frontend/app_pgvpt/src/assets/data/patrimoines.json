@@ -1,0 +1,162 @@
+[
+  {
+    "id": "1",
+    "nom": "Île de Gorée",
+    "description": "Symbole de la mémoire de la traite négrière en Afrique, reconnue pour son architecture coloniale pittoresque aux couleurs ocre et rouge.",
+    "type": "HISTORIQUE",
+    "categorie": "Patrimoine Mondial de l'UNESCO",
+    "images": [
+      "assets/images/patrimoine_1.jpg"
+    ],
+    "localisation": {
+      "region": "Dakar",
+      "departement": "Dakar",
+      "commune": "Gorée",
+      "adresse": "Île de Gorée, au large de Dakar",
+      "latitude": 14.6674,
+      "longitude": -17.3986
+    },
+    "note": 4.9,
+    "statut": "ACTIF"
+  },
+  {
+    "id": "2",
+    "nom": "Parc National du Niokolo-Koba",
+    "description": "L'une des plus grandes réserves animalières d'Afrique de l'Ouest, abritant lions, léopards, éléphants et une flore exceptionnelle.",
+    "type": "NATUREL",
+    "categorie": "Réserve Naturelle",
+    "images": [
+      "assets/images/patrimoine_2.jpg"
+    ],
+    "localisation": {
+      "region": "Tambacounda",
+      "departement": "Tambacounda",
+      "commune": "Niokolo",
+      "adresse": "Sud-Est du Sénégal",
+      "latitude": 13.0667,
+      "longitude": -12.7167
+    },
+    "note": 4.7,
+    "statut": "ACTIF"
+  },
+  {
+    "id": "3",
+    "nom": "Monument de la Renaissance Africaine",
+    "description": "Une immense statue en bronze dominant Dakar, célébrant la renaissance et l'avenir de l'Afrique.",
+    "type": "CULTUREL",
+    "categorie": "Monument",
+    "images": [
+      "assets/images/patrimoine_3.jpg"
+    ],
+    "localisation": {
+      "region": "Dakar",
+      "departement": "Dakar",
+      "commune": "Ouakam",
+      "adresse": "Collines des Mamelles",
+      "latitude": 14.7225,
+      "longitude": -17.4953
+    },
+    "note": 4.5,
+    "statut": "ACTIF"
+  },
+  {
+    "id": "4",
+    "nom": "Saint-Louis et Pont Faidherbe",
+    "description": "Ancienne capitale du Sénégal à l'architecture coloniale remarquable, reliée au continent par le célèbre pont Faidherbe.",
+    "type": "HISTORIQUE",
+    "categorie": "Patrimoine Mondial de l'UNESCO",
+    "images": [
+      "assets/images/patrimoine_4.jpg"
+    ],
+    "localisation": {
+      "region": "Saint-Louis",
+      "departement": "Saint-Louis",
+      "commune": "Saint-Louis",
+      "adresse": "Île de Saint-Louis",
+      "latitude": 16.0200,
+      "longitude": -16.4900
+    },
+    "note": 4.8,
+    "statut": "ACTIF"
+  },
+  {
+    "id": "5",
+    "nom": "Lac Rose (Lac Retba)",
+    "description": "Célèbre lac aux eaux roses dû à une micro-algue, ancien point d'arrivée du Rallye Paris-Dakar.",
+    "type": "NATUREL",
+    "categorie": "Site Naturel",
+    "images": [
+      "assets/images/circuit_1.jpg"
+    ],
+    "localisation": {
+      "region": "Dakar",
+      "departement": "Rufisque",
+      "commune": "Sangalkam",
+      "adresse": "35 km au nord-est de Dakar",
+      "latitude": 14.8400,
+      "longitude": -17.2336
+    },
+    "note": 4.6,
+    "statut": "ACTIF"
+  },
+  {
+    "id": "6",
+    "nom": "Mosquée de Touba",
+    "description": "La plus grande mosquée d'Afrique de l'Ouest, lieu saint de la confrérie mouride et centre du Grand Magal.",
+    "type": "CULTUREL",
+    "categorie": "Édifice Religieux",
+    "images": [
+      "assets/images/event_3.jpg"
+    ],
+    "localisation": {
+      "region": "Diourbel",
+      "departement": "Mbacké",
+      "commune": "Touba",
+      "adresse": "Centre-ville de Touba",
+      "latitude": 14.8510,
+      "longitude": -15.8826
+    },
+    "note": 4.9,
+    "statut": "ACTIF"
+  },
+  {
+    "id": "7",
+    "nom": "Delta du Saloum",
+    "description": "Un labyrinthe de mangroves, d'îles et de bolongs classé au patrimoine mondial de l'UNESCO.",
+    "type": "NATUREL",
+    "categorie": "Patrimoine Mondial de l'UNESCO",
+    "images": [
+      "assets/images/circuit_3.jpg"
+    ],
+    "localisation": {
+      "region": "Fatick",
+      "departement": "Foundiougne",
+      "commune": "Toubacouta",
+      "adresse": "Embouchure du fleuve Saloum",
+      "latitude": 13.6500,
+      "longitude": -16.5000
+    },
+    "note": 4.7,
+    "statut": "ACTIF"
+  },
+  {
+    "id": "8",
+    "nom": "Casamance - Cap Skirring",
+    "description": "Plages paradisiaques, forêts luxuriantes et culture Diola authentique dans le sud du Sénégal.",
+    "type": "NATUREL",
+    "categorie": "Site Balnéaire",
+    "images": [
+      "assets/images/circuit_2.jpg"
+    ],
+    "localisation": {
+      "region": "Ziguinchor",
+      "departement": "Oussouye",
+      "commune": "Cap Skirring",
+      "adresse": "Littoral sud de la Casamance",
+      "latitude": 12.3500,
+      "longitude": -16.7500
+    },
+    "note": 4.8,
+    "statut": "ACTIF"
+  }
+]

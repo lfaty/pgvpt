@@ -1,0 +1,13 @@
+export * from './conservation.service';
+import { ConservationService } from './conservation.service';
+export * from './horaires.service';
+import { HorairesService } from './horaires.service';
+export * from './patrimoines.service';
+import { PatrimoinesService } from './patrimoines.service';
+export * from './photos.service';
+import { PhotosService } from './photos.service';
+export * from './publication.service';
+import { PublicationService } from './publication.service';
+export * from './recherche.service';
+import { RechercheService } from './recherche.service';
+export const APIS = [ConservationService, HorairesService, PatrimoinesService, PhotosService, PublicationService, RechercheService];

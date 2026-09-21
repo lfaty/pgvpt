@@ -1,0 +1,3483 @@
+openapi: 3.0.3
+info:
+  title: MS Géolocalisation des patrimoines - API
+  description: "API Contract-First du microservice de géolocalisation des patrimoines\ntouristiques du PGVPT.\n\nCe microservice\
+    \ assure :\n  - la gestion des coordonnées géographiques des patrimoines ;\n  - la gestion de la localisation administrative\
+    \ ;\n  - la recherche spatiale ;\n  - le calcul des distances ;\n  - la recherche des patrimoines dans un rayon ;\n  -\
+    \ la gestion des points d'intérêt ;\n  - la gestion des zones géographiques ;\n  - la gestion des itinéraires et points\
+    \ d'accès ;\n  - la production de données cartographiques ;\n  - l'exploitation des informations géospatiales;\n  - Une\
+    \ géolocalisation peut être associée soit à un patrimoine (ms-patrimoine), soit à une entreprise (ms-entreprise), mais\
+    \ jamais aux deux simultanément.\"\n\n    Version 13.0.0 : contrat consolidé pour une génération Spring Boot 3 / Jakarta\n\
+    \    avec validation, pagination homogène, sécurité JWT, gestion d'erreurs standardisée\n    et contraintes métier explicites.\n\
+    \nModèle d'héritage : `BaseEntity` constitue la classe racine commune des entités persistantes. La géolocalisation est\
+    \ un modèle métier distinct et n'est pas implémentée par `BaseEntity`."
+  version: 13.0.1
+  contact:
+    name: PGVPT
+    email: contact@pgvpt.sn
+servers:
+- url: http://localhost:3002/api/v1
+  description: Environnement local
+- url: https://api.pgvpt.sn/geolocalisation/api/v1
+  description: Environnement de production
+tags:
+- name: Referentiel administratif
+  description: Pays, régions, départements, communes, villages et quartiers
+- name: Zone geographique
+  description: Zones géographiques composées de régions
+- name: Zone touristique
+  description: Zone touristique rattachées à une zone géographique
+- name: Geolocalisations
+  description: Coordonnées et rattachement des patrimoines
+- name: Geospatial
+  description: Recherche géographique, Calcul des distances et Points d'accès
+paths:
+  /geolocalisations:
+    get:
+      tags:
+      - Geolocalisations
+      summary: Lister les Geolocalisations
+      operationId: getGeolocalisations
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      - name: departement
+        in: query
+        schema:
+          type: string
+      - name: commune
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Liste des Geolocalisations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageGeolocalisation'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+      - Geolocalisations
+      summary: Créer une géolocalisation
+      operationId: createGeolocalisation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeolocalisationCreate'
+      responses:
+        '201':
+          description: Géolocalisation créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Geolocalisation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters: []
+      security:
+      - bearerAuth: []
+  /geolocalisations/{id}:
+    get:
+      tags:
+      - Geolocalisations
+      summary: Obtenir une géolocalisation
+      operationId: getGeolocalisation
+      responses:
+        '200':
+          description: Géolocalisation trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Geolocalisation'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+      - Geolocalisations
+      summary: Modifier une géolocalisation
+      operationId: updateGeolocalisation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeolocalisationUpdate'
+      responses:
+        '200':
+          description: Géolocalisation modifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Geolocalisation'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    patch:
+      tags:
+      - Geolocalisations
+      summary: Mise à jour partielle d'une géolocalisation
+      operationId: patchGeolocalisation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeolocalisationUpdate'
+      responses:
+        '200':
+          description: Géolocalisation modifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Geolocalisation'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - Geolocalisations
+      summary: Supprimer une géolocalisation
+      operationId: deleteGeolocalisation
+      responses:
+        '204':
+          description: Géolocalisation supprimée
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    parameters:
+    - $ref: '#/components/parameters/GeolocalisationId'
+  /patrimoines/{patrimoineId}/geolocalisation:
+    get:
+      tags:
+      - Geolocalisations
+      summary: Obtenir la géolocalisation d'un patrimoine
+      operationId: getPatrimoineGeolocalisation
+      responses:
+        '200':
+          description: Géolocalisation du patrimoine
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Geolocalisation'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+      - Geolocalisations
+      summary: Mettre à jour la géolocalisation d'un patrimoine
+      operationId: updatePatrimoineGeolocalisation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeolocalisationUpdate'
+      responses:
+        '200':
+          description: Géolocalisation mise à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Geolocalisation'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    patch:
+      tags:
+      - Geolocalisations
+      summary: Mise à jour partielle de la géolocalisation d'un patrimoine
+      operationId: patchPatrimoineGeolocalisation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeolocalisationUpdate'
+      responses:
+        '200':
+          description: Géolocalisation mise à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Geolocalisation'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    parameters:
+    - $ref: '#/components/parameters/PatrimoineId'
+  /patrimoines/{patrimoineId}/points-acces:
+    get:
+      tags:
+      - Geospatial
+      summary: Lister les points d'accès d'un patrimoine
+      operationId: getPointsAcces
+      responses:
+        '200':
+          description: Points d'accès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PointAcces'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+      - Geospatial
+      summary: Ajouter un point d'accès
+      operationId: createPointAcces
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PointAccesCreate'
+      responses:
+        '201':
+          description: Point d'accès créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PointAcces'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    parameters:
+    - $ref: '#/components/parameters/PatrimoineId'
+  /points-acces/{id}:
+    put:
+      tags:
+      - Geospatial
+      summary: Modifier un point d'accès
+      operationId: updatePointAcces
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PointAccesCreate'
+      responses:
+        '200':
+          description: Point d'accès modifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PointAcces'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - Geospatial
+      summary: Supprimer un point d'accès
+      operationId: deletePointAcces
+      responses:
+        '204':
+          description: Point d'accès supprimé
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    parameters:
+    - $ref: '#/components/parameters/PointAccesId'
+  /geolocalisations/recherche/rayon:
+    get:
+      tags:
+      - Geospatial
+      summary: Rechercher les patrimoines dans un rayon
+      operationId: rechercherDansRayon
+      parameters:
+      - name: latitude
+        in: query
+        required: true
+        schema:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+      - name: longitude
+        in: query
+        required: true
+        schema:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+      - name: rayonKm
+        in: query
+        required: true
+        schema:
+          type: number
+          format: double
+          minimum: 0
+          exclusiveMinimum: true
+      - name: typePatrimoine
+        in: query
+        schema:
+          type: string
+      - name: categorie
+        in: query
+        schema:
+          type: string
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: Patrimoines trouvés dans le rayon
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagePatrimoineGeographique'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /geolocalisations/recherche/bbox:
+    get:
+      tags:
+      - Geospatial
+      summary: Rechercher les patrimoines dans une emprise géographique
+      operationId: rechercherDansBoundingBox
+      parameters:
+      - name: minLatitude
+        in: query
+        required: true
+        schema:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+      - name: minLongitude
+        in: query
+        required: true
+        schema:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+      - name: maxLatitude
+        in: query
+        required: true
+        schema:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+      - name: maxLongitude
+        in: query
+        required: true
+        schema:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: Patrimoines situés dans l'emprise
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagePatrimoineGeographique'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /geolocalisations/distance:
+    get:
+      tags:
+      - Geospatial
+      summary: Calculer la distance entre deux positions
+      operationId: calculerDistance
+      parameters:
+      - name: latitudeDepart
+        in: query
+        required: true
+        schema:
+          type: number
+          format: double
+      - name: longitudeDepart
+        in: query
+        required: true
+        schema:
+          type: number
+          format: double
+      - name: latitudeArrivee
+        in: query
+        required: true
+        schema:
+          type: number
+          format: double
+      - name: longitudeArrivee
+        in: query
+        required: true
+        schema:
+          type: number
+          format: double
+      responses:
+        '200':
+          description: Distance calculée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Distance'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /geolocalisations/distance/patrimoines:
+    get:
+      tags:
+      - Geospatial
+      summary: Calculer la distance entre deux patrimoines
+      operationId: calculerDistancePatrimoines
+      parameters:
+      - name: patrimoineIdDepart
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: patrimoineIdArrivee
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Distance entre les patrimoines
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Distance'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /cartographie/patrimoines:
+    get:
+      tags:
+      - Geospatial
+      summary: Obtenir les patrimoines pour affichage cartographique
+      operationId: getPatrimoinesCarte
+      parameters:
+      - name: region
+        in: query
+        schema:
+          type: string
+      - name: typePatrimoine
+        in: query
+        schema:
+          type: string
+      - name: categorie
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Données cartographiques
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FeaturePatrimoine'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /cartographie/geojson:
+    get:
+      tags:
+      - Geospatial
+      summary: Exporter les patrimoines au format GeoJSON
+      operationId: exportGeoJson
+      responses:
+        '200':
+          description: Collection GeoJSON des patrimoines
+          content:
+            application/geo+json:
+              schema:
+                $ref: '#/components/schemas/GeoJsonFeatureCollection'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      parameters: []
+  /pays:
+    get:
+      tags:
+      - Referentiel administratif
+      summary: Lister les pays
+      operationId: getAllPays
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: Liste des pays
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagePays'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+      - Referentiel administratif
+      summary: Créer un pays
+      operationId: createPays
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaysCreate'
+      responses:
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pays'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters: []
+      security:
+      - bearerAuth: []
+  /pays/{id}:
+    get:
+      tags:
+      - Referentiel administratif
+      summary: Obtenir un pays
+      operationId: getPays
+      responses:
+        '200':
+          description: Pays trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pays'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+      - Referentiel administratif
+      summary: Modifier un pays
+      operationId: updatePays
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaysUpdate'
+      responses:
+        '200':
+          description: Pays modifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pays'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - Referentiel administratif
+      summary: Supprimer un pays
+      operationId: deletePays
+      responses:
+        '204':
+          description: Pays supprimée
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    parameters:
+    - $ref: '#/components/parameters/PaysId'
+  /regions:
+    get:
+      tags:
+      - Referentiel administratif
+      summary: Lister les régions
+      operationId: getRegions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: Liste des régions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageRegion'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+      - Referentiel administratif
+      summary: Créer une region
+      operationId: createRegion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegionCreate'
+      responses:
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Region'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters: []
+      security:
+      - bearerAuth: []
+  /regions/{id}:
+    get:
+      tags:
+      - Referentiel administratif
+      summary: Obtenir une region
+      operationId: getRegion
+      responses:
+        '200':
+          description: Region trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Region'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+      - Referentiel administratif
+      summary: Modifier une région
+      operationId: updateRegion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegionUpdate'
+      responses:
+        '200':
+          description: Region modifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Region'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - Referentiel administratif
+      summary: Supprimer une région
+      operationId: deleteRegion
+      responses:
+        '204':
+          description: Region supprimée
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    parameters:
+    - $ref: '#/components/parameters/RegionId'
+  /departements:
+    get:
+      tags:
+      - Referentiel administratif
+      summary: Lister les départements
+      operationId: getDepartements
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: Liste des départements
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageDepartement'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+      - Referentiel administratif
+      summary: Créer un(e) departement
+      operationId: createDepartement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartementCreate'
+      responses:
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Departement'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters: []
+      security:
+      - bearerAuth: []
+  /departements/{id}:
+    get:
+      tags:
+      - Referentiel administratif
+      summary: Obtenir un departement
+      operationId: getDepartement
+      responses:
+        '200':
+          description: Departement trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Departement'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+      - Referentiel administratif
+      summary: Modifier un département
+      operationId: updateDepartement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartementUpdate'
+      responses:
+        '200':
+          description: Département modifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Departement'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - Referentiel administratif
+      summary: Supprimer un département
+      operationId: deleteDepartement
+      responses:
+        '204':
+          description: Département supprimée
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    parameters:
+    - $ref: '#/components/parameters/DepartementId'
+  /communes:
+    get:
+      tags:
+      - Referentiel administratif
+      summary: Lister les communes
+      operationId: getCommunes
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: Liste des communes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageCommune'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+      - Referentiel administratif
+      summary: Créer une commune
+      operationId: createCommune
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommuneCreate'
+      responses:
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Commune'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters: []
+      security:
+      - bearerAuth: []
+  /communes/{id}:
+    get:
+      tags:
+      - Referentiel administratif
+      summary: Obtenir une commune
+      operationId: getCommune
+      responses:
+        '200':
+          description: Commune trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Commune'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+      - Referentiel administratif
+      summary: Modifier une commune
+      operationId: updateCommune
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommuneUpdate'
+      responses:
+        '200':
+          description: Commune modifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Commune'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - Referentiel administratif
+      summary: Supprimer une commune
+      operationId: deleteCommune
+      responses:
+        '204':
+          description: Commune supprimée
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    parameters:
+    - $ref: '#/components/parameters/CommuneId'
+  /villages:
+    get:
+      tags:
+      - Referentiel administratif
+      summary: Lister les villages
+      operationId: getVillages
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: Liste des villages
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageVillage'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+      - Referentiel administratif
+      summary: Créer un village
+      operationId: createVillage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VillageCreate'
+      responses:
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Village'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters: []
+      security:
+      - bearerAuth: []
+  /villages/{id}:
+    get:
+      tags:
+      - Referentiel administratif
+      summary: Obtenir un village
+      operationId: getVillage
+      responses:
+        '200':
+          description: Village trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Village'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+      - Referentiel administratif
+      summary: Modifier un village
+      operationId: updateVillage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VillageUpdate'
+      responses:
+        '200':
+          description: Village modifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Village'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - Referentiel administratif
+      summary: Supprimer un village
+      operationId: deleteVillage
+      responses:
+        '204':
+          description: Village supprimée
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    parameters:
+    - $ref: '#/components/parameters/VillageId'
+  /quartiers:
+    get:
+      tags:
+      - Referentiel administratif
+      summary: Lister les quartiers
+      operationId: getQuartiers
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: Liste des quartiers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageQuartier'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+      - Referentiel administratif
+      summary: Créer un quartier
+      operationId: createQuartier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuartierCreate'
+      responses:
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quartier'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters: []
+      security:
+      - bearerAuth: []
+  /quartiers/{id}:
+    get:
+      tags:
+      - Referentiel administratif
+      summary: Obtenir un quartie
+      operationId: getQuartier
+      responses:
+        '200':
+          description: Village trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quartier'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+      - Referentiel administratif
+      summary: Modifier un quartier
+      operationId: updateQuartier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuartierUpdate'
+      responses:
+        '200':
+          description: Quartier modifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quartier'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - Referentiel administratif
+      summary: Supprimer un quartier
+      operationId: deleteQuartier
+      responses:
+        '204':
+          description: Quartier supprimée
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    parameters:
+    - $ref: '#/components/parameters/QuartierId'
+  /zones-geographiques:
+    get:
+      tags:
+      - Zone geographique
+      summary: Lister les Zone geographique
+      operationId: getZonesGeographiques
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: Liste des Zone geographique
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageZoneGeographique'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+      - Zone geographique
+      summary: Créer une zone geographique
+      operationId: createZoneGeographique
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZoneGeographiqueCreate'
+      responses:
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZoneGeographique'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters: []
+      security:
+      - bearerAuth: []
+  /zones-geographiques/{id}:
+    get:
+      tags:
+      - Zone geographique
+      summary: Obtenir une zone géographique
+      operationId: getZoneGeographique
+      responses:
+        '200':
+          description: Zone trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZoneGeographique'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+      - Zone geographique
+      summary: Modifier un zone geographique
+      operationId: updateZoneGeographique
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZoneGeographiqueUpdate'
+      responses:
+        '200':
+          description: Zone geographique modifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZoneGeographique'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - Zone geographique
+      summary: Supprimer une zone geographique
+      operationId: deleteZoneGeographique
+      responses:
+        '204':
+          description: Zone geographique supprimée
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    parameters:
+    - $ref: '#/components/parameters/ZoneGeographiqueId'
+  /zones-touristiques:
+    get:
+      tags:
+      - Zone touristique
+      summary: Lister les Zone touristique
+      operationId: getZonesTouristiques
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: Liste des Zone touristique
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageZoneTouristique'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+      - Zone touristique
+      summary: Créer un(e) zonetouristique
+      operationId: createZoneTouristique
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZoneTouristiqueCreate'
+      responses:
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZoneTouristique'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters: []
+      security:
+      - bearerAuth: []
+  /zones-touristiques/{id}:
+    get:
+      tags:
+      - Zone touristique
+      summary: Obtenir une zone touristique
+      operationId: getZoneTouristique
+      responses:
+        '200':
+          description: Zone trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZoneTouristique'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+      - Zone touristique
+      summary: Modifier un zone touristique
+      operationId: updateZoneTouristique
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZoneTouristiqueUpdate'
+      responses:
+        '200':
+          description: Zone touristique modifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZoneTouristique'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - Zone touristique
+      summary: Supprimer une zone geographique
+      operationId: deleteZoneTouristique
+      responses:
+        '204':
+          description: Zone touristique supprimée
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      security:
+      - bearerAuth: []
+    parameters:
+    - $ref: '#/components/parameters/ZoneTouristiqueId'
+  /geolocalisations/recherche:
+    get:
+      tags:
+      - Geospatial
+      summary: Rechercher les ressources géolocalisées selon plusieurs critères
+      operationId: searchGeolocalisations
+      parameters:
+      - name: latitude
+        in: query
+        schema:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+      - name: longitude
+        in: query
+        schema:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+      - name: rayonKm
+        in: query
+        schema:
+          type: number
+          format: double
+          minimum: 0
+          exclusiveMinimum: true
+      - name: minLatitude
+        in: query
+        schema:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+      - name: maxLatitude
+        in: query
+        schema:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+      - name: minLongitude
+        in: query
+        schema:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+      - name: maxLongitude
+        in: query
+        schema:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+      - name: localite
+        in: query
+        schema:
+          type: string
+      - name: motCle
+        in: query
+        schema:
+          type: string
+      - name: typePatrimoine
+        in: query
+        schema:
+          $ref: '#/components/schemas/TypePatrimoine'
+      - name: categorie
+        in: query
+        schema:
+          type: string
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+      - name: size
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      responses:
+        '200':
+          description: Résultats de recherche
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagePatrimoineGeographique'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  parameters:
+    PaysId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    RegionId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    DepartementId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    CommuneId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    VillageId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    QuartierId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    GeolocalisationId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    PatrimoineId:
+      name: patrimoineId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    PointAccesId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ZoneGeographiqueId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ZoneTouristiqueId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Page:
+      name: page
+      in: query
+      required: false
+      description: Numéro de page, indexé à partir de 0.
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    Size:
+      name: size
+      in: query
+      required: false
+      description: Nombre maximal d’éléments par page.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  responses:
+    BadRequest:
+      description: Requête invalide
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    NotFound:
+      description: Ressource introuvable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Conflict:
+      description: Conflit
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Unauthorized:
+      description: Authentification requise
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Forbidden:
+      description: Accès interdit
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    InternalServerError:
+      description: Erreur interne du serveur
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    UnprocessableEntity:
+      description: Erreur de validation métier
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+  schemas:
+    BaseEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+      description: Classe racine commune de toutes les entités persistantes du PGVPT.
+    Geolocalisation:
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      - type: object
+        required:
+        - id
+        - latitude
+        - longitude
+        properties:
+          latitude:
+            type: number
+            format: double
+            minimum: -90
+            maximum: 90
+          longitude:
+            type: number
+            format: double
+            minimum: -180
+            maximum: 180
+          altitude:
+            type: number
+            format: double
+          precisionMetres:
+            type: number
+            format: double
+            minimum: 0
+          adresse:
+            type: string
+          lieuDit:
+            type: string
+          repere:
+            type: string
+          systemeReference:
+            type: string
+            default: WGS84
+            example: WGS84
+          codeEpsg:
+            type: integer
+            default: 4326
+            example: 4326
+          source:
+            type: string
+            enum:
+            - GPS
+            - ADMINISTRATION
+            - SIG
+            - OPEN_DATA
+            - IMPORT
+            - AUTRE
+            description: Origine de la donnée de géolocalisation.
+          dateAcquisition:
+            type: string
+            format: date
+          methodeAcquisition:
+            type: string
+            enum:
+            - GPS
+            - RELEVE_TERRAIN
+            - SATELLITE
+            - DRONE
+            - GEOCODAGE
+            - IMPORT_SIG
+            - AUTRE
+          niveauFiabilite:
+            type: string
+            enum:
+            - FAIBLE
+            - MOYEN
+            - ELEVE
+            - TRES_ELEVE
+          zoneTouristiqueId:
+            type: string
+            format: uuid
+          villageId:
+            type: string
+            format: uuid
+            nullable: true
+          quartierId:
+            type: string
+            format: uuid
+            nullable: true
+          patrimoineId:
+            type: string
+            format: uuid
+            nullable: true
+            description: Identifiant du patrimoine provenant de ms-patrimoine.
+          entrepriseId:
+            type: string
+            format: uuid
+            nullable: true
+            description: Identifiant de l'entreprise provenant de ms-entreprise.
+        oneOf:
+        - required:
+          - patrimoineId
+          not:
+            required:
+            - entrepriseId
+        - required:
+          - entrepriseId
+          not:
+            required:
+            - patrimoineId
+        description: 'Entité persistante décrivant la localisation d''une ressource géolocalisable. Elle hérite de BaseEntity.
+          Une géolocalisation est associée à exactement une ressource : soit un patrimoine provenant de ms-patrimoine, soit
+          une entreprise provenant de ms-entreprise.'
+    GeolocalisationCreate:
+      type: object
+      required:
+      - latitude
+      - longitude
+      properties:
+        latitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        longitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+        altitude:
+          type: number
+          format: double
+        precisionMetres:
+          type: number
+          format: double
+          minimum: 0
+        adresse:
+          type: string
+        lieuDit:
+          type: string
+        repere:
+          type: string
+        systemeReference:
+          type: string
+          default: WGS84
+          example: WGS84
+        codeEpsg:
+          type: integer
+          default: 4326
+          example: 4326
+        source:
+          type: string
+          enum:
+          - GPS
+          - ADMINISTRATION
+          - SIG
+          - OPEN_DATA
+          - IMPORT
+          - AUTRE
+          description: Origine de la donnée de géolocalisation.
+        dateAcquisition:
+          type: string
+          format: date
+        methodeAcquisition:
+          type: string
+          enum:
+          - GPS
+          - RELEVE_TERRAIN
+          - SATELLITE
+          - DRONE
+          - GEOCODAGE
+          - IMPORT_SIG
+          - AUTRE
+        niveauFiabilite:
+          type: string
+          enum:
+          - FAIBLE
+          - MOYEN
+          - ELEVE
+          - TRES_ELEVE
+        zoneTouristiqueId:
+          type: string
+          format: uuid
+        villageId:
+          type: string
+          format: uuid
+          nullable: true
+        quartierId:
+          type: string
+          format: uuid
+          nullable: true
+        patrimoineId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Identifiant du patrimoine provenant de ms-patrimoine.
+        entrepriseId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Identifiant de l'entreprise provenant de ms-entreprise.
+      oneOf:
+      - required:
+        - patrimoineId
+        not:
+          required:
+          - entrepriseId
+      - required:
+        - entrepriseId
+        not:
+          required:
+          - patrimoineId
+      description: 'Une géolocalisation doit référencer exactement une ressource : un patrimoine ou une entreprise.'
+    GeolocalisationUpdate:
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        longitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+        altitude:
+          type: number
+          format: double
+        precisionMetres:
+          type: number
+          format: double
+          minimum: 0
+        adresse:
+          type: string
+        lieuDit:
+          type: string
+        repere:
+          type: string
+        systemeReference:
+          type: string
+          default: WGS84
+          example: WGS84
+        codeEpsg:
+          type: integer
+          default: 4326
+          example: 4326
+        source:
+          type: string
+          enum:
+          - GPS
+          - ADMINISTRATION
+          - SIG
+          - OPEN_DATA
+          - IMPORT
+          - AUTRE
+          description: Origine de la donnée de géolocalisation.
+        dateAcquisition:
+          type: string
+          format: date
+        methodeAcquisition:
+          type: string
+          enum:
+          - GPS
+          - RELEVE_TERRAIN
+          - SATELLITE
+          - DRONE
+          - GEOCODAGE
+          - IMPORT_SIG
+          - AUTRE
+        niveauFiabilite:
+          type: string
+          enum:
+          - FAIBLE
+          - MOYEN
+          - ELEVE
+          - TRES_ELEVE
+        zoneTouristiqueId:
+          type: string
+          format: uuid
+        villageId:
+          type: string
+          format: uuid
+          nullable: true
+        quartierId:
+          type: string
+          format: uuid
+          nullable: true
+        patrimoineId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Identifiant du patrimoine provenant de ms-patrimoine.
+        entrepriseId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Identifiant de l'entreprise provenant de ms-entreprise.
+      oneOf:
+      - required:
+        - patrimoineId
+        not:
+          required:
+          - entrepriseId
+      - required:
+        - entrepriseId
+        not:
+          required:
+          - patrimoineId
+      description: 'Une géolocalisation doit référencer exactement une ressource : un patrimoine ou une entreprise.'
+    PatrimoineGeographique:
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      properties:
+        nom:
+          type: string
+        type:
+          $ref: '#/components/schemas/TypePatrimoine'
+        categorie:
+          type: string
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        distanceKm:
+          type: number
+          format: double
+        zoneTouristique:
+          $ref: '#/components/schemas/ZoneTouristiqueReference'
+        village:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/VillageReference'
+        quartier:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/QuartierReference'
+        patrimoineId:
+          type: string
+          format: uuid
+          nullable: true
+        entrepriseId:
+          type: string
+          format: uuid
+          nullable: true
+    Distance:
+      type: object
+      properties:
+        distanceKm:
+          type: number
+          format: double
+          minimum: 0
+          example: 12.45
+        distanceMetres:
+          type: number
+          format: double
+          minimum: 0
+          example: 12450
+        dureeEstimeeMinutes:
+          type: integer
+          minimum: 0
+        modeTransport:
+          $ref: '#/components/schemas/ModeTransport'
+        origine:
+          $ref: '#/components/schemas/Coordonnee'
+        destination:
+          $ref: '#/components/schemas/Coordonnee'
+      required:
+      - distanceKm
+      - distanceMetres
+      - origine
+      - destination
+      description: Résultat calculé de distance entre deux positions.
+    Coordonnee:
+      type: object
+      required:
+      - latitude
+      - longitude
+      properties:
+        latitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        longitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+      description: Coordonnée géographique en WGS84. Latitude comprise entre -90 et 90 et longitude entre -180 et 180.
+    PointAcces:
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      properties:
+        patrimoineId:
+          type: string
+          format: uuid
+        nom:
+          type: string
+        type:
+          $ref: '#/components/schemas/TypePointAcces'
+        description:
+          type: string
+        latitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        longitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+        adresse:
+          type: string
+        distancePatrimoineMetres:
+          type: number
+          format: double
+          minimum: 0
+        accessiblePMR:
+          type: boolean
+        parkingDisponible:
+          type: boolean
+        transportPublic:
+          type: boolean
+        horaires:
+          type: string
+    PointAccesCreate:
+      type: object
+      required:
+      - nom
+      - type
+      - latitude
+      - longitude
+      properties:
+        nom:
+          type: string
+        type:
+          $ref: '#/components/schemas/TypePointAcces'
+        description:
+          type: string
+        latitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        longitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+        adresse:
+          type: string
+        accessiblePMR:
+          type: boolean
+        parkingDisponible:
+          type: boolean
+        transportPublic:
+          type: boolean
+    ZoneGeographique:
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      required:
+      - id
+      - code
+      - nom
+      - regions
+      properties:
+        code:
+          type: string
+          example: ZG-OUEST
+        nom:
+          type: string
+          example: Zone géographique Ouest
+        description:
+          type: string
+        regions:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ZoneGeographiqueRegion'
+        superficieKm2:
+          type: number
+          format: double
+          minimum: 0
+        latitudeCentre:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        longitudeCentre:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+        actif:
+          type: boolean
+          default: true
+      description: Zone géographique composée d’une ou plusieurs régions via ZoneGeographiqueRegion. Une région ne peut appartenir
+        qu’à une seule zone géographique.
+    ZoneGeographiqueCreate:
+      type: object
+      required:
+      - code
+      - nom
+      - regionIds
+      properties:
+        code:
+          type: string
+          example: ZG-OUEST
+        nom:
+          type: string
+          example: Zone géographique Ouest
+        description:
+          type: string
+        regionIds:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            type: string
+            format: uuid
+        superficieKm2:
+          type: number
+          format: double
+          minimum: 0
+        latitudeCentre:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        longitudeCentre:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+    ZoneGeographiqueUpdate:
+      type: object
+      properties:
+        code:
+          type: string
+          example: ZG-OUEST
+        nom:
+          type: string
+          example: Zone géographique Ouest
+        description:
+          type: string
+        regionIds:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            format: uuid
+        superficieKm2:
+          type: number
+          format: double
+          minimum: 0
+        latitudeCentre:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        longitudeCentre:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+    FeaturePatrimoine:
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      properties:
+        patrimoineId:
+          type: string
+          format: uuid
+        nom:
+          type: string
+        type:
+          $ref: '#/components/schemas/TypePatrimoine'
+        categorie:
+          type: string
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        icone:
+          type: string
+          format: uri
+        couleur:
+          type: string
+        description:
+          type: string
+    GeoJsonFeatureCollection:
+      type: object
+      required:
+      - type
+      - features
+      properties:
+        type:
+          type: string
+          enum:
+          - FeatureCollection
+        features:
+          type: array
+          items:
+            $ref: '#/components/schemas/GeoJsonFeature'
+    GeoJsonFeature:
+      type: object
+      required:
+      - type
+      - geometry
+      - properties
+      properties:
+        type:
+          type: string
+          enum:
+          - Feature
+        geometry:
+          $ref: '#/components/schemas/GeoJsonPoint'
+        properties:
+          type: object
+          additionalProperties: true
+    GeoJsonPoint:
+      type: object
+      required:
+      - type
+      - coordinates
+      properties:
+        type:
+          type: string
+          enum:
+          - Point
+        coordinates:
+          type: array
+          minItems: 2
+          maxItems: 2
+          items:
+            type: number
+          description: Coordonnées GeoJSON dans l’ordre [longitude, latitude].
+      description: Géométrie GeoJSON de type Point. Les coordonnées sont exprimées dans l’ordre [longitude, latitude].
+    TypePointAcces:
+      type: string
+      enum:
+      - ENTREE_PRINCIPALE
+      - ENTREE_SECONDAIRE
+      - PARKING
+      - QUAI
+      - EMBARCADERE
+      - GARE
+      - ARRET_BUS
+      - AEROPORT
+      - PORT
+      - CENTRE_VISITEUR
+      - AUTRE
+    TypeZone:
+      type: string
+      enum:
+      - ZONE_URBAINE_ET_CULTURELLE
+      - ZONE_BALNEAIRE
+      - ZONE_RURALE_ET_TERROIR
+      - ZONE_AFFAIRES_ET_CONGRES
+      - ZONE_RELIGIEUSE_ET_PELERINAGE
+      - ZONE_RECREATIVE_ET_LOISIRS
+      - ZONE_NATURELLE_PROTEGEE
+      - AIRE_MARINE
+      - PARC_NATIONAL
+      - RESERVE_NATURELLE
+      - ZONE_MONTAGNE
+      - ZONE_TOURISTIQUE
+    ModeTransport:
+      type: string
+      enum:
+      - A_PIED
+      - VOITURE
+      - TAXI
+      - BUS
+      - TRAIN
+      - BATEAU
+      - VELO
+      - MOTO
+      - AUTRE
+    PageGeolocalisation:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Geolocalisation'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+        totalElements:
+          type: integer
+          format: int64
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+        first:
+          type: boolean
+        last:
+          type: boolean
+      required:
+      - content
+      - page
+      - size
+      - totalElements
+      - totalPages
+      - first
+      - last
+      description: Résultat paginé des géolocalisations.
+    ApiError:
+      type: object
+      required:
+      - timestamp
+      - status
+      - code
+      - message
+      - path
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          minimum: 400
+          maximum: 599
+        code:
+          type: string
+          example: GEOLOCALISATION_NOT_FOUND
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+        traceId:
+          type: string
+      description: Format d’erreur commun à l’ensemble des microservices PGVPT.
+    Pays:
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      required:
+      - id
+      - nom
+      - code
+      - devise
+      properties:
+        nom:
+          type: string
+          minLength: 1
+          maxLength: 150
+          example: Sénégal
+        code:
+          type: string
+          minLength: 2
+          maxLength: 3
+          example: SEN
+        codeIso2:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: SN
+        codeIso3:
+          type: string
+          minLength: 3
+          maxLength: 3
+          example: SEN
+        devise:
+          type: string
+          example: Franc CFA BCEAO
+        codeDevise:
+          type: string
+          minLength: 3
+          maxLength: 3
+          example: XOF
+        indicatifTelephonique:
+          type: string
+          example: '+221'
+        langueOfficielle:
+          type: string
+          example: Français
+        continent:
+          type: string
+          example: Afrique
+        actif:
+          type: boolean
+          default: true
+    PaysCreate:
+      type: object
+      required:
+      - nom
+      - code
+      - devise
+      properties:
+        nom:
+          type: string
+          minLength: 1
+          maxLength: 150
+          example: Sénégal
+        code:
+          type: string
+          minLength: 2
+          maxLength: 3
+          example: SEN
+        codeIso2:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: SN
+        codeIso3:
+          type: string
+          minLength: 3
+          maxLength: 3
+          example: SEN
+        devise:
+          type: string
+          example: Franc CFA BCEAO
+        codeDevise:
+          type: string
+          minLength: 3
+          maxLength: 3
+          example: XOF
+        indicatifTelephonique:
+          type: string
+          example: '+221'
+        langueOfficielle:
+          type: string
+          example: Français
+        continent:
+          type: string
+          example: Afrique
+        actif:
+          type: boolean
+          default: true
+    PaysUpdate:
+      type: object
+      required:
+      - nom
+      - code
+      - devise
+      properties:
+        nom:
+          type: string
+          minLength: 1
+          maxLength: 150
+          example: Sénégal
+        code:
+          type: string
+          minLength: 2
+          maxLength: 3
+          example: SEN
+        codeIso2:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: SN
+        codeIso3:
+          type: string
+          minLength: 3
+          maxLength: 3
+          example: SEN
+        devise:
+          type: string
+          example: Franc CFA BCEAO
+        codeDevise:
+          type: string
+          minLength: 3
+          maxLength: 3
+          example: XOF
+        indicatifTelephonique:
+          type: string
+          example: '+221'
+        langueOfficielle:
+          type: string
+          example: Français
+        continent:
+          type: string
+          example: Afrique
+        actif:
+          type: boolean
+          default: true
+    Region:
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      required:
+      - id
+      - code
+      - nom
+      properties:
+        pays:
+          $ref: '#/components/schemas/PaysReference'
+        code:
+          type: string
+          example: DK
+        nom:
+          type: string
+          example: Dakar
+        codePostal:
+          type: string
+          example: '10000'
+        description:
+          type: string
+    RegionCreate:
+      type: object
+      required:
+      - paysId
+      - code
+      - nom
+      properties:
+        paysId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: DK
+        nom:
+          type: string
+          example: Dakar
+        codePostal:
+          type: string
+          example: '10000'
+        description:
+          type: string
+    RegionUpdate:
+      type: object
+      required:
+      - paysId
+      - code
+      - nom
+      properties:
+        paysId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: DK
+        nom:
+          type: string
+          example: Dakar
+        codePostal:
+          type: string
+          example: '10000'
+        description:
+          type: string
+    Departement:
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      required:
+      - id
+      - code
+      - nom
+      properties:
+        region:
+          $ref: '#/components/schemas/RegionReference'
+        code:
+          type: string
+          example: DKR
+        nom:
+          type: string
+          example: Dakar
+        description:
+          type: string
+    DepartementCreate:
+      type: object
+      required:
+      - regionId
+      - code
+      - nom
+      properties:
+        regionId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: DKR
+        nom:
+          type: string
+          example: Dakar
+        description:
+          type: string
+    DepartementUpdate:
+      type: object
+      required:
+      - regionId
+      - code
+      - nom
+      properties:
+        regionId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: DKR
+        nom:
+          type: string
+          example: Dakar
+        description:
+          type: string
+    Commune:
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      required:
+      - id
+      - code
+      - nom
+      properties:
+        departement:
+          $ref: '#/components/schemas/DepartementReference'
+        code:
+          type: string
+          example: GOR
+        nom:
+          type: string
+          example: Gorée
+        description:
+          type: string
+    CommuneCreate:
+      type: object
+      required:
+      - departementId
+      - code
+      - nom
+      properties:
+        departementId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: GOR
+        nom:
+          type: string
+          example: Gorée
+        description:
+          type: string
+    CommuneUpdate:
+      type: object
+      required:
+      - departementId
+      - code
+      - nom
+      properties:
+        departementId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: GOR
+        nom:
+          type: string
+          example: Gorée
+        description:
+          type: string
+    Village:
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      required:
+      - id
+      - code
+      - nom
+      properties:
+        commune:
+          $ref: '#/components/schemas/CommuneReference'
+        code:
+          type: string
+          example: VIL001
+        nom:
+          type: string
+          example: Île de Gorée
+        description:
+          type: string
+    VillageCreate:
+      type: object
+      required:
+      - communeId
+      - code
+      - nom
+      properties:
+        communeId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: VIL001
+        nom:
+          type: string
+          example: Île de Gorée
+        description:
+          type: string
+    VillageUpdate:
+      type: object
+      required:
+      - communeId
+      - code
+      - nom
+      properties:
+        communeId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: VIL001
+        nom:
+          type: string
+          example: Île de Gorée
+        description:
+          type: string
+    Quartier:
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      required:
+      - id
+      - code
+      - nom
+      properties:
+        commune:
+          $ref: '#/components/schemas/CommuneReference'
+        village:
+          $ref: '#/components/schemas/VillageReference'
+        code:
+          type: string
+          example: Q001
+        nom:
+          type: string
+          example: Centre
+        description:
+          type: string
+    QuartierCreate:
+      type: object
+      required:
+      - communeId
+      - code
+      - nom
+      properties:
+        communeId:
+          type: string
+          format: uuid
+        villageId:
+          type: string
+          format: uuid
+          nullable: true
+        code:
+          type: string
+          example: Q001
+        nom:
+          type: string
+          example: Centre
+        description:
+          type: string
+    QuartierUpdate:
+      type: object
+      required:
+      - communeId
+      - code
+      - nom
+      properties:
+        communeId:
+          type: string
+          format: uuid
+        villageId:
+          type: string
+          format: uuid
+          nullable: true
+        code:
+          type: string
+          example: Q001
+        nom:
+          type: string
+          example: Centre
+        description:
+          type: string
+    PaysReference:
+      type: object
+      required:
+      - id
+      - code
+      - nom
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: SN
+        nom:
+          type: string
+          example: Senegal
+    RegionReference:
+      type: object
+      required:
+      - id
+      - code
+      - nom
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: DK
+        nom:
+          type: string
+          example: Dakar
+    DepartementReference:
+      type: object
+      required:
+      - id
+      - code
+      - nom
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: DKR
+        nom:
+          type: string
+          example: Dakar
+    CommuneReference:
+      type: object
+      required:
+      - id
+      - code
+      - nom
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: GOR
+        nom:
+          type: string
+          example: Gorée
+    VillageReference:
+      type: object
+      required:
+      - id
+      - code
+      - nom
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: VIL001
+        nom:
+          type: string
+          example: Île de Gorée
+    QuartierReference:
+      type: object
+      required:
+      - id
+      - code
+      - nom
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: Q001
+        nom:
+          type: string
+          example: Centre
+    ZoneTouristique:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntity'
+        - type: object
+          required:
+          - id
+          - code
+          - nom
+          - zoneGeographiqueId
+          properties:
+            code:
+              type: string
+              example: ZT-CASAMANCE
+            nom:
+              type: string
+              example: Zone touristique de Casamance
+            description:
+              type: string
+            zoneGeographiqueId:
+              type: string
+              format: uuid
+            zoneGeographique:
+              $ref: '#/components/schemas/ZoneGeographiqueReference'
+            departementId:
+              type: string
+              format: uuid
+              nullable: true
+            departement:
+              $ref: '#/components/schemas/DepartementReference'
+            typeZone:
+              $ref: '#/components/schemas/TypeZone'
+            superficieKm2:
+              type: number
+              format: double
+              minimum: 0
+            latitudeCentre:
+              type: number
+              format: double
+              minimum: -90
+              maximum: 90
+            longitudeCentre:
+              type: number
+              format: double
+              minimum: -180
+              maximum: 180
+            actif:
+              type: boolean
+              default: true
+            communeId:
+              type: string
+              format: uuid
+              nullable: true
+            villageId:
+              type: string
+              format: uuid
+              nullable: true
+          oneOf:
+          - required:
+            - departementId
+            not:
+              anyOf:
+              - required:
+                - communeId
+              - required:
+                - villageId
+          - required:
+            - communeId
+            not:
+              anyOf:
+              - required:
+                - departementId
+              - required:
+                - villageId
+          - required:
+            - villageId
+            not:
+              anyOf:
+              - required:
+                - departementId
+              - required:
+                - communeId
+          description: 'Entité persistante décrivant une zone touristique. Elle hérite de BaseEntity. Elle est rattachée à une
+            seule zone géographique et à exactement un niveau territorial : département, commune ou village.'
+    ZoneTouristiqueCreate:
+      type: object
+      required:
+      - code
+      - nom
+      - zoneGeographiqueId
+      properties:
+        code:
+          type: string
+          example: ZT-CASAMANCE
+        nom:
+          type: string
+          example: Zone touristique de Casamance
+        description:
+          type: string
+        zoneGeographiqueId:
+          type: string
+          format: uuid
+        superficieKm2:
+          type: number
+          format: double
+          minimum: 0
+        departementId:
+          type: string
+          format: uuid
+          nullable: true
+        typeZone:
+          $ref: '#/components/schemas/TypeZone'
+        communeId:
+          type: string
+          format: uuid
+          nullable: true
+        villageId:
+          type: string
+          format: uuid
+          nullable: true
+        latitudeCentre:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        longitudeCentre:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+      oneOf:
+      - required:
+        - departementId
+        not:
+          anyOf:
+          - required:
+            - communeId
+          - required:
+            - villageId
+      - required:
+        - communeId
+        not:
+          anyOf:
+          - required:
+            - departementId
+          - required:
+            - villageId
+      - required:
+        - villageId
+        not:
+          anyOf:
+          - required:
+            - departementId
+          - required:
+            - communeId
+      description: 'Création d’une zone touristique. Décrit une zone touristique rattachée à une seule zone géographique.
+        Elle est rattachée à exactement un seul niveau territorial : département, commune ou village.'
+    ZoneTouristiqueUpdate:
+      type: object
+      properties:
+        code:
+          type: string
+          example: ZT-CASAMANCE
+        nom:
+          type: string
+          example: Zone touristique de Casamance
+        description:
+          type: string
+        zoneGeographiqueId:
+          type: string
+          format: uuid
+        superficieKm2:
+          type: number
+          format: double
+          minimum: 0
+        departementId:
+          type: string
+          format: uuid
+          nullable: true
+        typeZone:
+          $ref: '#/components/schemas/TypeZone'
+        communeId:
+          type: string
+          format: uuid
+          nullable: true
+        villageId:
+          type: string
+          format: uuid
+          nullable: true
+        latitudeCentre:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        longitudeCentre:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+      description: 'Création d’une zone touristique. Décrit une zone touristique rattachée à une seule zone géographique.
+        Elle est rattachée à exactement un seul niveau territorial : département, commune ou village.'
+    ZoneGeographiqueReference:
+      type: object
+      required:
+      - id
+      - code
+      - nom
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: ZG-OUEST
+        nom:
+          type: string
+          example: Zone géographique Ouest
+    ZoneTouristiqueReference:
+      type: object
+      required:
+      - id
+      - code
+      - nom
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: ZT-CASAMANCE
+        nom:
+          type: string
+          example: Zone touristique de Casamance
+    ZoneGeographiqueRegion:
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      required:
+      - id
+      - zoneGeographiqueId
+      - regionId
+      properties:
+        zoneGeographiqueId:
+          type: string
+          format: uuid
+        regionId:
+          type: string
+          format: uuid
+      description: Relation persistée entre une zone géographique et une région. Une région ne peut appartenir qu’à une seule
+        zone géographique. Cette relation hérite de BaseEntity pour assurer la traçabilité (createdAt, updatedAt).
+      x-constraints:
+      - UNIQUE(regionId)
+      - UNIQUE(zoneGeographiqueId, regionId)
+      x-database-constraints:
+        unique:
+        - regionId
+      x-business-rules:
+      - Une région appartient à une seule zone géographique.
+    TypePatrimoine:
+      type: string
+      enum:
+      - SITE_NATUREL
+      - MUSEE
+      - MONUMENT
+      description: Type de patrimoine géré par ms-patrimoine.
+    PagePays:
+      type: object
+      required:
+      - content
+      - page
+      - size
+      - totalElements
+      - totalPages
+      - first
+      - last
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Pays'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+        totalElements:
+          type: integer
+          format: int64
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+        first:
+          type: boolean
+        last:
+          type: boolean
+    PageRegion:
+      type: object
+      required:
+      - content
+      - page
+      - size
+      - totalElements
+      - totalPages
+      - first
+      - last
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Region'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+        totalElements:
+          type: integer
+          format: int64
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+        first:
+          type: boolean
+        last:
+          type: boolean
+    PageDepartement:
+      type: object
+      required:
+      - content
+      - page
+      - size
+      - totalElements
+      - totalPages
+      - first
+      - last
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Departement'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+        totalElements:
+          type: integer
+          format: int64
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+        first:
+          type: boolean
+        last:
+          type: boolean
+    PageCommune:
+      type: object
+      required:
+      - content
+      - page
+      - size
+      - totalElements
+      - totalPages
+      - first
+      - last
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Commune'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+        totalElements:
+          type: integer
+          format: int64
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+        first:
+          type: boolean
+        last:
+          type: boolean
+    PageVillage:
+      type: object
+      required:
+      - content
+      - page
+      - size
+      - totalElements
+      - totalPages
+      - first
+      - last
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Village'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+        totalElements:
+          type: integer
+          format: int64
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+        first:
+          type: boolean
+        last:
+          type: boolean
+    PageQuartier:
+      type: object
+      required:
+      - content
+      - page
+      - size
+      - totalElements
+      - totalPages
+      - first
+      - last
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Quartier'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+        totalElements:
+          type: integer
+          format: int64
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+        first:
+          type: boolean
+        last:
+          type: boolean
+    PageZoneGeographique:
+      type: object
+      required:
+      - content
+      - page
+      - size
+      - totalElements
+      - totalPages
+      - first
+      - last
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ZoneGeographique'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+        totalElements:
+          type: integer
+          format: int64
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+        first:
+          type: boolean
+        last:
+          type: boolean
+    PageZoneTouristique:
+      type: object
+      required:
+      - content
+      - page
+      - size
+      - totalElements
+      - totalPages
+      - first
+      - last
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ZoneTouristique'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+        totalElements:
+          type: integer
+          format: int64
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+        first:
+          type: boolean
+        last:
+          type: boolean
+    PagePatrimoineGeographique:
+      type: object
+      required:
+      - content
+      - page
+      - size
+      - totalElements
+      - totalPages
+      - first
+      - last
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PatrimoineGeographique'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+        totalElements:
+          type: integer
+          format: int64
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+        first:
+          type: boolean
+        last:
+          type: boolean
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Jeton JWT émis par le système d’identité du PGVPT.

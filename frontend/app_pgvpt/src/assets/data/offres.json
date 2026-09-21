@@ -1,0 +1,29 @@
+[
+  {
+    "id": "1",
+    "titre": "Visite guidée de Dakar",
+    "description": "Découvrez l'histoire et la culture bouillonnante de la capitale avec un guide local passionné.",
+    "prix": 15000,
+    "image": "assets/images/offre_1.jpg",
+    "duree": "Demi-journée",
+    "type": "Visite"
+  },
+  {
+    "id": "2",
+    "titre": "Atelier Cuisine : Le vrai Thiéboudienne",
+    "description": "Apprenez à préparer le plat national sénégalais avec une famille locale et dégustez-le ensemble.",
+    "prix": 25000,
+    "image": "assets/images/offre_2.jpg",
+    "duree": "3 heures",
+    "type": "Gastronomie"
+  },
+  {
+    "id": "3",
+    "titre": "Balade en Pirogue au crépuscule",
+    "description": "Naviguez paisiblement sur la lagune de la Somone au coucher du soleil pour observer les oiseaux.",
+    "prix": 12000,
+    "image": "assets/images/offre_3.jpg",
+    "duree": "2 heures",
+    "type": "Nature"
+  }
+]

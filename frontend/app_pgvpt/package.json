@@ -1,0 +1,52 @@
+{
+  "name": "app-pgvpt",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "generate-api:circuit": "npx @openapitools/openapi-generator-cli generate -i ../../contrats_api/ms-circuit-api.yml -g typescript-angular -o src/app/core/api/circuit --additional-properties=ngVersion=17,fileNaming=kebab-case",
+    "generate-api:contenu": "npx @openapitools/openapi-generator-cli generate -i ../../contrats_api/ms-contenu-api.yml -g typescript-angular -o src/app/core/api/contenu --additional-properties=ngVersion=17,fileNaming=kebab-case",
+    "generate-api:evenement": "npx @openapitools/openapi-generator-cli generate -i ../../contrats_api/ms-evenement-api.yml -g typescript-angular -o src/app/core/api/evenement --additional-properties=ngVersion=17,fileNaming=kebab-case",
+    "generate-api:geolocalisation": "npx @openapitools/openapi-generator-cli generate -i ../../contrats_api/ms-geolocalisation-api.yml -g typescript-angular -o src/app/core/api/geolocalisation --additional-properties=ngVersion=17,fileNaming=kebab-case",
+    "generate-api:media": "npx @openapitools/openapi-generator-cli generate -i ../../contrats_api/ms-media-api.yml -g typescript-angular -o src/app/core/api/media --additional-properties=ngVersion=17,fileNaming=kebab-case",
+    "generate-api:patrimoine": "npx @openapitools/openapi-generator-cli generate -i ../../contrats_api/ms-patrimoine-api.yml -g typescript-angular -o src/app/core/api/patrimoine --additional-properties=ngVersion=17,fileNaming=kebab-case",
+    "generate-api:reservation": "npx @openapitools/openapi-generator-cli generate -i ../../contrats_api/ms-reservation-api.yml -g typescript-angular -o src/app/core/api/reservation --additional-properties=ngVersion=17,fileNaming=kebab-case",
+    "generate-api:tourisme": "npx @openapitools/openapi-generator-cli generate -i ../../contrats_api/ms-tourisme-api.yml -g typescript-angular -o src/app/core/api/tourisme --additional-properties=ngVersion=17,fileNaming=kebab-case",
+    "generate-api": "npm run generate-api:circuit && npm run generate-api:contenu && npm run generate-api:evenement && npm run generate-api:geolocalisation && npm run generate-api:media && npm run generate-api:patrimoine && npm run generate-api:reservation && npm run generate-api:tourisme"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "^17.3.0",
+    "@angular/common": "^17.3.0",
+    "@angular/compiler": "^17.3.0",
+    "@angular/core": "^17.3.0",
+    "@angular/forms": "^17.3.0",
+    "@angular/platform-browser": "^17.3.0",
+    "@angular/platform-browser-dynamic": "^17.3.0",
+    "@angular/router": "^17.3.0",
+    "leaflet": "^1.9.4",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.14.3"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^17.3.17",
+    "@angular/cli": "^17.3.17",
+    "@angular/compiler-cli": "^17.3.0",
+    "@types/jasmine": "~5.1.0",
+    "@types/leaflet": "^1.9.22",
+    "autoprefixer": "^10.6.1",
+    "jasmine-core": "~5.1.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "postcss": "^8.5.28",
+    "tailwindcss": "^3.4.19",
+    "typescript": "~5.4.2"
+  }
+}

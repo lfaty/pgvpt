@@ -1,0 +1,683 @@
+openapi: 3.0.3
+info:
+  title: PGVPT - API Offres touristiques
+  version: 2.0.0
+  description: Gestion du cycle de vie des offres touristiques, des prestations, de
+    leur tarification et de leur disponibilité dans PGVPT.
+servers:
+- url: /api/v1
+tags:
+- name: Offres
+- name: Prestations
+paths:
+  /offres:
+    get:
+      tags:
+      - Offres
+      operationId: searchOffres
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+      - name: size
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: zoneTouristiqueId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: categorie
+        in: query
+        schema:
+          $ref: '#/components/schemas/CategorieOffre'
+      - name: search
+        in: query
+        schema:
+          type: string
+          maxLength: 200
+      - name: acteurId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: circuitId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: statut
+        in: query
+        schema:
+          $ref: '#/components/schemas/StatutOffre'
+      - name: actif
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Offres
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OffrePage'
+    post:
+      tags:
+      - Offres
+      operationId: createOffre
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OffreCreate'
+      responses:
+        '201':
+          description: Offre créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offre'
+  /offres/{id}:
+    get:
+      tags:
+      - Offres
+      operationId: getOffre
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Offre
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offre'
+    put:
+      tags:
+      - Offres
+      operationId: updateOffre
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OffreUpdate'
+      responses:
+        '200':
+          description: Offre modifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offre'
+    delete:
+      tags:
+      - Offres
+      operationId: deleteOffre
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Offre supprimée
+  /offres/{id}/prestations:
+    get:
+      tags:
+      - Prestations
+      operationId: listPrestations
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Prestations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Prestation'
+    post:
+      tags:
+      - Prestations
+      operationId: addPrestation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrestationCreate'
+      responses:
+        '201':
+          description: Prestation créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prestation'
+  /offres/{id}/publier:
+    patch:
+      tags:
+      - Offres
+      operationId: publierOffre
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Publier une offre
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offre'
+        '404':
+          description: Offre introuvable
+        '409':
+          description: Transition métier invalide
+  /offres/{id}/depublier:
+    patch:
+      tags:
+      - Offres
+      operationId: depublierOffre
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Dépublier une offre
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offre'
+        '404':
+          description: Offre introuvable
+        '409':
+          description: Transition métier invalide
+  /offres/{id}/activer:
+    patch:
+      tags:
+      - Offres
+      operationId: activerOffre
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Activer une offre
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offre'
+        '404':
+          description: Offre introuvable
+        '409':
+          description: Transition métier invalide
+  /offres/{id}/desactiver:
+    patch:
+      tags:
+      - Offres
+      operationId: desactiverOffre
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Désactiver une offre
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offre'
+        '404':
+          description: Offre introuvable
+        '409':
+          description: Transition métier invalide
+  /offres/{id}/archiver:
+    patch:
+      tags:
+      - Offres
+      operationId: archiverOffre
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Archiver une offre
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offre'
+        '404':
+          description: Offre introuvable
+        '409':
+          description: Transition métier invalide
+  /offres/{id}/prix:
+    get:
+      tags:
+      - Offres
+      operationId: calculerPrixOffre
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Prix calculé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculPrixOffreResponse'
+        '404':
+          description: Offre introuvable
+  /offres/{id}/disponibilite:
+    get:
+      tags:
+      - Offres
+      operationId: verifierDisponibiliteOffre
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Disponibilité
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DisponibiliteOffreResponse'
+        '404':
+          description: Offre introuvable
+  /prestations/{id}:
+    get:
+      tags:
+      - Prestations
+      operationId: getPrestation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Prestation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prestation'
+        '404':
+          description: Prestation introuvable
+    put:
+      tags:
+      - Prestations
+      operationId: updatePrestation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrestationUpdate'
+      responses:
+        '200':
+          description: Prestation modifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prestation'
+        '404':
+          description: Prestation introuvable
+    delete:
+      tags:
+      - Prestations
+      operationId: deletePrestation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Prestation supprimée
+        '404':
+          description: Prestation introuvable
+  /prestations/{id}/activer:
+    patch:
+      tags:
+      - Prestations
+      operationId: activerPrestation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Activer une prestation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prestation'
+        '404':
+          description: Prestation introuvable
+  /prestations/{id}/desactiver:
+    patch:
+      tags:
+      - Prestations
+      operationId: desactiverPrestation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Désactiver une prestation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prestation'
+        '404':
+          description: Prestation introuvable
+components:
+  schemas:
+    BaseEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    OffreCreate:
+      type: object
+      required:
+      - nom
+      - categorie
+      - zoneTouristiqueId
+      - acteurId
+      - prix
+      - devise
+      properties:
+        nom:
+          type: string
+          minLength: 2
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 5000
+        categorie:
+          $ref: '#/components/schemas/CategorieOffre'
+        zoneTouristiqueId:
+          type: string
+          format: uuid
+        acteurId:
+          type: string
+          format: uuid
+        circuitId:
+          type: string
+          format: uuid
+        prix:
+          type: number
+          format: double
+          minimum: 0
+        devise:
+          type: string
+          minLength: 3
+          maxLength: 3
+          default: XOF
+        dureeMinutes:
+          type: integer
+          minimum: 1
+        capaciteMax:
+          type: integer
+          minimum: 1
+        dateDebutValidite:
+          type: string
+          format: date
+        dateFinValidite:
+          type: string
+          format: date
+          description: Date de fin de validité, supérieure ou égale à dateDebutValidite.
+        actif:
+          type: boolean
+          default: true
+        statut:
+          type: string
+          enum:
+          - BROUILLON
+          - PUBLIEE
+          - DEPUBLIEE
+          - EXPIREE
+          - ARCHIVEE
+          readOnly: true
+          default: BROUILLON
+    OffreUpdate:
+      $ref: '#/components/schemas/OffreCreate'
+    Offre:
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      - $ref: '#/components/schemas/OffreCreate'
+      properties: {}
+    PrestationCreate:
+      type: object
+      required:
+      - nom
+      - type
+      properties:
+        nom:
+          type: string
+          minLength: 2
+          maxLength: 200
+        type:
+          $ref: '#/components/schemas/TypePrestation'
+        description:
+          type: string
+          maxLength: 2000
+        prix:
+          type: number
+          format: double
+          minimum: 0
+        devise:
+          type: string
+          minLength: 3
+          maxLength: 3
+          default: XOF
+        actif:
+          type: boolean
+          default: true
+    Prestation:
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      - $ref: '#/components/schemas/PrestationCreate'
+    CategorieOffre:
+      type: string
+      enum:
+      - HEBERGEMENT
+      - RESTAURATION
+      - VISITE
+      - CIRCUIT
+      - EXPERIENCE
+      - ARTISANAT
+      - TRANSPORT
+      - LOISIR
+      - ECOTOURISME
+      - CULTURE
+    TypePrestation:
+      type: string
+      enum:
+      - GUIDE
+      - TRANSPORT
+      - REPAS
+      - HEBERGEMENT
+      - VISITE
+      - ANIMATION
+      - LOCATION
+      - AUTRE
+    OffrePage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Offre'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+    PrestationUpdate:
+      type: object
+      required:
+      - nom
+      - type
+      properties:
+        nom:
+          type: string
+          minLength: 2
+          maxLength: 200
+        type:
+          $ref: '#/components/schemas/TypePrestation'
+        description:
+          type: string
+          maxLength: 2000
+        prix:
+          type: number
+          format: double
+          minimum: 0
+        devise:
+          type: string
+          minLength: 3
+          maxLength: 3
+          default: XOF
+        actif:
+          type: boolean
+          default: true
+    StatutOffre:
+      type: string
+      enum:
+      - BROUILLON
+      - PUBLIEE
+      - DEPUBLIEE
+      - EXPIREE
+      - ARCHIVEE
+    CalculPrixOffreResponse:
+      type: object
+      required:
+      - offreId
+      - prixTotal
+      - devise
+      - calculeLe
+      properties:
+        offreId:
+          type: string
+          format: uuid
+        prixTotal:
+          type: number
+          format: double
+          minimum: 0
+        devise:
+          type: string
+        calculeLe:
+          type: string
+          format: date-time
+    DisponibiliteOffreResponse:
+      type: object
+      required:
+      - offreId
+      - disponible
+      properties:
+        offreId:
+          type: string
+          format: uuid
+        disponible:
+          type: boolean
+        capaciteMax:
+          type: integer
+          minimum: 1
+        capaciteDisponible:
+          type: integer
+          minimum: 0
+        message:
+          type: string

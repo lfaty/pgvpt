@@ -1,0 +1,38 @@
+[
+  {
+    "id": "1",
+    "nom": "L'Essentiel du Sénégal",
+    "description": "Un voyage inoubliable de Dakar au désert de Lompoul, en passant par le Lac Rose et l'Île de Gorée.",
+    "theme": "CULTURE_ET_DECOUVERTE",
+    "dureeJours": 7,
+    "difficulte": "FACILE",
+    "prixBase": 450000,
+    "imageCouverture": "assets/images/circuit_1.jpg",
+    "etapes": [],
+    "statut": "ACTIF"
+  },
+  {
+    "id": "2",
+    "nom": "Immersion en Casamance",
+    "description": "Explorez les forêts luxuriantes et les traditions authentiques de la verte Casamance en pirogue.",
+    "theme": "NATURE_ET_AVENTURE",
+    "dureeJours": 5,
+    "difficulte": "MOYEN",
+    "prixBase": 320000,
+    "imageCouverture": "assets/images/circuit_2.jpg",
+    "etapes": [],
+    "statut": "ACTIF"
+  },
+  {
+    "id": "3",
+    "nom": "Sur les traces des Rois du Sine",
+    "description": "Plongez dans l'histoire passionnante des anciens royaumes du Sine-Saloum et naviguez dans les mangroves.",
+    "theme": "HISTOIRE_ET_TRADITIONS",
+    "dureeJours": 3,
+    "difficulte": "FACILE",
+    "prixBase": 180000,
+    "imageCouverture": "assets/images/circuit_3.jpg",
+    "etapes": [],
+    "statut": "ACTIF"
+  }
+]

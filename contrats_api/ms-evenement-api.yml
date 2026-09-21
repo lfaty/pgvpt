@@ -1,0 +1,511 @@
+openapi: 3.0.3
+info:
+  title: PGVPT - API Événements
+  version: 2.0.0
+  description: API de gestion des événements culturels et touristiques du PGVPT. Gère
+    le cycle de vie des événements, leurs sessions, capacités, tarification et critères
+    de recherche.
+servers:
+- url: /api/v1
+tags:
+- name: Evenements
+- name: Sessions
+paths:
+  /evenements:
+    get:
+      tags:
+      - Evenements
+      operationId: searchEvenements
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+      - name: size
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: zoneTouristiqueId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: type
+        in: query
+        schema:
+          $ref: '#/components/schemas/TypeEvenement'
+      - name: statut
+        in: query
+        schema:
+          $ref: '#/components/schemas/StatutEvenement'
+      - name: dateDebut
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: dateFin
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: search
+        in: query
+        schema:
+          type: string
+          maxLength: 250
+      responses:
+        '200':
+          description: Événements
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvenementPage'
+    post:
+      tags:
+      - Evenements
+      operationId: createEvenement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvenementCreate'
+      responses:
+        '201':
+          description: Événement créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evenement'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /evenements/{id}:
+    get:
+      tags:
+      - Evenements
+      operationId: getEvenement
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Événement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evenement'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags:
+      - Evenements
+      operationId: updateEvenement
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvenementUpdate'
+      responses:
+        '200':
+          description: Événement modifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evenement'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+    delete:
+      tags:
+      - Evenements
+      operationId: deleteEvenement
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Événement supprimé
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /evenements/{id}/programmer:
+    patch:
+      tags:
+      - Evenements
+      operationId: programmerEvenement
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Événement programmé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evenement'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /evenements/{id}/ouvrir:
+    patch:
+      tags:
+      - Evenements
+      operationId: ouvrirEvenement
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Événement ouvert
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evenement'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /evenements/{id}/annuler:
+    patch:
+      tags:
+      - Evenements
+      operationId: annulerEvenement
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Événement annulé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evenement'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /evenements/{id}/terminer:
+    patch:
+      tags:
+      - Evenements
+      operationId: terminerEvenement
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Événement terminé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evenement'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /evenements/{id}/sessions:
+    get:
+      tags:
+      - Sessions
+      operationId: listSessions
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SessionEvenement'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags:
+      - Sessions
+      operationId: createSession
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionEvenementCreate'
+      responses:
+        '201':
+          description: Session créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionEvenement'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /sessions/{id}:
+    get:
+      tags:
+      - Sessions
+      operationId: getSession
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionEvenement'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags:
+      - Sessions
+      operationId: updateSession
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionEvenementUpdate'
+      responses:
+        '200':
+          description: Session modifiée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionEvenement'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+    delete:
+      tags:
+      - Sessions
+      operationId: deleteSession
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Session supprimée
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    NotFound:
+      description: Ressource introuvable
+    Conflict:
+      description: Conflit métier
+  schemas:
+    BaseEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    EvenementCreate:
+      type: object
+      required:
+      - titre
+      - type
+      - zoneTouristiqueId
+      - organisateurActeurId
+      properties:
+        titre:
+          type: string
+          minLength: 2
+          maxLength: 250
+        description:
+          type: string
+          maxLength: 5000
+        type:
+          $ref: '#/components/schemas/TypeEvenement'
+        zoneTouristiqueId:
+          type: string
+          format: uuid
+        patrimoineId:
+          type: string
+          format: uuid
+          nullable: true
+        organisateurActeurId:
+          type: string
+          format: uuid
+        statut:
+          $ref: '#/components/schemas/StatutEvenement'
+        capaciteMax:
+          type: integer
+          minimum: 1
+        tarif:
+          type: number
+          format: double
+          minimum: 0
+        devise:
+          type: string
+          minLength: 3
+          maxLength: 3
+          default: XOF
+        reservationRequise:
+          type: boolean
+          default: false
+        langues:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            minLength: 2
+            maxLength: 10
+    EvenementUpdate:
+      type: object
+      properties:
+        titre:
+          type: string
+          minLength: 2
+          maxLength: 250
+        description:
+          type: string
+          maxLength: 5000
+        type:
+          $ref: '#/components/schemas/TypeEvenement'
+        zoneTouristiqueId:
+          type: string
+          format: uuid
+        patrimoineId:
+          type: string
+          format: uuid
+          nullable: true
+        organisateurActeurId:
+          type: string
+          format: uuid
+        capaciteMax:
+          type: integer
+          minimum: 1
+        tarif:
+          type: number
+          format: double
+          minimum: 0
+        devise:
+          type: string
+          minLength: 3
+          maxLength: 3
+        reservationRequise:
+          type: boolean
+        langues:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            minLength: 2
+            maxLength: 10
+    Evenement:
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      - $ref: '#/components/schemas/EvenementCreate'
+    SessionEvenementCreate:
+      type: object
+      required:
+      - dateDebut
+      - dateFin
+      properties:
+        dateDebut:
+          type: string
+          format: date-time
+        dateFin:
+          type: string
+          format: date-time
+        capacite:
+          type: integer
+          minimum: 1
+        lieu:
+          type: string
+          maxLength: 500
+        patrimoineId:
+          type: string
+          format: uuid
+          nullable: true
+    SessionEvenementUpdate:
+      type: object
+      properties:
+        dateDebut:
+          type: string
+          format: date-time
+        dateFin:
+          type: string
+          format: date-time
+        capacite:
+          type: integer
+          minimum: 1
+        lieu:
+          type: string
+          maxLength: 500
+        patrimoineId:
+          type: string
+          format: uuid
+          nullable: true
+    SessionEvenement:
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      - $ref: '#/components/schemas/SessionEvenementCreate'
+    TypeEvenement:
+      type: string
+      enum:
+      - FESTIVAL
+      - CONCERT
+      - EXPOSITION
+      - CONFERENCE
+      - CEREMONIE
+      - FETE_CULTURELLE
+      - ARTISANAT
+      - SPORT
+      - VISITE_GUIDEE
+      - AUTRE
+    StatutEvenement:
+      type: string
+      enum:
+      - BROUILLON
+      - PROGRAMME
+      - OUVERT
+      - COMPLET
+      - TERMINE
+      - ANNULE
+    EvenementPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Evenement'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer

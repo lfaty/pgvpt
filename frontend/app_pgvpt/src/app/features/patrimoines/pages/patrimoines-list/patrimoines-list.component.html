@@ -1,0 +1,124 @@
+<div class="patrimoines-page">
+  
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-bg-pattern"></div>
+    <div class="hero-blob hero-blob-1"></div>
+    <div class="hero-blob hero-blob-2"></div>
+    
+    <div class="hero-content">
+      <span class="hero-badge">🏛️ Patrimoine du Sénégal</span>
+      <h1 class="hero-title">Catalogue des Patrimoines</h1>
+      <p class="hero-subtitle">
+        Explorez la richesse culturelle, historique et naturelle du Sénégal à travers nos sites d'exception.
+      </p>
+    </div>
+  </section>
+
+  <!-- Filter & Search Bar -->
+  <section class="filter-section">
+    <div class="filter-bar">
+      
+      <!-- Search Input -->
+      <div class="search-wrapper">
+        <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input type="text" 
+               [(ngModel)]="searchTerm" 
+               (input)="applyFilters()"
+               class="search-input" 
+               placeholder="Rechercher un site, un lieu...">
+      </div>
+
+      <div class="filter-divider"></div>
+
+      <!-- Filters container -->
+      <div class="filters-group">
+        <!-- Region Select -->
+        <div class="select-wrapper">
+          <svg class="select-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <select [(ngModel)]="selectedRegion" (change)="applyFilters()" class="filter-select">
+            <option *ngFor="let region of regions" [value]="region">
+              {{ region === 'TOUTES' ? '📍 Toutes les régions' : region }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Category Select -->
+        <div class="select-wrapper">
+          <svg class="select-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+          </svg>
+          <select [(ngModel)]="selectedCategory" (change)="applyFilters()" class="filter-select">
+            <option *ngFor="let cat of categories" [value]="cat">
+              {{ cat === 'TOUTES' ? '🏷️ Toutes les catégories' : cat }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Results Section -->
+  <section class="results-section">
+    
+    <!-- Result count & active filters -->
+    <div class="results-header">
+      <div class="results-count" *ngIf="filteredPatrimoines.length > 0">
+        <span class="count-number">{{ filteredPatrimoines.length }}</span>
+        <span class="count-label">sites trouvés</span>
+      </div>
+      <div class="results-count results-count--empty" *ngIf="filteredPatrimoines.length === 0">
+        <span class="count-label">Aucun site trouvé</span>
+      </div>
+
+      <!-- Active Filter Tags -->
+      <div class="active-filters">
+        <span class="filter-tag" *ngIf="selectedCategory !== 'TOUTES'">
+          {{ selectedCategory }}
+          <button (click)="selectedCategory='TOUTES'; applyFilters()" class="filter-tag-remove">✕</button>
+        </span>
+        <span class="filter-tag" *ngIf="selectedRegion !== 'TOUTES'">
+          {{ selectedRegion }}
+          <button (click)="selectedRegion='TOUTES'; applyFilters()" class="filter-tag-remove">✕</button>
+        </span>
+        <span class="filter-tag" *ngIf="searchTerm.trim() !== ''">
+          "{{ searchTerm }}"
+          <button (click)="searchTerm=''; applyFilters()" class="filter-tag-remove">✕</button>
+        </span>
+      </div>
+    </div>
+
+    <!-- The Grid -->
+    <div class="patrimoines-grid" *ngIf="filteredPatrimoines.length > 0">
+      <div *ngFor="let p of filteredPatrimoines; let i = index" 
+           class="card-wrapper"
+           [style.animation-delay]="(i * 80) + 'ms'">
+        <app-patrimoine-card [patrimoine]="p"></app-patrimoine-card>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredPatrimoines.length === 0" class="empty-state">
+      <div class="empty-icon-wrapper">
+        <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <h3 class="empty-title">Aucun résultat</h3>
+      <p class="empty-text">Nous n'avons trouvé aucun patrimoine correspondant à vos critères de recherche. Essayez de modifier vos filtres.</p>
+      <button (click)="searchTerm=''; selectedCategory='TOUTES'; selectedRegion='TOUTES'; applyFilters()" 
+              class="reset-button">
+        <svg class="reset-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        Réinitialiser les filtres
+      </button>
+    </div>
+
+  </section>
+</div>

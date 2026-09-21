@@ -1,1 +1,3 @@
 *.log
+target/
+frontend/app_pgvpt/node_modules/

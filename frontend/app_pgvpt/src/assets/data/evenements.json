@@ -1,0 +1,41 @@
+[
+  {
+    "id": "1",
+    "titre": "Biennale de l'Art Africain Contemporain",
+    "description": "Dak'Art est la principale exposition d'art contemporain africain, réunissant des artistes du monde entier.",
+    "dateDebut": "2026-05-15T10:00:00Z",
+    "dateFin": "2026-06-15T18:00:00Z",
+    "lieu": "Ancien Palais de Justice, Dakar",
+    "typeEvenement": "FESTIVAL",
+    "prix": 0,
+    "image": "assets/images/event_1.jpg",
+    "capaciteMax": 5000,
+    "statut": "PLANIFIE"
+  },
+  {
+    "id": "2",
+    "titre": "Festival International de Jazz de Saint-Louis",
+    "description": "L'un des plus grands événements musicaux en Afrique, célébrant le jazz dans l'ancienne capitale du Sénégal.",
+    "dateDebut": "2026-04-20T19:00:00Z",
+    "dateFin": "2026-04-25T23:59:00Z",
+    "lieu": "Place Faidherbe, Saint-Louis",
+    "typeEvenement": "CONCERT",
+    "prix": 15000,
+    "image": "assets/images/event_2.jpg",
+    "capaciteMax": 2000,
+    "statut": "PLANIFIE"
+  },
+  {
+    "id": "3",
+    "titre": "Magal de Touba",
+    "description": "Célébration religieuse majeure marquant le départ en exil de Cheikh Ahmadou Bamba.",
+    "dateDebut": "2026-08-25T00:00:00Z",
+    "dateFin": "2026-08-26T23:59:00Z",
+    "lieu": "Grande Mosquée de Touba",
+    "typeEvenement": "RELIGIEUX",
+    "prix": 0,
+    "image": "assets/images/event_3.jpg",
+    "capaciteMax": 3000000,
+    "statut": "PLANIFIE"
+  }
+]
