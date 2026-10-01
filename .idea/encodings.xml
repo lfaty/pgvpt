@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/backend/ms-circuit/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/ms-contenu/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/ms-evenement/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/ms-geolocalisation/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/ms-identite/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/ms-media/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/ms-patrimoine/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/ms-reservation/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/ms-tourisme/src/main/java" charset="UTF-8" />
+  </component>
+</project>

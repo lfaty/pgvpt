@@ -1,0 +1,33 @@
+package com.pgvpt.enums;
+
+import lombok.Getter;
+
+@Getter
+public enum CategoriePatrimoineMetier {
+  
+  PATRIMOINE_NATUREL,
+  
+  PATRIMOINE_HISTORIQUE,
+  
+  PATRIMOINE_CULTUREL,
+  
+  PATRIMOINE_ARCHITECTURAL,
+  
+  PATRIMOINE_RELIGIEUX,
+  
+  PATRIMOINE_COLONIAL,
+  
+  PATRIMOINE_ARCHEOLOGIQUE,
+  
+  PATRIMOINE_MUSEAL,
+  
+  PATRIMOINE_MEMORIEL,
+  
+  PATRIMOINE_MARITIME,
+  
+  PATRIMOINE_RURAL,
+  
+  AUTRE
+
+}
+

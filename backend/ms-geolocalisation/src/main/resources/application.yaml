@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: ms-geolocalisation
+
+  config:
+    import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:9999}"

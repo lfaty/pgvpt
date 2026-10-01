@@ -1,0 +1,249 @@
+name: pgvpt
+
+services:
+
+  # 1. BASES DE DONNEES
+  db-patrimoine:
+    image: postgres:15-alpine
+    container_name: db-patrimoine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${PATRIMOINE_DB}
+      POSTGRES_USER: ${PATRIMOINE_USER}
+      POSTGRES_PASSWORD: ${PATRIMOINE_PASSWORD}
+    volumes:
+      - patrimoine-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PATRIMOINE_USER} -d ${PATRIMOINE_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - pgvpt-network
+
+  db-geolocalisation:
+    image: postgis/postgis:15-3.4-alpine
+    container_name: db-geolocalisation
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${GEO_DB}
+      POSTGRES_USER: ${GEO_USER}
+      POSTGRES_PASSWORD: ${GEO_PASSWORD}
+    volumes:
+      - geolocalisation-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${GEO_USER} -d ${GEO_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - pgvpt-network
+
+  db-contenu:
+    image: postgres:15-alpine
+    container_name: db-contenu
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${CONTENU_DB}
+      POSTGRES_USER: ${CONTENU_USER}
+      POSTGRES_PASSWORD: ${CONTENU_PASSWORD}
+    volumes:
+      - contenu-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${CONTENU_USER} -d ${CONTENU_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - pgvpt-network
+
+  db-media:
+    image: postgres:15-alpine
+    container_name: db-media
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${MEDIA_DB}
+      POSTGRES_USER: ${MEDIA_USER}
+      POSTGRES_PASSWORD: ${MEDIA_PASSWORD}
+    volumes:
+      - media-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${MEDIA_USER} -d ${MEDIA_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - pgvpt-network
+
+  # 2. CONFIG SERVER
+  pgvpt-config:
+    image: pgvpt-config:1.0.0
+    container_name: pgvpt-config
+    restart: unless-stopped
+    ports:
+      - "9999:9999"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:9999/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks:
+      - pgvpt-network
+
+  # 3. EUREKA DISCOVERY
+  pgvpt-discovery:
+    image: pgvpt-discovery:1.0.0
+    container_name: pgvpt-discovery
+    restart: unless-stopped
+    ports:
+      - "8761:8761"
+    environment:
+      CONFIG_SERVER_URL: http://pgvpt-config:9999
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      pgvpt-config:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:8761/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks:
+      - pgvpt-network
+
+  # 4. API GATEWAY
+  pgvpt-gateway:
+    image: pgvpt-gateway:1.0.0
+    container_name: pgvpt-gateway
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      CONFIG_SERVER_URL: http://pgvpt-config:9999
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      pgvpt-config:
+        condition: service_healthy
+      pgvpt-discovery:
+        condition: service_healthy
+    networks:
+      - pgvpt-network
+
+  # 5. MICROSERVICE PATRIMOINE
+  ms-patrimoine:
+    image: ms-patrimoine:1.0.0
+    container_name: ms-patrimoine
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      CONFIG_SERVER_URL: http://pgvpt-config:9999
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: db-patrimoine
+      DB_PORT: 5432
+      DB_NAME: ${PATRIMOINE_DB}
+      DB_USER: ${PATRIMOINE_USER}
+      DB_PASSWORD: ${PATRIMOINE_PASSWORD}
+    depends_on:
+      db-patrimoine:
+        condition: service_healthy
+      pgvpt-config:
+        condition: service_healthy
+      pgvpt-discovery:
+        condition: service_healthy
+    networks:
+      - pgvpt-network
+
+  # 6. MICROSERVICE GEOLOCALISATION
+  ms-geolocalisation:
+    image: ms-geolocalisation:1.0.0
+    container_name: ms-geolocalisation
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      CONFIG_SERVER_URL: http://pgvpt-config:9999
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: db-geolocalisation
+      DB_PORT: 5432
+      DB_NAME: ${GEO_DB}
+      DB_USER: ${GEO_USER}
+      DB_PASSWORD: ${GEO_PASSWORD}
+    depends_on:
+      db-geolocalisation:
+        condition: service_healthy
+      pgvpt-config:
+        condition: service_healthy
+      pgvpt-discovery:
+        condition: service_healthy
+    networks:
+      - pgvpt-network
+
+  # 7. MICROSERVICE CONTENU
+  ms-contenu:
+    image: ms-contenu:1.0.0
+    container_name: ms-contenu
+    restart: unless-stopped
+    ports:
+      - "3006:3006"
+    environment:
+      CONFIG_SERVER_URL: http://pgvpt-config:9999
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: db-contenu
+      DB_PORT: 5432
+      DB_NAME: ${CONTENU_DB}
+      DB_USER: ${CONTENU_USER}
+      DB_PASSWORD: ${CONTENU_PASSWORD}
+    depends_on:
+      db-contenu:
+        condition: service_healthy
+      pgvpt-config:
+        condition: service_healthy
+      pgvpt-discovery:
+        condition: service_healthy
+    networks:
+      - pgvpt-network
+
+  # 8. MICROSERVICE MEDIA
+  ms-media:
+    image: ms-media:1.0.0
+    container_name: ms-media
+    restart: unless-stopped
+    ports:
+      - "3007:3007"
+    environment:
+      CONFIG_SERVER_URL: http://pgvpt-config:9999
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: db-media
+      DB_PORT: 5432
+      DB_NAME: ${MEDIA_DB}
+      DB_USER: ${MEDIA_USER}
+      DB_PASSWORD: ${MEDIA_PASSWORD}
+    depends_on:
+      db-media:
+        condition: service_healthy
+      pgvpt-config:
+        condition: service_healthy
+      pgvpt-discovery:
+        condition: service_healthy
+    networks:
+      - pgvpt-network
+
+# 9. RESEAU ET VOLUMES PERSISTANTS
+networks:
+  pgvpt-network:
+    driver: bridge
+
+volumes:
+  patrimoine-data:
+  geolocalisation-data:
+  contenu-data:
+  media-data:

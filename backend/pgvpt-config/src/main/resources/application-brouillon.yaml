@@ -1,0 +1,28 @@
+server:
+  port: 9999
+
+spring:
+  application:
+    name: pgvpt-config
+  cloud:
+    config:
+      server:
+        git:
+          uri: ${PGVPT_CONFIG_GIT_URI:file:///${user.home}/pgvpt-config-repo}
+          default-label: main
+          clone-on-start: true
+          try-master-branch: false
+          timeout: 5
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+  endpoint:
+    health:
+      # Permet de voir si la connexion au dépôt Git fonctionne (UP / DOWN)
+      show-details: always
+

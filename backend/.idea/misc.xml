@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/ms-media/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-circuit/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-contenu/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-identite/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-tourisme/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-evenement/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-patrimoine/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-reservation/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-geolocalisation/pom.xml" />
+        <option value="$PROJECT_DIR$/pgvpt-config-server/pom.xml" />
+        <option value="$PROJECT_DIR$/pgvpt-discovery/pom.xml" />
+        <option value="$PROJECT_DIR$/pgvpt-gateway/pom.xml" />
+        <option value="$PROJECT_DIR$/pgvpt-config/pom.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_24" default="true" project-jdk-name="24" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>
