@@ -1,0 +1,29 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: pgvpt-gateway
+
+  cloud:
+    gateway:
+      routes:
+        - id: patrimoine_route
+          uri: lb://MS-PATRIMOINE
+          predicates:
+            - Path=/api/v1/patrimoine/**
+
+        - id: geolocalisation_route
+          uri: lb://MS-GEOLOCALISATION
+          predicates:
+            - Path=/api/v1/geolocalisation/**
+
+  config:
+    import: "optional:configserver:${CONFIG_SERVER_URL:http://pgvpt-config:9999}"
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://pgvpt-discovery:8761/eureka/}
+  instance:
+    prefer-ip-address: true

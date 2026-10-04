@@ -267,6 +267,30 @@
                     <regex>true</regex>
                 </configuration>
             </plugin>
+            <!-- CORRECTION : Plugin Jib ajouté car manquant sur la branche master (Port 3005) -->
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.4.6</version>
+                <configuration>
+                    <from>
+                        <image>eclipse-temurin:21-jre-alpine</image>
+                    </from>
+                    <to>
+                        <image>ms-reservation:1.0.0</image>
+                    </to>
+                    <container>
+                        <mainClass>com.pgvpt.MsReservationApplication</mainClass>
+                        <ports>
+                            <port>3005</port>
+                        </ports>
+                        <environment>
+                            <SPRING_PROFILES_ACTIVE>docker</SPRING_PROFILES_ACTIVE>
+                        </environment>
+                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                    </container>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

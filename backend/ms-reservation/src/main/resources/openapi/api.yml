@@ -1,14 +1,15 @@
 openapi: 3.0.3
 info:
-  title: PGVPT - API Réservations
-  version: 3.0.0
-  description: API Contract-First du microservice ms-reservation du PGVPT. Orchestre
-    les réservations de circuits, activités, offres touristiques et événements, vérifie
-    la disponibilité auprès du microservice propriétaire, calcule le montant et gère
-    le cycle de vie et les participants. Les références inter-microservices sont des
-    UUID.
+  title: PGVPT - MS Réservation API
+  version: 4.0.0
+  description: Propriétaire des réservations et participants. Il orchestre disponibilité et prix auprès du microservice propriétaire
+    de la ressource, puis conserve un snapshot du montant applicable. Les références sont des UUID et aucune relation JPA
+    inter-microservices n'est utilisée.
 servers:
-- url: /api/v1
+- url: http://localhost:3008/api/v1
+  description: Local
+security:
+- bearerAuth: []
 tags:
 - name: Reservations
 - name: Disponibilite
@@ -505,6 +506,14 @@ components:
           commentaire:
             type: string
             maxLength: 2000
+          ressourceNomSnapshot:
+            type: string
+            readOnly: true
+          prixUnitaireSnapshot:
+            type: number
+            format: double
+            minimum: 0
+            readOnly: true
     ParticipantCreate:
       type: object
       required:
@@ -587,6 +596,7 @@ components:
       - ACTIVITE
       - OFFRE_TOURISTIQUE
       - EVENEMENT
+      description: Type de ressource réservée; le propriétaire de la disponibilité dépend de ce type.
     StatutReservation:
       type: string
       enum:
@@ -627,8 +637,7 @@ components:
         dateReservation:
           type: string
           format: date-time
-          description: Nouvelle date/heure de la réservation, si la modification est
-            autorisée.
+          description: Nouvelle date/heure de la réservation, si la modification est autorisée.
         nombrePersonnes:
           type: integer
           minimum: 1
@@ -675,14 +684,98 @@ components:
           format: date-time
         path:
           type: string
+    ApiError:
+      type: object
+      required:
+      - timestamp
+      - status
+      - code
+      - message
+      - path
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        code:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    BadRequest:
+      description: Requête invalide
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Unauthorized:
+      description: Authentification requise
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Forbidden:
+      description: Accès interdit
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    NotFound:
+      description: Ressource introuvable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Conflict:
+      description: Conflit métier
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    UnprocessableEntity:
+      description: Données métier invalides
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    InternalServerError:
+      description: Erreur interne
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    Size:
+      name: size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
 x-architecture:
   principes:
-  - BaseEntity est la racine des entités persistantes ; les DTO OpenAPI n'en héritent
-    pas côté Java.
-  - 'Aucune relation JPA inter-microservices : les ressources externes sont référencées
-    par UUID.'
-  - ms-reservation orchestre ms-circuit, ms-tourisme et ms-evenement sans dupliquer
-    leurs règles métier.
+  - BaseEntity est la racine des entités persistantes ; les DTO OpenAPI n'en héritent pas côté Java.
+  - 'Aucune relation JPA inter-microservices : les ressources externes sont référencées par UUID.'
+  - ms-reservation orchestre ms-circuit, ms-tourisme et ms-evenement sans dupliquer leurs règles métier.
   - Le montantTotal est calculé côté serveur à partir du service propriétaire.
   - La disponibilité est vérifiée avant création et, si nécessaire, avant modification.
   - Les transitions de statut sont contrôlées dans le service métier.

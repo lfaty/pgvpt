@@ -31,7 +31,7 @@
         <spring-cloud.version>2025.1.3</spring-cloud.version>
     </properties>
     <dependencies>
-        <!-- H2 console activée via spring.h2.console.enabled=true dans application.yaml -->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
@@ -40,6 +40,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -236,6 +237,32 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.4.2</version> <!-- Utilisez la dernière version stable -->
+                <configuration>
+                    <from>
+                        <!-- Image de base légère contenant le JRE -->
+                        <image>eclipse-temurin:21-jre-alpine</image>
+                    </from>
+                    <to>
+                        <!-- Nom de l'image locale générée par Jib -->
+                        <image>ms-patrimoine:1.0.0</image>
+                    </to>
+                    <container>
+                        <mainClass>com.pgvpt.MsPatrimoineApplication</mainClass>
+                        <ports>
+                            <!-- Port exposé par votre microservice -->
+                            <port>3001</port>
+                        </ports>
+                        <environment>
+                            <SPRING_PROFILES_ACTIVE>docker</SPRING_PROFILES_ACTIVE>
+                        </environment>
+                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                    </container>
+                </configuration>
             </plugin>
         </plugins>
 	</build>

@@ -1,12 +1,16 @@
 openapi: 3.0.3
 info:
-  title: PGVPT - API Événements
-  version: 2.0.0
-  description: API de gestion des événements culturels et touristiques du PGVPT. Gère
-    le cycle de vie des événements, leurs sessions, capacités, tarification et critères
-    de recherche.
+  title: PGVPT - MS Événements API
+  version: 3.0.0
+  description: Propriétaire des événements culturels/touristiques et de leurs sessions, capacités, tarifs et disponibilités.
+    ms-reservation orchestre la réservation sans posséder la capacité.
 servers:
-- url: /api/v1
+- url: http://localhost:3005/api/v1
+  description: Environnement local
+- url: https://api.pgvpt.sn/evenement/api/v1
+  description: Environnement de production
+security:
+- bearerAuth: []
 tags:
 - name: Evenements
 - name: Sessions
@@ -100,7 +104,7 @@ paths:
                 $ref: '#/components/schemas/Evenement'
         '404':
           $ref: '#/components/responses/NotFound'
-    patch:
+    put:
       tags:
       - Evenements
       operationId: updateEvenement
@@ -263,7 +267,7 @@ paths:
                 $ref: '#/components/schemas/SessionEvenement'
         '404':
           $ref: '#/components/responses/NotFound'
-    patch:
+    put:
       tags:
       - Sessions
       operationId: updateSession
@@ -299,6 +303,40 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
+  /evenements/{id}/disponibilite:
+    get:
+      tags:
+      - Evenements
+      operationId: getEvenementDisponibilite
+      summary: Vérifier la disponibilité d'un événement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: date
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: nombrePersonnes
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Disponibilité
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DisponibiliteEvenement'
+        '404':
+          $ref: '#/components/responses/NotFound'
 components:
   parameters:
     Id:
@@ -308,11 +346,64 @@ components:
       schema:
         type: string
         format: uuid
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    Size:
+      name: size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
   responses:
     NotFound:
       description: Ressource introuvable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
     Conflict:
       description: Conflit métier
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    BadRequest:
+      description: Requête invalide
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Unauthorized:
+      description: Authentification requise
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Forbidden:
+      description: Accès interdit
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    UnprocessableEntity:
+      description: Données métier invalides
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    InternalServerError:
+      description: Erreur interne
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
   schemas:
     BaseEntity:
       type: object
@@ -381,47 +472,8 @@ components:
             minLength: 2
             maxLength: 10
     EvenementUpdate:
-      type: object
-      properties:
-        titre:
-          type: string
-          minLength: 2
-          maxLength: 250
-        description:
-          type: string
-          maxLength: 5000
-        type:
-          $ref: '#/components/schemas/TypeEvenement'
-        zoneTouristiqueId:
-          type: string
-          format: uuid
-        patrimoineId:
-          type: string
-          format: uuid
-          nullable: true
-        organisateurActeurId:
-          type: string
-          format: uuid
-        capaciteMax:
-          type: integer
-          minimum: 1
-        tarif:
-          type: number
-          format: double
-          minimum: 0
-        devise:
-          type: string
-          minLength: 3
-          maxLength: 3
-        reservationRequise:
-          type: boolean
-        langues:
-          type: array
-          uniqueItems: true
-          items:
-            type: string
-            minLength: 2
-            maxLength: 10
+      allOf:
+      - $ref: '#/components/schemas/EvenementCreate'
     Evenement:
       allOf:
       - $ref: '#/components/schemas/BaseEntity'
@@ -449,24 +501,8 @@ components:
           format: uuid
           nullable: true
     SessionEvenementUpdate:
-      type: object
-      properties:
-        dateDebut:
-          type: string
-          format: date-time
-        dateFin:
-          type: string
-          format: date-time
-        capacite:
-          type: integer
-          minimum: 1
-        lieu:
-          type: string
-          maxLength: 500
-        patrimoineId:
-          type: string
-          format: uuid
-          nullable: true
+      allOf:
+      - $ref: '#/components/schemas/SessionEvenementCreate'
     SessionEvenement:
       allOf:
       - $ref: '#/components/schemas/BaseEntity'
@@ -509,3 +545,52 @@ components:
           format: int64
         totalPages:
           type: integer
+    ApiError:
+      type: object
+      required:
+      - timestamp
+      - status
+      - code
+      - message
+      - path
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        code:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+    DisponibiliteEvenement:
+      type: object
+      required:
+      - disponible
+      - capaciteMax
+      - placesRestantes
+      properties:
+        disponible:
+          type: boolean
+        capaciteMax:
+          type: integer
+          minimum: 0
+        placesRestantes:
+          type: integer
+          minimum: 0
+        sessionId:
+          type: string
+          format: uuid
+          nullable: true
+        motif:
+          type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,30 +1,48 @@
 package com.pgvpt.contenu.model;
 
+import com.pgvpt.contenu.enums.TypeContenuMetier;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import com.pgvpt.contenu.common.BaseEntity;
-import com.pgvpt.contenu.enums.Statut;
+import com.pgvpt.contenu.enums.StatutContenuMetier;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table(name="contenus")
 @Getter @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 public class ContenuEntity extends BaseEntity {
-    private String type;
+    @Column(name = "patrimoine_id", nullable = false)
+    private UUID patrimoineId;
+
+    @Enumerated(EnumType.STRING)
+    private TypeContenuMetier type;
+
     private String langue;
     private String titre;
-    @Column(columnDefinition = "TEXT")
     private String resume;
-    @Column(columnDefinition = "TEXT")
     private String corps;
-    private UUID patrimoineId;
+
+    @Column(name = "auteur_acteur_id")
     private UUID auteurActeurId;
-    private String motsCles;
-    private Statut statut;
+
+    @ElementCollection
+    @CollectionTable(name = "contenu_mots_cles", joinColumns = @JoinColumn(name = "contenu_id"))
+    @Column(name = "mot_cle")
+    private List<String> motsCles;
+
+    @ElementCollection
+    @CollectionTable(name = "contenu_media_ids", joinColumns = @JoinColumn(name = "contenu_id"))
+    @Column(name = "media_id")
+    private List<UUID> mediaIds;
+
+    @Enumerated(EnumType.STRING)
+    private StatutContenuMetier statut = StatutContenuMetier.BROUILLON;
+
+    @Column(name = "date_publication")
+    private LocalDateTime datePublication;
+
 }

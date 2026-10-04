@@ -1,13 +1,10 @@
 package com.pgvpt.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.pgvpt.common.BaseEntity;
 import com.pgvpt.enums.*;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.lang.Nullable;
+import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -16,58 +13,54 @@ import java.util.UUID;
 @Table(name = "geolocalisations")
 @Getter
 @Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class GeolocalisationEntity extends BaseEntity {
-
-    @Id
-    @GeneratedValue
-    private UUID id;
-
-    private @Nullable UUID patrimoineId = null;
-
-    private @Nullable UUID entrepriseId = null;
-
     private Double latitude;
-
     private Double longitude;
 
-    private @Nullable Double altitude;
+    private Double altitude;
 
-    private @Nullable Double precisionMetres;
+    @Column(name = "precision_metres")
+    private  Double precisionMetres;
+    private  String adresse;
 
-    private @Nullable String adresse;
+    @Column(name = "lieu_dit")
+    private String lieuDit;
+    private String repere;
 
-    private @Nullable String lieuDit;
-
-    private @Nullable String repere;
-
+    @Column(name = "systeme_reference")
     private String systemeReference = "WGS84";
 
+    @Column(name = "code_epsg")
     private Integer codeEpsg = 4326;
 
-    private @Nullable SourceEnum source;
+    @Enumerated(EnumType.STRING)
+    private SourceDonneeMetier source;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private @Nullable LocalDate dateAcquisition;
+    @Column(name = "date_acquisition")
+    private LocalDate dateAcquisition;
 
-    private @Nullable MethodeAcquisition methodeAcquisition;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "methode_acquisition")
+    private MethodeAcquisitionMetier methodeAcquisition;
 
-    private @Nullable NiveauFiabilite niveauFiabilite;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "niveau_fiabilite")
+    private NiveauFiabiliteMetier niveauFiabilite;
+    private UUID patrimoineId = null;
+    private UUID entrepriseId = null;
 
-    @JoinColumn(name = "zoneTouristique_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "zone_touristique_id", nullable = false)
+    private ZoneTouristiqueEntity zoneTouristique = null;
+
     @ManyToOne
-    private @Nullable ZoneTouristiqueEntity zoneTouristique = null;
-
     @JoinColumn(name = "village_id")
+    private  VillageEntity village= null;
+
     @ManyToOne
-    private @Nullable VillageEntity village= null;
-
-
     @JoinColumn(name = "quartier_id")
-    @ManyToOne
-    private @Nullable QuartierEntity quartier = null;
+    private QuartierEntity quartier = null;
 
-
+    @Column(columnDefinition = "geometry(Point, 4326)")
+    private Point geom;
 }

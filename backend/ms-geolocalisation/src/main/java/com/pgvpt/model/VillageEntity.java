@@ -2,10 +2,7 @@ package com.pgvpt.model;
 
 import com.pgvpt.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.lang.Nullable;
 
 import java.util.List;
@@ -13,16 +10,9 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "villages")
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 public class VillageEntity extends BaseEntity {
-
-    @Id
-    @GeneratedValue
-    private UUID id;
-
     @Column(unique = true)
     private String code;
 

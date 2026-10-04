@@ -1,41 +1,68 @@
 package com.pgvpt.contenu.exception;
 
+import com.pgvpt.dto.ApiError;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
-@RestControllerAdvice
+@Slf4j
+@ControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiError> handleNotFound(ResourceNotFoundException exception) {
-        ApiError error = new ApiError(LocalDateTime.now(), 404, "NOT_FOUND", exception.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    public ResponseEntity<ApiError> handleResourceNotFoundException(ResourceNotFoundException ex, HttpServletRequest request) {
+        ApiError error = createBaseApiError(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ApiError> handleBusiness(BusinessException exception) {
-        return ResponseEntity.badRequest()
-                .body(new ApiError(LocalDateTime.now(), 400, "BAD_REQUEST", exception.getMessage()));
+    @ExceptionHandler(InvalidRequestException.class)
+    public ResponseEntity<ApiError> handleInvalidRequestException(InvalidRequestException ex, HttpServletRequest request) {
+        ApiError error = createBaseApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiError> handleBadRequest(IllegalArgumentException exception) {
-        ApiError error = new ApiError(LocalDateTime.now(), 400, "BAD_REQUEST", exception.getMessage());
-        return ResponseEntity.badRequest().body(error);
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiError> handleUnreadableRequest(HttpMessageNotReadableException ex, HttpServletRequest request) {
+        String detailMessage = ex.getMostSpecificCause().getMessage();
+        ApiError error = createBaseApiError(HttpStatus.BAD_REQUEST, "Requête JSON invalide : " + detailMessage, request.getRequestURI());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleGlobalException(Exception exception) {
-        exception.printStackTrace();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ApiError(LocalDateTime.now(), 500, "INTERNAL_ERROR",
-                        exception.getMessage() != null ? exception.getMessage() : "Une erreur inattendue est survenue."));
+    public ResponseEntity<ApiError> handleGlobalException(Exception ex, HttpServletRequest request) {
+        // Journalisation de la stacktrace côté serveur pour le débogage (Remplace ex.printStackTrace())
+        log.error("Erreur interne non gérée sur l'URI : {}", request.getRequestURI(), ex);
+
+        ApiError error = createBaseApiError(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Une erreur interne imprévue s'est produite sur le serveur.",
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public record ApiError(LocalDateTime timestamp, int status, String code, String message) {
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ApiError> handleBusinessRuleException(BusinessException ex, HttpServletRequest request) {
+        // Mapping sémantique vers un statut 409 Conflict pour les violations de règles métier
+        ApiError error = createBaseApiError(HttpStatus.CONFLICT, ex.getMessage(), request.getRequestURI());
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
+
+    private ApiError createBaseApiError(HttpStatus status, String message, String path) {
+        ApiError error = new ApiError();
+        error.setTimestamp(OffsetDateTime.now());
+        error.setStatus(status.value());
+        error.setCode(String.valueOf(status.value()));
+        error.setMessage(message);
+        error.setPath(path);
+        return error;
+    }
+
 }
+

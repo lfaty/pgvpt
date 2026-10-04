@@ -23,4 +23,8 @@ public abstract class BaseEntity {
 
     @PreUpdate
     void onUpdate() { updatedAt = Instant.now(); }
+
 }
+
+
+

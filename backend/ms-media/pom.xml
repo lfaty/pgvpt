@@ -267,6 +267,34 @@
                     <regex>true</regex>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.4.2</version> <!-- Utilisez la dernière version stable -->
+                <configuration>
+                    <from>
+                        <!-- Image de base légère contenant le JRE -->
+                        <image>eclipse-temurin:21-jre-alpine</image>
+                    </from>
+                    <to>
+                        <!-- Nom de l'image locale générée par Jib -->
+                        <image>ms-media:1.0.0</image>
+                    </to>
+                    <container>
+                        <!-- CORRECTION: L'ancien package etait errone -->
+                        <!-- <mainClass>com.pgvpt.MsMediaApplication</mainClass> -->
+                        <mainClass>com.pgvpt.media.MsMediaApplication</mainClass>
+                        <ports>
+                            <!-- Port exposé par votre microservice -->
+                            <port>3007</port>
+                        </ports>
+                        <environment>
+                            <SPRING_PROFILES_ACTIVE>docker</SPRING_PROFILES_ACTIVE>
+                        </environment>
+                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                    </container>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

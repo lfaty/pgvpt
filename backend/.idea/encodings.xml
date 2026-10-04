@@ -5,9 +5,13 @@
     <file url="file://$PROJECT_DIR$/ms-contenu/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ms-evenement/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ms-geolocalisation/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ms-identite/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ms-media/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ms-patrimoine/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ms-reservation/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ms-tourisme/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pgvpt-config/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pgvpt-discovery/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pgvpt-gateway/src/main/java" charset="UTF-8" />
   </component>
 </project>

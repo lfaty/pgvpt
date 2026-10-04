@@ -58,7 +58,7 @@ Content-Type: application/json
     "Pèlerinage de la diaspora"
   ],
   "langues": ["Français", "Wolof", "Anglais", "Espagnol"],
-  "etatConservation": "BON",
+  "etatConservationMetier": "BON",
   "statut": "BROUILLON",
   "classePatrimoine": true,
   "referenceClassement": "MH-SN-1978-001",
@@ -204,7 +204,7 @@ Content-Type: application/json
   "importanceCulturelle": "Patrimoine naturel exceptionnel du Sénégal, fierté nationale.",
   "importanceTouristique": "Destination phare de l'écotourisme au Sénégal. Attire environ 15 000 visiteurs par an.",
   "valeurPatrimoniale": "Inscrit au patrimoine mondial de l'UNESCO depuis 1981.",
-  "etatConservation": "BON",
+  "etatConservationMetier": "BON",
   "statut": "BROUILLON",
   "classePatrimoine": true,
   "referenceClassement": "PN-SN-1971-002",
@@ -376,7 +376,7 @@ Content-Type: application/json
   "importanceHistorique": "Concrétisation de la vision panafricaine de Senghor, symbole de la renaissance culturelle africaine.",
   "importanceCulturelle": "Plus grand musée consacré aux civilisations noires au monde.",
   "importanceTouristique": "Attraction culturelle majeure de Dakar, attirant plus de 100 000 visiteurs par an.",
-  "etatConservation": "EXCELLENT",
+  "etatConservationMetier": "EXCELLENT",
   "statut": "BROUILLON",
   "classePatrimoine": false,
   "inscritUnesco": false,
@@ -545,7 +545,7 @@ Content-Type: application/json
     "Expositions"
   ],
   "langues": ["Français"],
-  "etatConservation": "BON",
+  "etatConservationMetier": "BON",
   "statut": "PUBLIE",
   "classePatrimoine": true,
   "referenceClassement": "SN-PAT-1936",
@@ -651,7 +651,7 @@ Content-Type: application/json
   "categorie": "PATRIMOINE_MEMORIEL",
   "description": "La Maison des Esclaves est un édifice historique situé sur l'île de Gorée, au large de Dakar. Construite vers 1776, elle est devenue le symbole mondial de la traite transatlantique des esclaves. Le bâtiment a été entièrement restauré et modernisé avec de nouveaux panneaux informatifs en 2024.",
   "descriptionCourte": "Symbole mondial de la traite négrière, récemment restauré, situé sur l'île de Gorée.",
-  "etatConservation": "EXCELLENT",
+  "etatConservationMetier": "EXCELLENT",
   "tarification": {
     "gratuit": false,
     "tarifNormal": 1000.0,
@@ -719,7 +719,7 @@ GET /patrimoines?type=MONUMENT
 #### Filtres combinés
 
 ```
-GET /patrimoines?type=SITE_NATUREL&categorie=PATRIMOINE_NATUREL&etatConservation=BON&inscritUnesco=true&page=0&size=5
+GET /patrimoines?type=SITE_NATUREL&categorie=PATRIMOINE_NATUREL&etatConservationMetier=BON&inscritUnesco=true&page=0&size=5
 ```
 
 #### Recherche textuelle
@@ -811,7 +811,7 @@ GET /patrimoines/recherche?q=oiseaux&type=SITE_NATUREL&categorie=PATRIMOINE_NATU
     "categorie": "PATRIMOINE_NATUREL",
     "descriptionCourte": "Troisième réserve ornithologique mondiale...",
     "photoPrincipale": "https://images.pgvpt.sn/djoudj/principale.jpg",
-    "etatConservation": "BON",
+    "etatConservationMetier": "BON",
     "inscritUnesco": true
   }
 ]

@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgis/postgis:16-3.4-alpine # PostgreSQL 16 avec PostGIS 3.4 (version légère Alpine)
+    container_name: pgvpt-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: pgvpt_main_db # Base par défaut (optionnel si géré par script)
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Script automatique pour créer les deux bases nécessaires à vos MS au premier démarrage
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"] # CORRECTION : Utilisateur correspondant
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pgvpt-network
+    restart: unless-stopped # Redémarre automatiquement si le conteneur crash
+
+  ms-patrimoine:
+    build:
+      context: ./ms-patrimoine
+    image: ms-patrimoine:latest # Nom de l'image locale générée par Jib
+    container_name: ms-patrimoine
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/patrimoine_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update # Automatise la création des tables
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - pgvpt-network
+    restart: on-failure
+
+  ms-geolocalisation:
+    build:
+      context: ./ms-geolocalisation
+    image: ms-geolocalisation:latest
+    container_name: ms-geolocalisation
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/geolocalisation_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "3002:3002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - pgvpt-network
+    restart: on-failure
+
+volumes:
+  postgres_data:
+
+networks:
+  pgvpt-network:
+    driver: bridge

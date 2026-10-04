@@ -3,6 +3,26 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
+      <profile name="Annotation profile for ms-circuit" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.5.5.Final/mapstruct-1.5.5.Final.jar" />
+        </processorPath>
+        <module name="ms-circuit" />
+      </profile>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="pgvpt-discovery" />
+        <module name="pgvpt-config" />
+        <module name="pgvpt-gateway" />
+      </profile>
       <profile name="Annotation profile for ms-tourisme" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -13,22 +33,31 @@
           <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.5.5.Final/mapstruct-1.5.5.Final.jar" />
         </processorPath>
-        <module name="ms-circuit" />
         <module name="ms-tourisme" />
-        <module name="ms-patrimoine.main" />
-        <module name="ms-patrimoine" />
-        <module name="ms-patrimoine.test" />
-        <module name="ms-geolocalisation" />
-        <module name="ms-media" />
-        <module name="ms-contenu" />
+        <module name="ms-identite" />
         <module name="ms-evenement" />
         <module name="ms-reservation" />
       </profile>
+      <profile name="Annotation profile for ms-media" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.5.5.Final/mapstruct-1.5.5.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.5.5.Final/mapstruct-1.5.5.Final.jar" />
+        </processorPath>
+        <module name="ms-patrimoine" />
+        <module name="ms-media" />
+        <module name="ms-contenu" />
+        <module name="ms-geolocalisation" />
+      </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="ms-geolocalisation.main" target="21" />
-      <module name="ms-geolocalisation.test" target="21" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
@@ -36,14 +65,14 @@
       <module name="ms-contenu" options="-parameters" />
       <module name="ms-evenement" options="-parameters" />
       <module name="ms-geolocalisation" options="-parameters" />
-      <module name="ms-geolocalisation.main" options="-parameters" />
-      <module name="ms-geolocalisation.test" options="-parameters" />
+      <module name="ms-identite" options="-parameters" />
       <module name="ms-media" options="-parameters" />
       <module name="ms-patrimoine" options="-parameters" />
-      <module name="ms-patrimoine.main" options="-parameters" />
-      <module name="ms-patrimoine.test" options="-parameters" />
       <module name="ms-reservation" options="-parameters" />
       <module name="ms-tourisme" options="-parameters" />
+      <module name="pgvpt-config" options="-parameters" />
+      <module name="pgvpt-discovery" options="-parameters" />
+      <module name="pgvpt-gateway" options="-parameters" />
     </option>
   </component>
 </project>

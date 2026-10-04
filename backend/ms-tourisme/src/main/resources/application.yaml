@@ -15,7 +15,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/tourisme_db
     driver-class-name: org.postgresql.Driver
     username: postgres
-    password: "Thies@#1521"
+    password: "admin"
   jpa:
     hibernate:
       ddl-auto: update

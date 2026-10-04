@@ -2,26 +2,14 @@ package com.pgvpt.model;
 
 import com.pgvpt.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.lang.Nullable;
-
-import java.util.UUID;
 
 @Entity
 @Table(name = "quartiers")
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 public class QuartierEntity extends BaseEntity {
-
-    @Id
-    @GeneratedValue
-    private UUID id;
-
     private String code;
 
     @Column(unique = true)
@@ -29,12 +17,12 @@ public class QuartierEntity extends BaseEntity {
 
     private @Nullable String description;
 
-    @ManyToOne
-    @JoinColumn(name = "commune_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "commune_id", nullable = false)
     private CommuneEntity commune;
 
-    @ManyToOne
-    @JoinColumn(name = "village_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "village_id", nullable = false)
     private VillageEntity village;
 
 }

@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.UUID;
 
-@FeignClient(name = "ms-patrimoine", url = "http://localhost:3001/api/v1")
+@FeignClient(name = "ms-patrimoine")
 public interface PatrimoineClient {
 
-    @GetMapping("/patrimoines/{id}")
+    @GetMapping("/api/v1/patrimoines/{id}")
     Object getById(@PathVariable("id") UUID id);
 }

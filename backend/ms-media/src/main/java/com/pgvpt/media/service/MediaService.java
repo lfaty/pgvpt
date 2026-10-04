@@ -1,17 +1,17 @@
 package com.pgvpt.media.service;
 
-import com.pgvpt.media.enums.TypeMedia;
-import com.pgvpt.media.model.MediaEntity;
+import com.pgvpt.dto.Media;
+import com.pgvpt.dto.MediaCreate;
+import com.pgvpt.dto.TypeMedia;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface MediaService {
-    List<MediaEntity> getAll();
-    List<MediaEntity> findByPatrimoineIdAndType(UUID patrimoineId, TypeMedia typeMedia);
-    MediaEntity getById(UUID id);
-    MediaEntity create(MediaEntity entity);
-    MediaEntity update(UUID id, MediaEntity entity);
+    List<Media> findByPatrimoineIdAndType(UUID patrimoineId, TypeMedia type);
+    Media getById(UUID id);
+    Media create(MediaCreate dto);
+    Media update(UUID id, MediaCreate dto) ;
     void delete(UUID id);
 
 }

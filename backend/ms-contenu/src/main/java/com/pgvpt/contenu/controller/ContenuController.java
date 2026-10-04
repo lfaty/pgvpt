@@ -1,9 +1,10 @@
 package com.pgvpt.contenu.controller;
 
 import com.pgvpt.api.*;
-import com.pgvpt.contenu.mapper.ContenuApiMapper;
+import com.pgvpt.contenu.enums.StatutContenuMetier;
 import com.pgvpt.dto.*;
 import com.pgvpt.contenu.service.ContenuService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,22 +12,19 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
+@RequiredArgsConstructor
 public class ContenuController implements ContenusApi{
 
     private final ContenuService service;
-    private final ContenuApiMapper mapper;
 
-    public ContenuController(ContenuService service, ContenuApiMapper mapper) {
-        this.service = service;
-        this.mapper = mapper;
+    @Override
+    public ResponseEntity<Contenu> archiverContenu(UUID id) {
+        return ResponseEntity.ok(service.archiver(id));
     }
-
 
     @Override
     public ResponseEntity<Contenu> createContenu(ContenuCreate contenuCreate) {
-        var entity = mapper.toEntity(contenuCreate);
-        var created = service.create(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toApi(created));
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(contenuCreate));
     }
 
     @Override
@@ -37,21 +35,27 @@ public class ContenuController implements ContenusApi{
 
     @Override
     public ResponseEntity<Contenu> getContenu(UUID id) {
-        return ResponseEntity.ok(mapper.toApi(service.getById(id)));
+        return ResponseEntity.ok(service.getById(id));
     }
 
     @Override
     public ResponseEntity<List<Contenu>> listContenus(UUID patrimoineId, String langue, StatutContenu statut) {
-        com.pgvpt.contenu.enums.Statut entityStatut = mapper.toEntityEnum(statut);
-        return ResponseEntity.ok(
-                mapper.toApi(service.findByFilters(patrimoineId, langue, entityStatut))
-        );
+        return ResponseEntity.ok(service.findByFilters(patrimoineId, langue, statut));
+    }
+
+    @Override
+    public ResponseEntity<Contenu> publierContenu(UUID id) {
+        return ResponseEntity.ok(service.publier(id));
     }
 
 
     @Override
     public ResponseEntity<Contenu> updateContenu(UUID id, ContenuUpdate contenuUpdate) {
-        var updated = service.update(id, mapper.toEntity(contenuUpdate));
-        return ResponseEntity.ok(mapper.toApi(updated));
+        return ResponseEntity.ok(service.update(id, contenuUpdate));
+    }
+
+    @Override
+    public ResponseEntity<Contenu> validerContenu(UUID id) {
+        return ResponseEntity.ok(service.valider(id));
     }
 }

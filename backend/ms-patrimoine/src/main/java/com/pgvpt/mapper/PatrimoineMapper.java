@@ -1,225 +1,162 @@
 package com.pgvpt.mapper;
 
 import com.pgvpt.dto.*;
+import com.pgvpt.embeddable.HoraireOuvertureEmbeddable;
+import com.pgvpt.enums.CategoriePatrimoineMetier;
+import com.pgvpt.enums.EtatConservationMetier;
+import com.pgvpt.enums.StatutPatrimoineMetier;
+import com.pgvpt.enums.TypePatrimoineMetier;
 import com.pgvpt.model.*;
-import com.pgvpt.exception.InvalidRequestException;
 import org.mapstruct.*;
 
-@Mapper(
-    componentModel = "spring",
-    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-    nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
-    unmappedTargetPolicy = ReportingPolicy.ERROR
-)
-public abstract class PatrimoineMapper {
+import com.pgvpt.record.PatrimoineSearchCriteria;
 
-    // ============================================================
-    // POLYMORPHIC DISPATCHERS
-    // ============================================================
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
+import java.net.URI;
 
-    @SubclassMapping(source = SiteNaturelCreate.class, target = SiteNaturelEntity.class)
-    @SubclassMapping(source = MuseeCreate.class, target = MuseeEntity.class)
-    @SubclassMapping(source = MonumentCreate.class, target = MonumentEntity.class)
-    public abstract PatrimoineEntity toEntity(PatrimoineCreate dto);
 
-    @SubclassMapping(source = SiteNaturelEntity.class, target = SiteNaturel.class)
-    @SubclassMapping(source = MuseeEntity.class, target = Musee.class)
-    @SubclassMapping(source = MonumentEntity.class, target = Monument.class)
-    @Mapping(target = "geolocalisation", ignore = true)
-    public abstract Patrimoine toDto(PatrimoineEntity entity);
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+public interface PatrimoineMapper {
 
-    public void updateEntity(PatrimoineUpdate dto, PatrimoineEntity entity) {
-        if (dto instanceof SiteNaturelUpdate site && entity instanceof SiteNaturelEntity siteEntity) {
-            updateSiteNaturelEntity(site, siteEntity);
-        } else if (dto instanceof MuseeUpdate musee && entity instanceof MuseeEntity museeEntity) {
-            updateMuseeEntity(musee, museeEntity);
-        } else if (dto instanceof MonumentUpdate monument && entity instanceof MonumentEntity monumentEntity) {
-            updateMonumentEntity(monument, monumentEntity);
+    // --- Vers Entity (Création / Mutation) ---
+    default PatrimoineEntity toEntity(PatrimoineCreate dto) {
+        if (dto == null) return null;
+        if (dto instanceof SiteNaturelCreate sn) return toSiteNaturelEntity(sn);
+        if (dto instanceof MuseeCreate m) return toMuseeEntity(m);
+        if (dto instanceof MonumentCreate mon) return toMonumentEntity(mon);
+        throw new IllegalArgumentException("Type de patrimoine inconnu");
+    }
+
+    SiteNaturelEntity toSiteNaturelEntity(SiteNaturelCreate dto);
+    MuseeEntity toMuseeEntity(MuseeCreate dto);
+    MonumentEntity toMonumentEntity(MonumentCreate dto);
+
+    // --- Vers DTO (Lecture) ---
+    default Patrimoine toDto(PatrimoineEntity entity) {
+        if (entity == null) return null;
+        if (entity instanceof SiteNaturelEntity sn) return toSiteNaturelDto(sn);
+        if (entity instanceof MuseeEntity m) return toMuseeDto(m);
+        if (entity instanceof MonumentEntity mon) return toMonumentDto(mon);
+        return toBaseDto(entity);
+    }
+
+    SiteNaturel toSiteNaturelDto(SiteNaturelEntity entity);
+    Musee toMuseeDto(MuseeEntity entity);
+    Monument toMonumentDto(MonumentEntity entity);
+    Patrimoine toBaseDto(PatrimoineEntity entity);
+
+    // --- Updates In-Place (CORRIGÉ POUR LE POLYMORPHISME) ---
+    default void updateEntity(PatrimoineUpdate dto, @MappingTarget PatrimoineEntity entity) {
+        if (dto == null || entity == null) return;
+        if (dto instanceof SiteNaturelUpdate sn && entity instanceof SiteNaturelEntity snEntity) {
+            updateSiteNaturelEntity(sn, snEntity);
+        } else if (dto instanceof MuseeUpdate m && entity instanceof MuseeEntity mEntity) {
+            updateMuseeEntity(m, mEntity);
+        } else if (dto instanceof MonumentUpdate mon && entity instanceof MonumentEntity monEntity) {
+            updateMonumentEntity(mon, monEntity);
         } else {
-            throw new InvalidRequestException("Le type concret de patrimoine est obligatoire ou ne correspond pas à l'entité");
+            throw new IllegalArgumentException("Incompatibilité de type pour la mise à jour polymorphe");
+        }
+    }
+
+    void updateSiteNaturelEntity(SiteNaturelUpdate dto, @MappingTarget SiteNaturelEntity entity);
+    void updateMuseeEntity(MuseeUpdate dto, @MappingTarget MuseeEntity entity);
+    void updateMonumentEntity(MonumentUpdate dto, @MappingTarget MonumentEntity entity);
+
+    // --- Sub-Objects Mappings ---
+    HoraireOuverture toHoraireDto(HoraireOuvertureEmbeddable embeddable);
+    HoraireOuvertureEmbeddable toHoraireEmbeddable(HoraireOuverture dto);
+    List<HoraireOuverture> toHoraireDtoList(List<HoraireOuvertureEmbeddable> list);
+//    List<HoraireOuvertureEmbeddable> toHoraireEmbeddableList(List<HoraireOuverture> list);
+
+    List<HoraireOuvertureEmbeddable> toHoraireEmbeddableList(List<HoraireOuverture> dtos);
+
+    @Mapping(target = "patrimoineId", source = "patrimoine.id")
+    @Mapping(target = "contactConservateurId", source = "contactConservateur.id")
+    Conservation toConservationDto(ConservationEntity entity);
+
+    @Mapping(target = "patrimoine", ignore = true)
+    @Mapping(target = "contactConservateur", ignore = true)
+    void updateConservationEntity(Conservation dto, @MappingTarget ConservationEntity entity);
+
+    PatrimoineSummary toSummaryDto(PatrimoineEntity entity);
+    List<PatrimoineSummary> toSummaryDtoList(List<PatrimoineEntity> list);
+
+    // --- ENUMS & CRITERIA (CORRIGÉ ET SÉCURISÉ) ---
+    CategoriePatrimoineMetier toCategorie(CategoriePatrimoine source);
+    TypePatrimoineMetier toType(TypePatrimoine source);
+    StatutPatrimoineMetier toStatut(StatutPatrimoine source);
+    EtatConservationMetier toEtat(EtatConservation source);
+
+    PatrimoineSearchCriteria toCriteria(
+            CategoriePatrimoine categorie,
+            TypePatrimoine type,
+            StatutPatrimoine statut,
+            EtatConservation etatConservation,
+            Boolean accessiblePublic,
+            Boolean inscritUnesco,
+            Boolean classePatrimoine,
+            String q
+    );
+
+    // --- LIAISON BIDIRECTIONNELLE AUTOMATIQUE MAPSTRUCT ---
+    @AfterMapping
+    default void lierEspecesAuSiteNaturel(@MappingTarget SiteNaturelEntity site) {
+        if (site != null && site.getEspecesProtegees() != null) {
+            site.getEspecesProtegees().forEach(espece -> espece.setSiteNaturel(site));
         }
     }
 
     @AfterMapping
-    protected void linkChildren(@MappingTarget PatrimoineEntity entity) {
-        if (entity.getHoraires() != null) {
-            entity.getHoraires().forEach(h -> h.setPatrimoine(entity));
+    default void lierEspecesAuSiteNaturelUpdate(SiteNaturelUpdate dto, @MappingTarget SiteNaturelEntity site) {
+        if (site != null && site.getEspecesProtegees() != null) {
+            site.getEspecesProtegees().forEach(espece -> espece.setSiteNaturel(site));
         }
-        if (entity.getPhotos() != null) {
-            entity.getPhotos().forEach(p -> p.setPatrimoine(entity));
-        }
-        if (entity.getMedias() != null) {
-            entity.getMedias().forEach(m -> m.setPatrimoine(entity));
-        }
-        if (entity instanceof MuseeEntity musee) {
+    }
+
+    @AfterMapping
+    default void lierCollectionsEtExpositionsAuMusee(@MappingTarget MuseeEntity musee) {
+        if (musee != null) {
             if (musee.getCollections() != null) {
-                musee.getCollections().forEach(c -> c.setMusee(musee));
+                // Remplacer 'setMusee' par le nom exact de votre setter dans CollectionMuseeEntity
+                musee.getCollections().forEach(collection -> collection.setMusee(musee));
             }
             if (musee.getExpositions() != null) {
-                musee.getExpositions().forEach(e -> e.setMusee(musee));
-            }
-        } else if (entity instanceof SiteNaturelEntity site) {
-            if (site.getEspecesProtegees() != null) {
-                site.getEspecesProtegees().forEach(e -> e.setSiteNaturel(site));
+                // Remplacer 'setMusee' par le nom exact de votre setter dans ExpositionEntity
+                musee.getExpositions().forEach(exposition -> exposition.setMusee(musee));
             }
         }
     }
 
-    // ============================================================
-    // CREATE DTO -> ENTITY
-    // ============================================================
-
-    @Mapping(target = "natureMonument", source = "natureMonument.value")
-    @Mapping(target = "categorie", source = "categorie.value")
-    @Mapping(target = "statut", source = "statut.value")
-    @Mapping(target = "anneeRenovation", ignore = true)
-    @Mapping(target = "architecte", ignore = true)
-    public abstract MonumentEntity toMonumentEntity(MonumentCreate dto);
-
-    @Mapping(target = "categorie", source = "categorie.value")
-    @Mapping(target = "statut", source = "statut.value")
-    @Mapping(target = "nombreOeuvres", ignore = true)
-    @Mapping(target = "typesCollections", ignore = true)
-    @Mapping(target = "servicesMusee", ignore = true)
-    @Mapping(target = "capaciteAccueil", ignore = true)
-    @Mapping(target = "museographie", ignore = true)
-    public abstract MuseeEntity toMuseeEntity(MuseeCreate dto);
-
-    @Mapping(target = "natureSite", source = "natureSite.value")
-    @Mapping(target = "categorie", source = "categorie.value")
-    @Mapping(target = "statut", source = "statut.value")
-    @Mapping(target = "biodiversite", ignore = true)
-    @Mapping(target = "zoneProtegee", ignore = true)
-    @Mapping(target = "categorieProtection", ignore = true)
-    @Mapping(target = "risquesEnvironnementaux", ignore = true)
-    @Mapping(target = "ressourcesNaturelles", ignore = true)
-    @Mapping(target = "activitesEcotouristiques", ignore = true)
-    @Mapping(target = "capaciteAccueil", ignore = true)
-    public abstract SiteNaturelEntity toSiteNaturelEntity(SiteNaturelCreate dto);
-
-    // ============================================================
-    // UPDATE DTO -> ENTITY
-    // ============================================================
-
-    @Mapping(target = "natureMonument", source = "dto.natureMonument.value")
-    @Mapping(target = "categorie", source = "dto.categorie.value")
-    @Mapping(target = "statut", source = "dto.statut.value")
-    @Mapping(target = "anneeRenovation", ignore = true)
-    @Mapping(target = "architecte", ignore = true)
-    public abstract void updateMonumentEntity(MonumentUpdate dto, @MappingTarget MonumentEntity entity);
-
-    @Mapping(target = "categorie", source = "dto.categorie.value")
-    @Mapping(target = "statut", source = "dto.statut.value")
-    @Mapping(target = "nombreOeuvres", ignore = true)
-    @Mapping(target = "typesCollections", ignore = true)
-    @Mapping(target = "servicesMusee", ignore = true)
-    @Mapping(target = "capaciteAccueil", ignore = true)
-    @Mapping(target = "museographie", ignore = true)
-    public abstract void updateMuseeEntity(MuseeUpdate dto, @MappingTarget MuseeEntity entity);
-
-    @Mapping(target = "natureSite", source = "dto.natureSite.value")
-    @Mapping(target = "categorie", source = "dto.categorie.value")
-    @Mapping(target = "statut", source = "dto.statut.value")
-    @Mapping(target = "biodiversite", ignore = true)
-    @Mapping(target = "zoneProtegee", ignore = true)
-    @Mapping(target = "categorieProtection", ignore = true)
-    @Mapping(target = "risquesEnvironnementaux", ignore = true)
-    @Mapping(target = "ressourcesNaturelles", ignore = true)
-    @Mapping(target = "activitesEcotouristiques", ignore = true)
-    @Mapping(target = "capaciteAccueil", ignore = true)
-    public abstract void updateSiteNaturelEntity(SiteNaturelUpdate dto, @MappingTarget SiteNaturelEntity entity);
-
-    // ============================================================
-    // ENTITY -> DTO
-    // ============================================================
+    @AfterMapping
+    default void lierCollectionsEtExpositionsAuMuseeUpdate(MuseeUpdate dto, @MappingTarget MuseeEntity musee) {
+        lierCollectionsEtExpositionsAuMusee(musee);
+    }
 
     @Mapping(target = "id", ignore = true)
-    public abstract AccessibiliteEntity toAccessibiliteEntity(Accessibilite dto);
-    
-    @Mapping(target = "id", ignore = true)
-    public abstract ConservationEntity toConservationEntity(Conservation dto);
-    
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "patrimoine", ignore = true)
-    public abstract HoraireOuvertureEntity toHoraireOuvertureEntity(HoraireOuverture dto);
-    
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "patrimoine", ignore = true)
-    public abstract PhotoEntity toPhotoEntity(PhotoCreate dto);
-    
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "patrimoine", ignore = true)
-    public abstract PhotoEntity toPhotoEntity(Photo dto);
-    
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "patrimoine", ignore = true)
-    public abstract MediaEntity toMediaEntity(Media dto);
+    void updateEntityFromPatch(PatrimoinePatch dto, @MappingTarget PatrimoineEntity entity);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "musee", ignore = true)
-    public abstract CollectionMuseeEntity toCollectionMuseeEntity(CollectionMusee dto);
+    void updateSiteNaturelEntityFromPatch(PatrimoinePatch dto, @MappingTarget SiteNaturelEntity entity);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "musee", ignore = true)
-    public abstract ExpositionEntity toExpositionEntity(Exposition dto);
+    void updateMuseeEntityFromPatch(PatrimoinePatch dto, @MappingTarget MuseeEntity entity);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "siteNaturel", ignore = true)
-    public abstract EspeceProtegeeEntity toEspeceProtegeeEntity(EspeceProtegee dto);
+    void updateMonumentEntityFromPatch(PatrimoinePatch dto, @MappingTarget MonumentEntity entity);
 
-    @Mapping(target = "geolocalisation", ignore = true)
-    public abstract Monument toMonumentDto(MonumentEntity entity);
 
-    @Mapping(target = "geolocalisation", ignore = true)
-    public abstract Musee toMuseeDto(MuseeEntity entity);
 
-    @Mapping(target = "geolocalisation", ignore = true)
-    public abstract SiteNaturel toSiteNaturelDto(SiteNaturelEntity entity);
-    
-    // Convertisseurs URI / String
-    public String mapUriToString(java.net.URI uri) {
-        return uri != null ? uri.toString() : null;
-    }
 
-    public java.net.URI mapStringToUri(String value) {
-        if (value == null) return null;
-        try {
-            return new java.net.URI(value);
-        } catch (java.net.URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    
-    // Convertisseurs Enum/String
-    public String mapNatureMonument(NatureMonument value) {
-        return value != null ? value.getValue() : null;
-    }
-    
-    public String mapNatureSiteNaturel(NatureSiteNaturel value) {
-        return value != null ? value.getValue() : null;
-    }
-    
-    public String mapCategorie(CategoriePatrimoine value) {
-        return value != null ? value.getValue() : null;
-    }
-    
-    public String mapStatut(StatutPatrimoine value) {
-        return value != null ? value.getValue() : null;
-    }
+    // --- UTILITAIRES TEMPORELS ---
+    default Instant map(OffsetDateTime value) { return value == null ? null : value.toInstant(); }
+    default OffsetDateTime map(Instant value) { return value == null ? null : value.atOffset(ZoneOffset.UTC); }
 
-    public NatureMonument mapNatureMonument(String value) {
-        return value != null ? NatureMonument.fromValue(value) : null;
-    }
-    
-    public NatureSiteNaturel mapNatureSiteNaturel(String value) {
-        return value != null ? NatureSiteNaturel.fromValue(value) : null;
-    }
-    
-    public CategoriePatrimoine mapCategorie(String value) {
-        return value != null ? CategoriePatrimoine.fromValue(value) : null;
-    }
-    
-    public StatutPatrimoine mapStatut(String value) {
-        return value != null ? StatutPatrimoine.fromValue(value) : null;
-    }
+    // --- UTILITAIRES URI ---
+    default String map(URI value) { return value == null ? null : value.toString(); }
+    default URI map(String value) { return value == null ? null : URI.create(value); }
 }
+

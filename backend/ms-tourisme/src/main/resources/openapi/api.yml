@@ -1,11 +1,14 @@
 openapi: 3.0.3
 info:
-  title: PGVPT - API Offres touristiques
-  version: 2.0.0
-  description: Gestion du cycle de vie des offres touristiques, des prestations, de
-    leur tarification et de leur disponibilité dans PGVPT.
+  title: PGVPT - MS Offres Touristiques API
+  version: 3.0.0
+  description: Propriétaire des offres et prestations touristiques commercialisables. Il gère tarification, disponibilité,
+    activation et publication. circuitId est une référence UUID vers un circuit existant; ms-tourisme ne possède pas le circuit.
 servers:
-- url: /api/v1
+- url: http://localhost:3007/api/v1
+  description: Local
+security:
+- bearerAuth: []
 tags:
 - name: Offres
 - name: Prestations
@@ -494,6 +497,7 @@ components:
         circuitId:
           type: string
           format: uuid
+          nullable: true
         prix:
           type: number
           format: double
@@ -681,3 +685,90 @@ components:
           minimum: 0
         message:
           type: string
+    ApiError:
+      type: object
+      required:
+      - timestamp
+      - status
+      - code
+      - message
+      - path
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        code:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    BadRequest:
+      description: Requête invalide
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Unauthorized:
+      description: Authentification requise
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Forbidden:
+      description: Accès interdit
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    NotFound:
+      description: Ressource introuvable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Conflict:
+      description: Conflit métier
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    UnprocessableEntity:
+      description: Données métier invalides
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    InternalServerError:
+      description: Erreur interne
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    Size:
+      name: size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20

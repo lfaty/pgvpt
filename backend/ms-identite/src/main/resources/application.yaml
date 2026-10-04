@@ -1,0 +1,53 @@
+server:
+  port: 3000
+  servlet:
+    context-path: /api/v1
+
+spring:
+  application:
+    name: ms-identite
+  jackson:
+    default-property-inclusion: non_null
+    deserialization:
+      fail-on-unknown-properties: false
+
+  # --- Désactiver Spring Cloud Config et Eureka pour le dev local ---
+  cloud:
+    config:
+      enabled: false
+    discovery:
+      enabled: false
+
+  # --- Base de données PostgreSQL ---
+  datasource:
+    url: jdbc:postgresql://localhost:5432/identite_db
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: "admin"
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+# --- Eureka désactivé ---
+#eureka:
+#  client:
+#    enabled: false
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

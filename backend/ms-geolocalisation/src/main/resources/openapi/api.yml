@@ -1,54 +1,47 @@
 openapi: 3.0.3
 info:
-  title: MS Géolocalisation des patrimoines - API
-  description: "API Contract-First du microservice de géolocalisation des patrimoines\ntouristiques du PGVPT.\n\nCe microservice\
-    \ assure :\n  - la gestion des coordonnées géographiques des patrimoines ;\n  - la gestion de la localisation administrative\
-    \ ;\n  - la recherche spatiale ;\n  - le calcul des distances ;\n  - la recherche des patrimoines dans un rayon ;\n  -\
-    \ la gestion des points d'intérêt ;\n  - la gestion des zones géographiques ;\n  - la gestion des itinéraires et points\
-    \ d'accès ;\n  - la production de données cartographiques ;\n  - l'exploitation des informations géospatiales;\n  - Une\
-    \ géolocalisation peut être associée soit à un patrimoine (ms-patrimoine), soit à une entreprise (ms-entreprise), mais\
-    \ jamais aux deux simultanément.\"\n\n    Version 13.0.0 : contrat consolidé pour une génération Spring Boot 3 / Jakarta\n\
-    \    avec validation, pagination homogène, sécurité JWT, gestion d'erreurs standardisée\n    et contraintes métier explicites.\n\
-    \nModèle d'héritage : `BaseEntity` constitue la classe racine commune des entités persistantes. La géolocalisation est\
-    \ un modèle métier distinct et n'est pas implémentée par `BaseEntity`."
-  version: 13.0.1
+  title: PGVPT - MS Géolocalisation API
+  description: Propriétaire des coordonnées, du référentiel administratif, des zones géographiques et touristiques, des points
+    d'accès et des recherches spatiales. Une géolocalisation cible exactement un patrimoine ou une entreprise; les références
+    sont des UUID.
+  version: 14.0.0
   contact:
     name: PGVPT
     email: contact@pgvpt.sn
 servers:
-- url: http://localhost:3002/api/v1
-  description: Environnement local
-- url: https://api.pgvpt.sn/geolocalisation/api/v1
-  description: Environnement de production
+  - url: http://localhost:3002/api/v1/geolocalisations
+    description: Environnement local
+  - url: https://api.pgvpt.sn/geolocalisation/api/v1
+    description: Environnement de production
 tags:
-- name: Referentiel administratif
-  description: Pays, régions, départements, communes, villages et quartiers
-- name: Zone geographique
-  description: Zones géographiques composées de régions
-- name: Zone touristique
-  description: Zone touristique rattachées à une zone géographique
-- name: Geolocalisations
-  description: Coordonnées et rattachement des patrimoines
-- name: Geospatial
-  description: Recherche géographique, Calcul des distances et Points d'accès
+  - name: Referentiel administratif
+    description: Pays, régions, départements, communes, villages et quartiers
+  - name: Zone geographique
+    description: Zones géographiques composées de régions
+  - name: Zone touristique
+    description: Zone touristique rattachées à une zone géographique
+  - name: Geolocalisations
+    description: Coordonnées et rattachement des patrimoines
+  - name: Geospatial
+    description: Recherche géographique, Calcul des distances et Points d'accès
 paths:
   /geolocalisations:
     get:
       tags:
-      - Geolocalisations
+        - Geolocalisations
       summary: Lister les Geolocalisations
       operationId: getGeolocalisations
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Size'
-      - name: departement
-        in: query
-        schema:
-          type: string
-      - name: commune
-        in: query
-        schema:
-          type: string
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - name: departement
+          in: query
+          schema:
+            type: string
+        - name: commune
+          in: query
+          schema:
+            type: string
       responses:
         '200':
           description: Liste des Geolocalisations
@@ -60,7 +53,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-      - Geolocalisations
+        - Geolocalisations
       summary: Créer une géolocalisation
       operationId: createGeolocalisation
       requestBody:
@@ -88,11 +81,11 @@ paths:
           $ref: '#/components/responses/Forbidden'
       parameters: []
       security:
-      - bearerAuth: []
+        - bearerAuth: []
   /geolocalisations/{id}:
     get:
       tags:
-      - Geolocalisations
+        - Geolocalisations
       summary: Obtenir une géolocalisation
       operationId: getGeolocalisation
       responses:
@@ -108,7 +101,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     put:
       tags:
-      - Geolocalisations
+        - Geolocalisations
       summary: Modifier une géolocalisation
       operationId: updateGeolocalisation
       requestBody:
@@ -131,10 +124,10 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     patch:
       tags:
-      - Geolocalisations
+        - Geolocalisations
       summary: Mise à jour partielle d'une géolocalisation
       operationId: patchGeolocalisation
       requestBody:
@@ -157,10 +150,10 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     delete:
       tags:
-      - Geolocalisations
+        - Geolocalisations
       summary: Supprimer une géolocalisation
       operationId: deleteGeolocalisation
       responses:
@@ -173,13 +166,13 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     parameters:
-    - $ref: '#/components/parameters/GeolocalisationId'
+      - $ref: '#/components/parameters/GeolocalisationId'
   /patrimoines/{patrimoineId}/geolocalisation:
     get:
       tags:
-      - Geolocalisations
+        - Geolocalisations
       summary: Obtenir la géolocalisation d'un patrimoine
       operationId: getPatrimoineGeolocalisation
       responses:
@@ -195,7 +188,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     put:
       tags:
-      - Geolocalisations
+        - Geolocalisations
       summary: Mettre à jour la géolocalisation d'un patrimoine
       operationId: updatePatrimoineGeolocalisation
       requestBody:
@@ -218,10 +211,10 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     patch:
       tags:
-      - Geolocalisations
+        - Geolocalisations
       summary: Mise à jour partielle de la géolocalisation d'un patrimoine
       operationId: patchPatrimoineGeolocalisation
       requestBody:
@@ -244,13 +237,13 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     parameters:
-    - $ref: '#/components/parameters/PatrimoineId'
+      - $ref: '#/components/parameters/PatrimoineId'
   /patrimoines/{patrimoineId}/points-acces:
     get:
       tags:
-      - Geospatial
+        - Geospatial
       summary: Lister les points d'accès d'un patrimoine
       operationId: getPointsAcces
       responses:
@@ -266,7 +259,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-      - Geospatial
+        - Geospatial
       summary: Ajouter un point d'accès
       operationId: createPointAcces
       requestBody:
@@ -289,13 +282,13 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     parameters:
-    - $ref: '#/components/parameters/PatrimoineId'
+      - $ref: '#/components/parameters/PatrimoineId'
   /points-acces/{id}:
     put:
       tags:
-      - Geospatial
+        - Geospatial
       summary: Modifier un point d'accès
       operationId: updatePointAcces
       requestBody:
@@ -318,10 +311,10 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     delete:
       tags:
-      - Geospatial
+        - Geospatial
       summary: Supprimer un point d'accès
       operationId: deletePointAcces
       responses:
@@ -334,50 +327,50 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     parameters:
-    - $ref: '#/components/parameters/PointAccesId'
+      - $ref: '#/components/parameters/PointAccesId'
   /geolocalisations/recherche/rayon:
     get:
       tags:
-      - Geospatial
+        - Geospatial
       summary: Rechercher les patrimoines dans un rayon
       operationId: rechercherDansRayon
       parameters:
-      - name: latitude
-        in: query
-        required: true
-        schema:
-          type: number
-          format: double
-          minimum: -90
-          maximum: 90
-      - name: longitude
-        in: query
-        required: true
-        schema:
-          type: number
-          format: double
-          minimum: -180
-          maximum: 180
-      - name: rayonKm
-        in: query
-        required: true
-        schema:
-          type: number
-          format: double
-          minimum: 0
-          exclusiveMinimum: true
-      - name: typePatrimoine
-        in: query
-        schema:
-          type: string
-      - name: categorie
-        in: query
-        schema:
-          type: string
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Size'
+        - name: latitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+            minimum: -90
+            maximum: 90
+        - name: longitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+            minimum: -180
+            maximum: 180
+        - name: rayonKm
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+            minimum: 0
+            exclusiveMinimum: true
+        - name: type
+          in: query
+          schema:
+            $ref: '#/components/schemas/TypePatrimoine'
+        - name: categorie
+          in: query
+          schema:
+            $ref: '#/components/schemas/CategoriePatrimoine'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
       responses:
         '200':
           description: Patrimoines trouvés dans le rayon
@@ -390,44 +383,44 @@ paths:
   /geolocalisations/recherche/bbox:
     get:
       tags:
-      - Geospatial
+        - Geospatial
       summary: Rechercher les patrimoines dans une emprise géographique
       operationId: rechercherDansBoundingBox
       parameters:
-      - name: minLatitude
-        in: query
-        required: true
-        schema:
-          type: number
-          format: double
-          minimum: -90
-          maximum: 90
-      - name: minLongitude
-        in: query
-        required: true
-        schema:
-          type: number
-          format: double
-          minimum: -180
-          maximum: 180
-      - name: maxLatitude
-        in: query
-        required: true
-        schema:
-          type: number
-          format: double
-          minimum: -90
-          maximum: 90
-      - name: maxLongitude
-        in: query
-        required: true
-        schema:
-          type: number
-          format: double
-          minimum: -180
-          maximum: 180
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Size'
+        - name: minLatitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+            minimum: -90
+            maximum: 90
+        - name: minLongitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+            minimum: -180
+            maximum: 180
+        - name: maxLatitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+            minimum: -90
+            maximum: 90
+        - name: maxLongitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+            minimum: -180
+            maximum: 180
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
       responses:
         '200':
           description: Patrimoines situés dans l'emprise
@@ -440,34 +433,34 @@ paths:
   /geolocalisations/distance:
     get:
       tags:
-      - Geospatial
+        - Geospatial
       summary: Calculer la distance entre deux positions
       operationId: calculerDistance
       parameters:
-      - name: latitudeDepart
-        in: query
-        required: true
-        schema:
-          type: number
-          format: double
-      - name: longitudeDepart
-        in: query
-        required: true
-        schema:
-          type: number
-          format: double
-      - name: latitudeArrivee
-        in: query
-        required: true
-        schema:
-          type: number
-          format: double
-      - name: longitudeArrivee
-        in: query
-        required: true
-        schema:
-          type: number
-          format: double
+        - name: latitudeDepart
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: longitudeDepart
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: latitudeArrivee
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: longitudeArrivee
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
       responses:
         '200':
           description: Distance calculée
@@ -480,22 +473,22 @@ paths:
   /geolocalisations/distance/patrimoines:
     get:
       tags:
-      - Geospatial
+        - Geospatial
       summary: Calculer la distance entre deux patrimoines
       operationId: calculerDistancePatrimoines
       parameters:
-      - name: patrimoineIdDepart
-        in: query
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: patrimoineIdArrivee
-        in: query
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: patrimoineIdDepart
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: patrimoineIdArrivee
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: Distance entre les patrimoines
@@ -508,22 +501,22 @@ paths:
   /cartographie/patrimoines:
     get:
       tags:
-      - Geospatial
+        - Geospatial
       summary: Obtenir les patrimoines pour affichage cartographique
       operationId: getPatrimoinesCarte
       parameters:
-      - name: region
-        in: query
-        schema:
-          type: string
-      - name: typePatrimoine
-        in: query
-        schema:
-          type: string
-      - name: categorie
-        in: query
-        schema:
-          type: string
+        - name: region
+          in: query
+          schema:
+            type: string
+        - name: type
+          in: query
+          schema:
+            $ref: '#/components/schemas/TypePatrimoine'
+        - name: categorie
+          in: query
+          schema:
+            $ref: '#/components/schemas/CategoriePatrimoine'
       responses:
         '200':
           description: Données cartographiques
@@ -538,7 +531,7 @@ paths:
   /cartographie/geojson:
     get:
       tags:
-      - Geospatial
+        - Geospatial
       summary: Exporter les patrimoines au format GeoJSON
       operationId: exportGeoJson
       responses:
@@ -554,12 +547,12 @@ paths:
   /pays:
     get:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Lister les pays
       operationId: getAllPays
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
       responses:
         '200':
           description: Liste des pays
@@ -571,7 +564,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Créer un pays
       operationId: createPays
       requestBody:
@@ -595,11 +588,11 @@ paths:
           $ref: '#/components/responses/Forbidden'
       parameters: []
       security:
-      - bearerAuth: []
+        - bearerAuth: []
   /pays/{id}:
     get:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Obtenir un pays
       operationId: getPays
       responses:
@@ -615,7 +608,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     put:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Modifier un pays
       operationId: updatePays
       requestBody:
@@ -638,10 +631,10 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     delete:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Supprimer un pays
       operationId: deletePays
       responses:
@@ -654,18 +647,18 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     parameters:
-    - $ref: '#/components/parameters/PaysId'
+      - $ref: '#/components/parameters/PaysId'
   /regions:
     get:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Lister les régions
       operationId: getRegions
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
       responses:
         '200':
           description: Liste des régions
@@ -677,7 +670,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Créer une region
       operationId: createRegion
       requestBody:
@@ -701,11 +694,11 @@ paths:
           $ref: '#/components/responses/Forbidden'
       parameters: []
       security:
-      - bearerAuth: []
+        - bearerAuth: []
   /regions/{id}:
     get:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Obtenir une region
       operationId: getRegion
       responses:
@@ -721,7 +714,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     put:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Modifier une région
       operationId: updateRegion
       requestBody:
@@ -744,10 +737,10 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     delete:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Supprimer une région
       operationId: deleteRegion
       responses:
@@ -760,18 +753,18 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     parameters:
-    - $ref: '#/components/parameters/RegionId'
+      - $ref: '#/components/parameters/RegionId'
   /departements:
     get:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Lister les départements
       operationId: getDepartements
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
       responses:
         '200':
           description: Liste des départements
@@ -783,7 +776,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Créer un(e) departement
       operationId: createDepartement
       requestBody:
@@ -807,11 +800,11 @@ paths:
           $ref: '#/components/responses/Forbidden'
       parameters: []
       security:
-      - bearerAuth: []
+        - bearerAuth: []
   /departements/{id}:
     get:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Obtenir un departement
       operationId: getDepartement
       responses:
@@ -827,7 +820,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     put:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Modifier un département
       operationId: updateDepartement
       requestBody:
@@ -850,10 +843,10 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     delete:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Supprimer un département
       operationId: deleteDepartement
       responses:
@@ -866,18 +859,18 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     parameters:
-    - $ref: '#/components/parameters/DepartementId'
+      - $ref: '#/components/parameters/DepartementId'
   /communes:
     get:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Lister les communes
       operationId: getCommunes
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
       responses:
         '200':
           description: Liste des communes
@@ -889,7 +882,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Créer une commune
       operationId: createCommune
       requestBody:
@@ -913,11 +906,11 @@ paths:
           $ref: '#/components/responses/Forbidden'
       parameters: []
       security:
-      - bearerAuth: []
+        - bearerAuth: []
   /communes/{id}:
     get:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Obtenir une commune
       operationId: getCommune
       responses:
@@ -933,7 +926,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     put:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Modifier une commune
       operationId: updateCommune
       requestBody:
@@ -956,10 +949,10 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     delete:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Supprimer une commune
       operationId: deleteCommune
       responses:
@@ -972,18 +965,18 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     parameters:
-    - $ref: '#/components/parameters/CommuneId'
+      - $ref: '#/components/parameters/CommuneId'
   /villages:
     get:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Lister les villages
       operationId: getVillages
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
       responses:
         '200':
           description: Liste des villages
@@ -995,7 +988,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Créer un village
       operationId: createVillage
       requestBody:
@@ -1019,11 +1012,11 @@ paths:
           $ref: '#/components/responses/Forbidden'
       parameters: []
       security:
-      - bearerAuth: []
+        - bearerAuth: []
   /villages/{id}:
     get:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Obtenir un village
       operationId: getVillage
       responses:
@@ -1039,7 +1032,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     put:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Modifier un village
       operationId: updateVillage
       requestBody:
@@ -1062,10 +1055,10 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     delete:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Supprimer un village
       operationId: deleteVillage
       responses:
@@ -1078,18 +1071,18 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     parameters:
-    - $ref: '#/components/parameters/VillageId'
+      - $ref: '#/components/parameters/VillageId'
   /quartiers:
     get:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Lister les quartiers
       operationId: getQuartiers
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
       responses:
         '200':
           description: Liste des quartiers
@@ -1101,7 +1094,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Créer un quartier
       operationId: createQuartier
       requestBody:
@@ -1125,11 +1118,11 @@ paths:
           $ref: '#/components/responses/Forbidden'
       parameters: []
       security:
-      - bearerAuth: []
+        - bearerAuth: []
   /quartiers/{id}:
     get:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Obtenir un quartie
       operationId: getQuartier
       responses:
@@ -1145,7 +1138,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     put:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Modifier un quartier
       operationId: updateQuartier
       requestBody:
@@ -1168,10 +1161,10 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     delete:
       tags:
-      - Referentiel administratif
+        - Referentiel administratif
       summary: Supprimer un quartier
       operationId: deleteQuartier
       responses:
@@ -1184,18 +1177,18 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     parameters:
-    - $ref: '#/components/parameters/QuartierId'
+      - $ref: '#/components/parameters/QuartierId'
   /zones-geographiques:
     get:
       tags:
-      - Zone geographique
+        - Zone geographique
       summary: Lister les Zone geographique
       operationId: getZonesGeographiques
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
       responses:
         '200':
           description: Liste des Zone geographique
@@ -1207,7 +1200,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-      - Zone geographique
+        - Zone geographique
       summary: Créer une zone geographique
       operationId: createZoneGeographique
       requestBody:
@@ -1231,11 +1224,11 @@ paths:
           $ref: '#/components/responses/Forbidden'
       parameters: []
       security:
-      - bearerAuth: []
+        - bearerAuth: []
   /zones-geographiques/{id}:
     get:
       tags:
-      - Zone geographique
+        - Zone geographique
       summary: Obtenir une zone géographique
       operationId: getZoneGeographique
       responses:
@@ -1251,7 +1244,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     put:
       tags:
-      - Zone geographique
+        - Zone geographique
       summary: Modifier un zone geographique
       operationId: updateZoneGeographique
       requestBody:
@@ -1274,10 +1267,10 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     delete:
       tags:
-      - Zone geographique
+        - Zone geographique
       summary: Supprimer une zone geographique
       operationId: deleteZoneGeographique
       responses:
@@ -1290,18 +1283,18 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     parameters:
-    - $ref: '#/components/parameters/ZoneGeographiqueId'
+      - $ref: '#/components/parameters/ZoneGeographiqueId'
   /zones-touristiques:
     get:
       tags:
-      - Zone touristique
+        - Zone touristique
       summary: Lister les Zone touristique
       operationId: getZonesTouristiques
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
       responses:
         '200':
           description: Liste des Zone touristique
@@ -1313,7 +1306,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-      - Zone touristique
+        - Zone touristique
       summary: Créer un(e) zonetouristique
       operationId: createZoneTouristique
       requestBody:
@@ -1337,11 +1330,11 @@ paths:
           $ref: '#/components/responses/Forbidden'
       parameters: []
       security:
-      - bearerAuth: []
+        - bearerAuth: []
   /zones-touristiques/{id}:
     get:
       tags:
-      - Zone touristique
+        - Zone touristique
       summary: Obtenir une zone touristique
       operationId: getZoneTouristique
       responses:
@@ -1357,7 +1350,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     put:
       tags:
-      - Zone touristique
+        - Zone touristique
       summary: Modifier un zone touristique
       operationId: updateZoneTouristique
       requestBody:
@@ -1380,10 +1373,10 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     delete:
       tags:
-      - Zone touristique
+        - Zone touristique
       summary: Supprimer une zone geographique
       operationId: deleteZoneTouristique
       responses:
@@ -1396,94 +1389,96 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
     parameters:
-    - $ref: '#/components/parameters/ZoneTouristiqueId'
+      - $ref: '#/components/parameters/ZoneTouristiqueId'
   /geolocalisations/recherche:
     get:
       tags:
-      - Geospatial
+        - Geospatial
       summary: Rechercher les ressources géolocalisées selon plusieurs critères
       operationId: searchGeolocalisations
       parameters:
-      - name: latitude
-        in: query
-        schema:
-          type: number
-          format: double
-          minimum: -90
-          maximum: 90
-      - name: longitude
-        in: query
-        schema:
-          type: number
-          format: double
-          minimum: -180
-          maximum: 180
-      - name: rayonKm
-        in: query
-        schema:
-          type: number
-          format: double
-          minimum: 0
-          exclusiveMinimum: true
-      - name: minLatitude
-        in: query
-        schema:
-          type: number
-          format: double
-          minimum: -90
-          maximum: 90
-      - name: maxLatitude
-        in: query
-        schema:
-          type: number
-          format: double
-          minimum: -90
-          maximum: 90
-      - name: minLongitude
-        in: query
-        schema:
-          type: number
-          format: double
-          minimum: -180
-          maximum: 180
-      - name: maxLongitude
-        in: query
-        schema:
-          type: number
-          format: double
-          minimum: -180
-          maximum: 180
-      - name: localite
-        in: query
-        schema:
-          type: string
-      - name: motCle
-        in: query
-        schema:
-          type: string
-      - name: typePatrimoine
-        in: query
-        schema:
-          $ref: '#/components/schemas/TypePatrimoine'
-      - name: categorie
-        in: query
-        schema:
-          type: string
-      - name: page
-        in: query
-        schema:
-          type: integer
-          minimum: 0
-          default: 0
-      - name: size
-        in: query
-        schema:
-          type: integer
-          minimum: 1
-          maximum: 100
-          default: 20
+        - name: latitude
+          in: query
+          schema:
+            type: number
+            format: double
+            minimum: -90
+            maximum: 90
+        - name: longitude
+          in: query
+          schema:
+            type: number
+            format: double
+            minimum: -180
+            maximum: 180
+        - name: rayonKm
+          in: query
+          schema:
+            type: number
+            format: double
+            minimum: 0
+            exclusiveMinimum: true
+        - name: minLatitude
+          in: query
+          schema:
+            type: number
+            format: double
+            minimum: -90
+            maximum: 90
+        - name: maxLatitude
+          in: query
+          schema:
+            type: number
+            format: double
+            minimum: -90
+            maximum: 90
+        - name: minLongitude
+          in: query
+          schema:
+            type: number
+            format: double
+            minimum: -180
+            maximum: 180
+        - name: maxLongitude
+          in: query
+          schema:
+            type: number
+            format: double
+            minimum: -180
+            maximum: 180
+        - name: localite
+          in: query
+          schema:
+            type: string
+        - name: motCle
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - name: type
+          in: query
+          schema:
+            $ref: '#/components/schemas/TypePatrimoine'
+        - name: categorie
+          in: query
+          schema:
+            $ref: '#/components/schemas/CategoriePatrimoine'
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
       responses:
         '200':
           description: Résultats de recherche
@@ -1609,7 +1604,7 @@ components:
           schema:
             $ref: '#/components/schemas/ApiError'
     Conflict:
-      description: Conflit
+      description: Conflit métier
       content:
         application/json:
           schema:
@@ -1627,13 +1622,13 @@ components:
           schema:
             $ref: '#/components/schemas/ApiError'
     InternalServerError:
-      description: Erreur interne du serveur
+      description: Erreur interne
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiError'
     UnprocessableEntity:
-      description: Erreur de validation métier
+      description: Données métier invalides
       content:
         application/json:
           schema:
@@ -1657,114 +1652,116 @@ components:
       description: Classe racine commune de toutes les entités persistantes du PGVPT.
     Geolocalisation:
       allOf:
-      - $ref: '#/components/schemas/BaseEntity'
-      - type: object
-        required:
-        - id
-        - latitude
-        - longitude
-        properties:
-          latitude:
-            type: number
-            format: double
-            minimum: -90
-            maximum: 90
-          longitude:
-            type: number
-            format: double
-            minimum: -180
-            maximum: 180
-          altitude:
-            type: number
-            format: double
-          precisionMetres:
-            type: number
-            format: double
-            minimum: 0
-          adresse:
-            type: string
-          lieuDit:
-            type: string
-          repere:
-            type: string
-          systemeReference:
-            type: string
-            default: WGS84
-            example: WGS84
-          codeEpsg:
-            type: integer
-            default: 4326
-            example: 4326
-          source:
-            type: string
-            enum:
-            - GPS
-            - ADMINISTRATION
-            - SIG
-            - OPEN_DATA
-            - IMPORT
-            - AUTRE
-            description: Origine de la donnée de géolocalisation.
-          dateAcquisition:
-            type: string
-            format: date
-          methodeAcquisition:
-            type: string
-            enum:
-            - GPS
-            - RELEVE_TERRAIN
-            - SATELLITE
-            - DRONE
-            - GEOCODAGE
-            - IMPORT_SIG
-            - AUTRE
-          niveauFiabilite:
-            type: string
-            enum:
-            - FAIBLE
-            - MOYEN
-            - ELEVE
-            - TRES_ELEVE
-          zoneTouristiqueId:
-            type: string
-            format: uuid
-          villageId:
-            type: string
-            format: uuid
-            nullable: true
-          quartierId:
-            type: string
-            format: uuid
-            nullable: true
-          patrimoineId:
-            type: string
-            format: uuid
-            nullable: true
-            description: Identifiant du patrimoine provenant de ms-patrimoine.
-          entrepriseId:
-            type: string
-            format: uuid
-            nullable: true
-            description: Identifiant de l'entreprise provenant de ms-entreprise.
-        oneOf:
-        - required:
-          - patrimoineId
-          not:
-            required:
-            - entrepriseId
-        - required:
-          - entrepriseId
-          not:
-            required:
-            - patrimoineId
-        description: 'Entité persistante décrivant la localisation d''une ressource géolocalisable. Elle hérite de BaseEntity.
+        - $ref: '#/components/schemas/BaseEntity'
+        - type: object
+          required:
+            - id
+            - zoneTouristiqueId
+            - latitude
+            - longitude
+          properties:
+            latitude:
+              type: number
+              format: double
+              minimum: -90
+              maximum: 90
+            longitude:
+              type: number
+              format: double
+              minimum: -180
+              maximum: 180
+            altitude:
+              type: number
+              format: double
+            precisionMetres:
+              type: number
+              format: double
+              minimum: 0
+            adresse:
+              type: string
+            lieuDit:
+              type: string
+            repere:
+              type: string
+            systemeReference:
+              type: string
+              default: WGS84
+              example: WGS84
+            codeEpsg:
+              type: integer
+              default: 4326
+              example: 4326
+            source:
+              type: string
+              enum:
+                - GPS
+                - ADMINISTRATION
+                - SIG
+                - OPEN_DATA
+                - IMPORT
+                - AUTRE
+              description: Origine de la donnée de géolocalisation.
+            dateAcquisition:
+              type: string
+              format: date
+            methodeAcquisition:
+              type: string
+              enum:
+                - GPS
+                - RELEVE_TERRAIN
+                - SATELLITE
+                - DRONE
+                - GEOCODAGE
+                - IMPORT_SIG
+                - AUTRE
+            niveauFiabilite:
+              type: string
+              enum:
+                - FAIBLE
+                - MOYEN
+                - ELEVE
+                - TRES_ELEVE
+            zoneTouristiqueId:
+              type: string
+              format: uuid
+            villageId:
+              type: string
+              format: uuid
+              nullable: true
+            quartierId:
+              type: string
+              format: uuid
+              nullable: true
+            patrimoineId:
+              type: string
+              format: uuid
+              nullable: true
+              description: Identifiant du patrimoine provenant de ms-patrimoine.
+            entrepriseId:
+              type: string
+              format: uuid
+              nullable: true
+              description: Identifiant de l'entreprise provenant de ms-entreprise.
+          oneOf:
+            - required:
+                - patrimoineId
+              not:
+                required:
+                  - entrepriseId
+            - required:
+                - entrepriseId
+              not:
+                required:
+                  - patrimoineId
+          description: 'Entité persistante décrivant la localisation d''une ressource géolocalisable. Elle hérite de BaseEntity.
           Une géolocalisation est associée à exactement une ressource : soit un patrimoine provenant de ms-patrimoine, soit
           une entreprise provenant de ms-entreprise.'
     GeolocalisationCreate:
       type: object
       required:
-      - latitude
-      - longitude
+        - zoneTouristiqueId
+        - latitude
+        - longitude
       properties:
         latitude:
           type: number
@@ -1800,12 +1797,12 @@ components:
         source:
           type: string
           enum:
-          - GPS
-          - ADMINISTRATION
-          - SIG
-          - OPEN_DATA
-          - IMPORT
-          - AUTRE
+            - GPS
+            - ADMINISTRATION
+            - SIG
+            - OPEN_DATA
+            - IMPORT
+            - AUTRE
           description: Origine de la donnée de géolocalisation.
         dateAcquisition:
           type: string
@@ -1813,20 +1810,20 @@ components:
         methodeAcquisition:
           type: string
           enum:
-          - GPS
-          - RELEVE_TERRAIN
-          - SATELLITE
-          - DRONE
-          - GEOCODAGE
-          - IMPORT_SIG
-          - AUTRE
+            - GPS
+            - RELEVE_TERRAIN
+            - SATELLITE
+            - DRONE
+            - GEOCODAGE
+            - IMPORT_SIG
+            - AUTRE
         niveauFiabilite:
           type: string
           enum:
-          - FAIBLE
-          - MOYEN
-          - ELEVE
-          - TRES_ELEVE
+            - FAIBLE
+            - MOYEN
+            - ELEVE
+            - TRES_ELEVE
         zoneTouristiqueId:
           type: string
           format: uuid
@@ -1849,16 +1846,16 @@ components:
           nullable: true
           description: Identifiant de l'entreprise provenant de ms-entreprise.
       oneOf:
-      - required:
-        - patrimoineId
-        not:
-          required:
-          - entrepriseId
-      - required:
-        - entrepriseId
-        not:
-          required:
-          - patrimoineId
+        - required:
+            - patrimoineId
+          not:
+            required:
+              - entrepriseId
+        - required:
+            - entrepriseId
+          not:
+            required:
+              - patrimoineId
       description: 'Une géolocalisation doit référencer exactement une ressource : un patrimoine ou une entreprise.'
     GeolocalisationUpdate:
       type: object
@@ -1897,12 +1894,12 @@ components:
         source:
           type: string
           enum:
-          - GPS
-          - ADMINISTRATION
-          - SIG
-          - OPEN_DATA
-          - IMPORT
-          - AUTRE
+            - GPS
+            - ADMINISTRATION
+            - SIG
+            - OPEN_DATA
+            - IMPORT
+            - AUTRE
           description: Origine de la donnée de géolocalisation.
         dateAcquisition:
           type: string
@@ -1910,20 +1907,20 @@ components:
         methodeAcquisition:
           type: string
           enum:
-          - GPS
-          - RELEVE_TERRAIN
-          - SATELLITE
-          - DRONE
-          - GEOCODAGE
-          - IMPORT_SIG
-          - AUTRE
+            - GPS
+            - RELEVE_TERRAIN
+            - SATELLITE
+            - DRONE
+            - GEOCODAGE
+            - IMPORT_SIG
+            - AUTRE
         niveauFiabilite:
           type: string
           enum:
-          - FAIBLE
-          - MOYEN
-          - ELEVE
-          - TRES_ELEVE
+            - FAIBLE
+            - MOYEN
+            - ELEVE
+            - TRES_ELEVE
         zoneTouristiqueId:
           type: string
           format: uuid
@@ -1946,20 +1943,20 @@ components:
           nullable: true
           description: Identifiant de l'entreprise provenant de ms-entreprise.
       oneOf:
-      - required:
-        - patrimoineId
-        not:
-          required:
-          - entrepriseId
-      - required:
-        - entrepriseId
-        not:
-          required:
-          - patrimoineId
+        - required:
+            - patrimoineId
+          not:
+            required:
+              - entrepriseId
+        - required:
+            - entrepriseId
+          not:
+            required:
+              - patrimoineId
       description: 'Une géolocalisation doit référencer exactement une ressource : un patrimoine ou une entreprise.'
     PatrimoineGeographique:
       allOf:
-      - $ref: '#/components/schemas/BaseEntity'
+        - $ref: '#/components/schemas/BaseEntity'
       properties:
         nom:
           type: string
@@ -1981,11 +1978,11 @@ components:
         village:
           nullable: true
           allOf:
-          - $ref: '#/components/schemas/VillageReference'
+            - $ref: '#/components/schemas/VillageReference'
         quartier:
           nullable: true
           allOf:
-          - $ref: '#/components/schemas/QuartierReference'
+            - $ref: '#/components/schemas/QuartierReference'
         patrimoineId:
           type: string
           format: uuid
@@ -2017,16 +2014,16 @@ components:
         destination:
           $ref: '#/components/schemas/Coordonnee'
       required:
-      - distanceKm
-      - distanceMetres
-      - origine
-      - destination
+        - distanceKm
+        - distanceMetres
+        - origine
+        - destination
       description: Résultat calculé de distance entre deux positions.
     Coordonnee:
       type: object
       required:
-      - latitude
-      - longitude
+        - latitude
+        - longitude
       properties:
         latitude:
           type: number
@@ -2041,7 +2038,7 @@ components:
       description: Coordonnée géographique en WGS84. Latitude comprise entre -90 et 90 et longitude entre -180 et 180.
     PointAcces:
       allOf:
-      - $ref: '#/components/schemas/BaseEntity'
+        - $ref: '#/components/schemas/BaseEntity'
       properties:
         patrimoineId:
           type: string
@@ -2079,10 +2076,10 @@ components:
     PointAccesCreate:
       type: object
       required:
-      - nom
-      - type
-      - latitude
-      - longitude
+        - nom
+        - type
+        - latitude
+        - longitude
       properties:
         nom:
           type: string
@@ -2110,12 +2107,12 @@ components:
           type: boolean
     ZoneGeographique:
       allOf:
-      - $ref: '#/components/schemas/BaseEntity'
+        - $ref: '#/components/schemas/BaseEntity'
       required:
-      - id
-      - code
-      - nom
-      - regions
+        - id
+        - code
+        - nom
+        - regions
       properties:
         code:
           type: string
@@ -2152,9 +2149,9 @@ components:
     ZoneGeographiqueCreate:
       type: object
       required:
-      - code
-      - nom
-      - regionIds
+        - code
+        - nom
+        - regionIds
       properties:
         code:
           type: string
@@ -2218,7 +2215,7 @@ components:
           maximum: 180
     FeaturePatrimoine:
       allOf:
-      - $ref: '#/components/schemas/BaseEntity'
+        - $ref: '#/components/schemas/BaseEntity'
       properties:
         patrimoineId:
           type: string
@@ -2245,13 +2242,13 @@ components:
     GeoJsonFeatureCollection:
       type: object
       required:
-      - type
-      - features
+        - type
+        - features
       properties:
         type:
           type: string
           enum:
-          - FeatureCollection
+            - FeatureCollection
         features:
           type: array
           items:
@@ -2259,14 +2256,14 @@ components:
     GeoJsonFeature:
       type: object
       required:
-      - type
-      - geometry
-      - properties
+        - type
+        - geometry
+        - properties
       properties:
         type:
           type: string
           enum:
-          - Feature
+            - Feature
         geometry:
           $ref: '#/components/schemas/GeoJsonPoint'
         properties:
@@ -2275,13 +2272,13 @@ components:
     GeoJsonPoint:
       type: object
       required:
-      - type
-      - coordinates
+        - type
+        - coordinates
       properties:
         type:
           type: string
           enum:
-          - Point
+            - Point
         coordinates:
           type: array
           minItems: 2
@@ -2293,44 +2290,44 @@ components:
     TypePointAcces:
       type: string
       enum:
-      - ENTREE_PRINCIPALE
-      - ENTREE_SECONDAIRE
-      - PARKING
-      - QUAI
-      - EMBARCADERE
-      - GARE
-      - ARRET_BUS
-      - AEROPORT
-      - PORT
-      - CENTRE_VISITEUR
-      - AUTRE
+        - ENTREE_PRINCIPALE
+        - ENTREE_SECONDAIRE
+        - PARKING
+        - QUAI
+        - EMBARCADERE
+        - GARE
+        - ARRET_BUS
+        - AEROPORT
+        - PORT
+        - CENTRE_VISITEUR
+        - AUTRE
     TypeZone:
       type: string
       enum:
-      - ZONE_URBAINE_ET_CULTURELLE
-      - ZONE_BALNEAIRE
-      - ZONE_RURALE_ET_TERROIR
-      - ZONE_AFFAIRES_ET_CONGRES
-      - ZONE_RELIGIEUSE_ET_PELERINAGE
-      - ZONE_RECREATIVE_ET_LOISIRS
-      - ZONE_NATURELLE_PROTEGEE
-      - AIRE_MARINE
-      - PARC_NATIONAL
-      - RESERVE_NATURELLE
-      - ZONE_MONTAGNE
-      - ZONE_TOURISTIQUE
+        - ZONE_URBAINE_ET_CULTURELLE
+        - ZONE_BALNEAIRE
+        - ZONE_RURALE_ET_TERROIR
+        - ZONE_AFFAIRES_ET_CONGRES
+        - ZONE_RELIGIEUSE_ET_PELERINAGE
+        - ZONE_RECREATIVE_ET_LOISIRS
+        - ZONE_NATURELLE_PROTEGEE
+        - AIRE_MARINE
+        - PARC_NATIONAL
+        - RESERVE_NATURELLE
+        - ZONE_MONTAGNE
+        - ZONE_TOURISTIQUE
     ModeTransport:
       type: string
       enum:
-      - A_PIED
-      - VOITURE
-      - TAXI
-      - BUS
-      - TRAIN
-      - BATEAU
-      - VELO
-      - MOTO
-      - AUTRE
+        - A_PIED
+        - VOITURE
+        - TAXI
+        - BUS
+        - TRAIN
+        - BATEAU
+        - VELO
+        - MOTO
+        - AUTRE
     PageGeolocalisation:
       type: object
       properties:
@@ -2356,54 +2353,45 @@ components:
         last:
           type: boolean
       required:
-      - content
-      - page
-      - size
-      - totalElements
-      - totalPages
-      - first
-      - last
+        - content
+        - page
+        - size
+        - totalElements
+        - totalPages
+        - first
+        - last
       description: Résultat paginé des géolocalisations.
     ApiError:
       type: object
       required:
-      - timestamp
-      - status
-      - code
-      - message
-      - path
+        - timestamp
+        - status
+        - code
+        - message
+        - path
       properties:
         timestamp:
           type: string
           format: date-time
         status:
           type: integer
-          minimum: 400
-          maximum: 599
         code:
-          type: string
-          example: GEOLOCALISATION_NOT_FOUND
-        error:
           type: string
         message:
           type: string
         path:
           type: string
         details:
-          type: array
-          items:
-            type: string
-        traceId:
-          type: string
-      description: Format d’erreur commun à l’ensemble des microservices PGVPT.
+          type: object
+          additionalProperties: true
     Pays:
       allOf:
-      - $ref: '#/components/schemas/BaseEntity'
+        - $ref: '#/components/schemas/BaseEntity'
       required:
-      - id
-      - nom
-      - code
-      - devise
+        - id
+        - nom
+        - code
+        - devise
       properties:
         nom:
           type: string
@@ -2448,9 +2436,9 @@ components:
     PaysCreate:
       type: object
       required:
-      - nom
-      - code
-      - devise
+        - nom
+        - code
+        - devise
       properties:
         nom:
           type: string
@@ -2495,9 +2483,9 @@ components:
     PaysUpdate:
       type: object
       required:
-      - nom
-      - code
-      - devise
+        - nom
+        - code
+        - devise
       properties:
         nom:
           type: string
@@ -2541,11 +2529,11 @@ components:
           default: true
     Region:
       allOf:
-      - $ref: '#/components/schemas/BaseEntity'
+        - $ref: '#/components/schemas/BaseEntity'
       required:
-      - id
-      - code
-      - nom
+        - id
+        - code
+        - nom
       properties:
         pays:
           $ref: '#/components/schemas/PaysReference'
@@ -2563,9 +2551,9 @@ components:
     RegionCreate:
       type: object
       required:
-      - paysId
-      - code
-      - nom
+        - paysId
+        - code
+        - nom
       properties:
         paysId:
           type: string
@@ -2584,9 +2572,9 @@ components:
     RegionUpdate:
       type: object
       required:
-      - paysId
-      - code
-      - nom
+        - paysId
+        - code
+        - nom
       properties:
         paysId:
           type: string
@@ -2604,11 +2592,11 @@ components:
           type: string
     Departement:
       allOf:
-      - $ref: '#/components/schemas/BaseEntity'
+        - $ref: '#/components/schemas/BaseEntity'
       required:
-      - id
-      - code
-      - nom
+        - id
+        - code
+        - nom
       properties:
         region:
           $ref: '#/components/schemas/RegionReference'
@@ -2623,9 +2611,9 @@ components:
     DepartementCreate:
       type: object
       required:
-      - regionId
-      - code
-      - nom
+        - regionId
+        - code
+        - nom
       properties:
         regionId:
           type: string
@@ -2641,9 +2629,9 @@ components:
     DepartementUpdate:
       type: object
       required:
-      - regionId
-      - code
-      - nom
+        - regionId
+        - code
+        - nom
       properties:
         regionId:
           type: string
@@ -2658,11 +2646,11 @@ components:
           type: string
     Commune:
       allOf:
-      - $ref: '#/components/schemas/BaseEntity'
+        - $ref: '#/components/schemas/BaseEntity'
       required:
-      - id
-      - code
-      - nom
+        - id
+        - code
+        - nom
       properties:
         departement:
           $ref: '#/components/schemas/DepartementReference'
@@ -2677,9 +2665,9 @@ components:
     CommuneCreate:
       type: object
       required:
-      - departementId
-      - code
-      - nom
+        - departementId
+        - code
+        - nom
       properties:
         departementId:
           type: string
@@ -2695,9 +2683,9 @@ components:
     CommuneUpdate:
       type: object
       required:
-      - departementId
-      - code
-      - nom
+        - departementId
+        - code
+        - nom
       properties:
         departementId:
           type: string
@@ -2712,11 +2700,11 @@ components:
           type: string
     Village:
       allOf:
-      - $ref: '#/components/schemas/BaseEntity'
+        - $ref: '#/components/schemas/BaseEntity'
       required:
-      - id
-      - code
-      - nom
+        - id
+        - code
+        - nom
       properties:
         commune:
           $ref: '#/components/schemas/CommuneReference'
@@ -2731,9 +2719,9 @@ components:
     VillageCreate:
       type: object
       required:
-      - communeId
-      - code
-      - nom
+        - communeId
+        - code
+        - nom
       properties:
         communeId:
           type: string
@@ -2749,9 +2737,9 @@ components:
     VillageUpdate:
       type: object
       required:
-      - communeId
-      - code
-      - nom
+        - communeId
+        - code
+        - nom
       properties:
         communeId:
           type: string
@@ -2766,11 +2754,11 @@ components:
           type: string
     Quartier:
       allOf:
-      - $ref: '#/components/schemas/BaseEntity'
+        - $ref: '#/components/schemas/BaseEntity'
       required:
-      - id
-      - code
-      - nom
+        - id
+        - code
+        - nom
       properties:
         commune:
           $ref: '#/components/schemas/CommuneReference'
@@ -2787,13 +2775,13 @@ components:
     QuartierCreate:
       type: object
       required:
-      - communeId
-      - code
-      - nom
+        - code
+        - nom
       properties:
         communeId:
           type: string
           format: uuid
+          nullable: true
         villageId:
           type: string
           format: uuid
@@ -2809,9 +2797,9 @@ components:
     QuartierUpdate:
       type: object
       required:
-      - communeId
-      - code
-      - nom
+        - communeId
+        - code
+        - nom
       properties:
         communeId:
           type: string
@@ -2831,9 +2819,9 @@ components:
     PaysReference:
       type: object
       required:
-      - id
-      - code
-      - nom
+        - id
+        - code
+        - nom
       properties:
         id:
           type: string
@@ -2847,9 +2835,9 @@ components:
     RegionReference:
       type: object
       required:
-      - id
-      - code
-      - nom
+        - id
+        - code
+        - nom
       properties:
         id:
           type: string
@@ -2863,9 +2851,9 @@ components:
     DepartementReference:
       type: object
       required:
-      - id
-      - code
-      - nom
+        - id
+        - code
+        - nom
       properties:
         id:
           type: string
@@ -2879,9 +2867,9 @@ components:
     CommuneReference:
       type: object
       required:
-      - id
-      - code
-      - nom
+        - id
+        - code
+        - nom
       properties:
         id:
           type: string
@@ -2895,9 +2883,9 @@ components:
     VillageReference:
       type: object
       required:
-      - id
-      - code
-      - nom
+        - id
+        - code
+        - nom
       properties:
         id:
           type: string
@@ -2911,9 +2899,9 @@ components:
     QuartierReference:
       type: object
       required:
-      - id
-      - code
-      - nom
+        - id
+        - code
+        - nom
       properties:
         id:
           type: string
@@ -2929,10 +2917,10 @@ components:
         - $ref: '#/components/schemas/BaseEntity'
         - type: object
           required:
-          - id
-          - code
-          - nom
-          - zoneGeographiqueId
+            - id
+            - code
+            - nom
+            - zoneGeographiqueId
           properties:
             code:
               type: string
@@ -2981,38 +2969,38 @@ components:
               format: uuid
               nullable: true
           oneOf:
-          - required:
-            - departementId
-            not:
-              anyOf:
-              - required:
-                - communeId
-              - required:
-                - villageId
-          - required:
-            - communeId
-            not:
-              anyOf:
-              - required:
+            - required:
                 - departementId
-              - required:
-                - villageId
-          - required:
-            - villageId
-            not:
-              anyOf:
-              - required:
-                - departementId
-              - required:
+              not:
+                anyOf:
+                  - required:
+                      - communeId
+                  - required:
+                      - villageId
+            - required:
                 - communeId
+              not:
+                anyOf:
+                  - required:
+                      - departementId
+                  - required:
+                      - villageId
+            - required:
+                - villageId
+              not:
+                anyOf:
+                  - required:
+                      - departementId
+                  - required:
+                      - communeId
           description: 'Entité persistante décrivant une zone touristique. Elle hérite de BaseEntity. Elle est rattachée à une
-            seule zone géographique et à exactement un niveau territorial : département, commune ou village.'
+          seule zone géographique et à exactement un niveau territorial : département, commune ou village.'
     ZoneTouristiqueCreate:
       type: object
       required:
-      - code
-      - nom
-      - zoneGeographiqueId
+        - code
+        - nom
+        - zoneGeographiqueId
       properties:
         code:
           type: string
@@ -3054,30 +3042,30 @@ components:
           minimum: -180
           maximum: 180
       oneOf:
-      - required:
-        - departementId
-        not:
-          anyOf:
-          - required:
-            - communeId
-          - required:
-            - villageId
-      - required:
-        - communeId
-        not:
-          anyOf:
-          - required:
+        - required:
             - departementId
-          - required:
-            - villageId
-      - required:
-        - villageId
-        not:
-          anyOf:
-          - required:
-            - departementId
-          - required:
+          not:
+            anyOf:
+              - required:
+                  - communeId
+              - required:
+                  - villageId
+        - required:
             - communeId
+          not:
+            anyOf:
+              - required:
+                  - departementId
+              - required:
+                  - villageId
+        - required:
+            - villageId
+          not:
+            anyOf:
+              - required:
+                  - departementId
+              - required:
+                  - communeId
       description: 'Création d’une zone touristique. Décrit une zone touristique rattachée à une seule zone géographique.
         Elle est rattachée à exactement un seul niveau territorial : département, commune ou village.'
     ZoneTouristiqueUpdate:
@@ -3127,9 +3115,9 @@ components:
     ZoneGeographiqueReference:
       type: object
       required:
-      - id
-      - code
-      - nom
+        - id
+        - code
+        - nom
       properties:
         id:
           type: string
@@ -3143,9 +3131,9 @@ components:
     ZoneTouristiqueReference:
       type: object
       required:
-      - id
-      - code
-      - nom
+        - id
+        - code
+        - nom
       properties:
         id:
           type: string
@@ -3158,11 +3146,11 @@ components:
           example: Zone touristique de Casamance
     ZoneGeographiqueRegion:
       allOf:
-      - $ref: '#/components/schemas/BaseEntity'
+        - $ref: '#/components/schemas/BaseEntity'
       required:
-      - id
-      - zoneGeographiqueId
-      - regionId
+        - id
+        - zoneGeographiqueId
+        - regionId
       properties:
         zoneGeographiqueId:
           type: string
@@ -3173,30 +3161,53 @@ components:
       description: Relation persistée entre une zone géographique et une région. Une région ne peut appartenir qu’à une seule
         zone géographique. Cette relation hérite de BaseEntity pour assurer la traçabilité (createdAt, updatedAt).
       x-constraints:
-      - UNIQUE(regionId)
-      - UNIQUE(zoneGeographiqueId, regionId)
+        - UNIQUE(regionId)
+        - UNIQUE(zoneGeographiqueId, regionId)
       x-database-constraints:
         unique:
-        - regionId
+          - regionId
       x-business-rules:
-      - Une région appartient à une seule zone géographique.
+        - Une région appartient à une seule zone géographique.
+    ypePatrimoine:
+      type: string
+      enum:
+        - SITE_NATUREL
+        - MUSEE
+        - MONUMENT
+      description: Type de patrimoine géré par ms-patrimoine.
     TypePatrimoine:
       type: string
       enum:
-      - SITE_NATUREL
-      - MUSEE
-      - MONUMENT
+        - SITE_NATUREL
+        - MUSEE
+        - MONUMENT
       description: Type de patrimoine géré par ms-patrimoine.
+    CategoriePatrimoine:
+      type: string
+      enum:
+        - PATRIMOINE_NATUREL
+        - PATRIMOINE_HISTORIQUE
+        - PATRIMOINE_CULTUREL
+        - PATRIMOINE_ARCHITECTURAL
+        - PATRIMOINE_RELIGIEUX
+        - PATRIMOINE_COLONIAL
+        - PATRIMOINE_ARCHEOLOGIQUE
+        - PATRIMOINE_MUSEAL
+        - PATRIMOINE_MEMORIEL
+        - PATRIMOINE_MARITIME
+        - PATRIMOINE_RURAL
+        - AUTRE
+
     PagePays:
       type: object
       required:
-      - content
-      - page
-      - size
-      - totalElements
-      - totalPages
-      - first
-      - last
+        - content
+        - page
+        - size
+        - totalElements
+        - totalPages
+        - first
+        - last
       properties:
         content:
           type: array
@@ -3222,13 +3233,13 @@ components:
     PageRegion:
       type: object
       required:
-      - content
-      - page
-      - size
-      - totalElements
-      - totalPages
-      - first
-      - last
+        - content
+        - page
+        - size
+        - totalElements
+        - totalPages
+        - first
+        - last
       properties:
         content:
           type: array
@@ -3254,13 +3265,13 @@ components:
     PageDepartement:
       type: object
       required:
-      - content
-      - page
-      - size
-      - totalElements
-      - totalPages
-      - first
-      - last
+        - content
+        - page
+        - size
+        - totalElements
+        - totalPages
+        - first
+        - last
       properties:
         content:
           type: array
@@ -3286,13 +3297,13 @@ components:
     PageCommune:
       type: object
       required:
-      - content
-      - page
-      - size
-      - totalElements
-      - totalPages
-      - first
-      - last
+        - content
+        - page
+        - size
+        - totalElements
+        - totalPages
+        - first
+        - last
       properties:
         content:
           type: array
@@ -3318,13 +3329,13 @@ components:
     PageVillage:
       type: object
       required:
-      - content
-      - page
-      - size
-      - totalElements
-      - totalPages
-      - first
-      - last
+        - content
+        - page
+        - size
+        - totalElements
+        - totalPages
+        - first
+        - last
       properties:
         content:
           type: array
@@ -3350,13 +3361,13 @@ components:
     PageQuartier:
       type: object
       required:
-      - content
-      - page
-      - size
-      - totalElements
-      - totalPages
-      - first
-      - last
+        - content
+        - page
+        - size
+        - totalElements
+        - totalPages
+        - first
+        - last
       properties:
         content:
           type: array
@@ -3382,13 +3393,13 @@ components:
     PageZoneGeographique:
       type: object
       required:
-      - content
-      - page
-      - size
-      - totalElements
-      - totalPages
-      - first
-      - last
+        - content
+        - page
+        - size
+        - totalElements
+        - totalPages
+        - first
+        - last
       properties:
         content:
           type: array
@@ -3414,13 +3425,13 @@ components:
     PageZoneTouristique:
       type: object
       required:
-      - content
-      - page
-      - size
-      - totalElements
-      - totalPages
-      - first
-      - last
+        - content
+        - page
+        - size
+        - totalElements
+        - totalPages
+        - first
+        - last
       properties:
         content:
           type: array
@@ -3446,13 +3457,13 @@ components:
     PagePatrimoineGeographique:
       type: object
       required:
-      - content
-      - page
-      - size
-      - totalElements
-      - totalPages
-      - first
-      - last
+        - content
+        - page
+        - size
+        - totalElements
+        - totalPages
+        - first
+        - last
       properties:
         content:
           type: array
@@ -3480,4 +3491,5 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: Jeton JWT émis par le système d’identité du PGVPT.
+security:
+  - bearerAuth: []

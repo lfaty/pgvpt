@@ -1,39 +1,51 @@
 package com.pgvpt.service;
 
-import com.pgvpt.model.GeolocalisationEntity;
+import com.pgvpt.dto.*;
+import com.pgvpt.record.GeolocalisationSearchCriteria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface GeolocalisationService {
 
-    GeolocalisationEntity create(GeolocalisationEntity geolocalisationEntity);
+    PageGeolocalisation getAll(Pageable pageable);
 
-    GeolocalisationEntity getById(UUID id);
+    Geolocalisation getById(UUID id);
 
-    GeolocalisationEntity getByPatrimoineId(UUID patrimoineId);
+    Geolocalisation getByPatrimoineId(UUID patrimoineId);
 
-    GeolocalisationEntity getByZoneTouristiqueId(UUID zoneTouristiqueId);
+    Geolocalisation create(GeolocalisationCreate dto);
 
-    GeolocalisationEntity update(UUID id, GeolocalisationEntity geolocalisationEntity);
+    Geolocalisation update(UUID id, GeolocalisationUpdate dto);
 
     void delete(UUID id);
 
-    Page<GeolocalisationEntity> getAll(Pageable pageable);
+    Geolocalisation patch(UUID id, GeolocalisationUpdate dto);
 
-    /**
-     * Recherche les géolocalisations dans un rayon autour d'un point central (formule de Haversine).
-     */
-    Page<GeolocalisationEntity> findNearby(double latitude, double longitude, double rayonKm, Pageable pageable);
+    Geolocalisation patchByPatrimoineId(UUID patrimoineId, GeolocalisationUpdate dto);
 
-    /**
-     * Recherche les géolocalisations contenues dans une emprise géographique (bounding box).
-     */
-    Page<GeolocalisationEntity> findInBoundingBox(double minLat, double minLon, double maxLat, double maxLon, Pageable pageable);
+    Page<Geolocalisation> getWithinRadius(double lat, double lon, double radiusKm, Pageable pageable);
 
-    /**
-     * Calcule la distance en km entre deux coordonnées GPS (formule de Haversine).
-     */
-    double calculateDistance(double lat1, double lon1, double lat2, double lon2);
+    Distance calculateDistanceBetweenPositions(double lat1, double lon1, double lat2, double lon2);
+
+    Distance calculerDistancePatrimoines(UUID idDepart, UUID idArrivee);
+
+    PagePatrimoineGeographique rechercherDansBoundingBox(Double minLat, Double minLon, Double maxLat, Double maxLon, Pageable pageable);
+
+    PagePatrimoineGeographique searchGeolocalisations(GeolocalisationSearchCriteria criteria, Pageable pageable);
+
+    GeoJsonFeatureCollection exportGeoJson();
+
+    List<FeaturePatrimoine> getPatrimoinesCarte(String region, TypePatrimoine type, CategoriePatrimoine categorie);
+
+    PointAcces addPointAcces(UUID patrimoineId, PointAccesCreate dto);
+
+    List<PointAcces> getPointsAcces(UUID patrimoineId);
+
+    PointAcces updatePointAcces(UUID id, PointAccesCreate dto);
+
+    void deletePointAcces(UUID id);
+
 }

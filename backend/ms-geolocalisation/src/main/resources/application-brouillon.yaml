@@ -1,0 +1,83 @@
+server:
+  port: 3002
+  servlet:
+    context-path: /api/v1/geolocalisations
+
+spring:
+  application:
+    name: ms-geolocalisation
+
+  cloud:
+    config:
+      enabled: false
+    import-check:
+      enabled: false
+
+  jackson:
+    default-property-inclusion: non_null
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:geolocalisation_db}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:admin}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: GeolocalisationHikariPool
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: ${DDL_AUTO:update}
+    show-sql: ${SHOW_SQL:false}
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+
+  # Configuration Flyway facultative si vous l'utilisez
+  # flyway:
+  #   enabled: true
+  #   locations: classpath:db/migration
+
+eureka:
+  client:
+    enabled: ${EUREKA_ENABLED:true}
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true
+
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: ${HIBERNATE_SQL_LEVEL:WARN}
+    org.hibernate.orm.jdbc.bind: WARN

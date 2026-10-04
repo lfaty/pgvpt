@@ -1,59 +1,68 @@
 package com.pgvpt.controller;
 
 import com.pgvpt.api.PatrimoinesApi;
-import com.pgvpt.dto.Patrimoine;
-import com.pgvpt.dto.PatrimoineCreate;
-import com.pgvpt.dto.PatrimoineUpdate;
-import com.pgvpt.dto.PagePatrimoine;
-import com.pgvpt.dto.CategoriePatrimoine;
-import com.pgvpt.dto.TypePatrimoine;
-import com.pgvpt.dto.StatutPatrimoine;
-import com.pgvpt.dto.EtatConservation;
+import com.pgvpt.dto.*;
+import com.pgvpt.mapper.PatrimoineMapper;
+import com.pgvpt.record.PatrimoineSearchCriteria;
 import com.pgvpt.service.PatrimoineService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 public class PatrimoineController implements PatrimoinesApi {
 
-    private final PatrimoineService patrimoineService;
+    private final PatrimoineService service;
+    private final PatrimoineMapper mapper;
 
     @Override
-    public ResponseEntity<Patrimoine> createPatrimoine(PatrimoineCreate patrimoineCreate) {
-        Patrimoine result = patrimoineService.create(patrimoineCreate);
-        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    public ResponseEntity<Patrimoine> createPatrimoine(@Valid @RequestBody PatrimoineCreate patrimoineCreate) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.createPatrimoine(patrimoineCreate));
     }
 
     @Override
-    public ResponseEntity<Patrimoine> getPatrimoine(UUID id) {
-        Patrimoine result = patrimoineService.getPatrimoine(id);
-        return ResponseEntity.ok(result);
-    }
-
-    @Override
-    public ResponseEntity<Void> deletePatrimoine(UUID id) {
-        patrimoineService.deletePatrimoine(id);
+    public ResponseEntity<Void> deletePatrimoine(@PathVariable UUID id) {
+        service.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<Patrimoine> updatePatrimoine(UUID id, PatrimoineUpdate patrimoineUpdate) {
-        Patrimoine result = patrimoineService.updatePatrimoine(id, patrimoineUpdate);
-        return ResponseEntity.ok(result);
+    public ResponseEntity<PagePatrimoine> getAllPatrimoines(Integer page, Integer size) {
+        return ResponseEntity.ok(service.getAllPatrimoines(page, size));
     }
 
     @Override
-    public ResponseEntity<PagePatrimoine> getPatrimoines(Integer page, Integer size, String sort, 
-        CategoriePatrimoine categorie, TypePatrimoine type, String region, 
-        String departement, String commune, StatutPatrimoine statut, 
-        EtatConservation etatConservation, Boolean accessiblePublic, 
-        Boolean inscritUnesco, Boolean classePatrimoine, String q) {
-        
-        PagePatrimoine result = patrimoineService.getPatrimoines(page, size, sort, categorie, type, region, departement, commune, statut, etatConservation, accessiblePublic, inscritUnesco, classePatrimoine, q);
-        return ResponseEntity.ok(result);
+    public ResponseEntity<Patrimoine> getPatrimoine(UUID id) {
+        return ResponseEntity.ok(service.getById(id));
     }
+
+    @Override
+    public ResponseEntity<PagePatrimoine> getPatrimoines(Integer page, Integer size, String sort,
+            CategoriePatrimoine categorie, TypePatrimoine type, StatutPatrimoine statut,
+            EtatConservation etatConservation, Boolean accessiblePublic, Boolean inscritUnesco,
+            Boolean classePatrimoine, String q) {
+        PatrimoineSearchCriteria criteria = mapper.toCriteria(categorie, type, statut, etatConservation,
+                accessiblePublic, inscritUnesco, classePatrimoine, q);
+        return ResponseEntity.ok(service.getPatrimoines(page, size, sort, criteria));
+    }
+
+    @Override
+    public ResponseEntity<Patrimoine> updatePatrimoine(@PathVariable UUID id,
+            @Valid @RequestBody PatrimoineUpdate patrimoineUpdate) {
+        return ResponseEntity.ok(service.updatePatrimoine(id, patrimoineUpdate));
+    }
+
+
+
+    @Override
+    public ResponseEntity<Patrimoine> patchPatrimoine(UUID id, @Valid PatrimoinePatch patrimoinePatch) {
+        return ResponseEntity.ok(service.patchPatrimoine(id, patrimoinePatch));
+    }
+
 }

@@ -1,0 +1,41 @@
+package com.pgvpt.mapper;
+
+import com.pgvpt.dto.*;
+import com.pgvpt.model.SiteNaturelEntity;
+import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
+
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.net.URI;
+
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface SiteNaturelMapper {
+
+    SiteNaturelEntity toEntity(SiteNaturelCreate dto
+    );
+
+    SiteNaturelEntity toEntity(SiteNaturelUpdate dto);
+
+    SiteNaturel toDto(SiteNaturelEntity entity);
+
+    default Instant map(OffsetDateTime value) {
+        return value != null
+                ? value.toInstant()
+                : null;
+    }
+
+    default OffsetDateTime map(Instant value) {
+        return value != null
+                ? value.atOffset(ZoneOffset.UTC)
+                : null;
+    }
+
+    default String map(URI value) { 
+        return value == null ? null : value.toString(); 
+    }
+    default URI map(String value) {
+         return value == null ? null : URI.create(value); 
+    }
+}

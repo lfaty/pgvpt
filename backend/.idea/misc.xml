@@ -4,14 +4,19 @@
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
-        <option value="$PROJECT_DIR$/ms-patrimoine/pom.xml" />
-        <option value="$PROJECT_DIR$/ms-geolocalisation/pom.xml" />
-        <option value="$PROJECT_DIR$/ms-contenu/pom.xml" />
         <option value="$PROJECT_DIR$/ms-media/pom.xml" />
         <option value="$PROJECT_DIR$/ms-circuit/pom.xml" />
-        <option value="$PROJECT_DIR$/ms-evenement/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-contenu/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-identite/pom.xml" />
         <option value="$PROJECT_DIR$/ms-tourisme/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-evenement/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-patrimoine/pom.xml" />
         <option value="$PROJECT_DIR$/ms-reservation/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-geolocalisation/pom.xml" />
+        <option value="$PROJECT_DIR$/pgvpt-config-server/pom.xml" />
+        <option value="$PROJECT_DIR$/pgvpt-discovery/pom.xml" />
+        <option value="$PROJECT_DIR$/pgvpt-gateway/pom.xml" />
+        <option value="$PROJECT_DIR$/pgvpt-config/pom.xml" />
       </list>
     </option>
   </component>

@@ -1,18 +1,15 @@
 package com.pgvpt.controller;
 
 import com.pgvpt.api.GeolocalisationsApi;
-import com.pgvpt.dto.Geolocalisation;
-import com.pgvpt.dto.GeolocalisationCreate;
-import com.pgvpt.dto.GeolocalisationUpdate;
-import com.pgvpt.dto.PageGeolocalisation;
-import com.pgvpt.mapper.GeolocalisationApiMapper;
-import com.pgvpt.model.GeolocalisationEntity;
+import com.pgvpt.dto.*;
 import com.pgvpt.service.GeolocalisationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 
 import java.util.UUID;
 
@@ -21,49 +18,10 @@ import java.util.UUID;
 public class GeolocalisationController implements GeolocalisationsApi {
 
     private final GeolocalisationService service;
-    private final GeolocalisationApiMapper mapper;
 
     @Override
-    public ResponseEntity<Geolocalisation> createGeolocalisation(GeolocalisationCreate request) {
-        var entity = mapper.toEntity(request);
-        var created = service.create(entity);
-        return ResponseEntity.status(201).body(mapper.toApi(created));
-    }
-
-    @Override
-    public ResponseEntity<Geolocalisation> getGeolocalisation(UUID id) {
-        return ResponseEntity.ok(mapper.toApi(service.getById(id)));
-    }
-
-    @Override
-    public ResponseEntity<PageGeolocalisation> getGeolocalisations(Integer page, Integer size, String departement, String commune) {
-        Page<GeolocalisationEntity> result = service.getAll(PageRequest.of(page, size));
-
-        PageGeolocalisation response = new PageGeolocalisation(
-            result.getContent().stream().map(mapper::toApi).toList(),
-            result.getNumber(),
-            result.getSize(),
-            result.getTotalElements(),
-            result.getTotalPages(),
-            result.isFirst(),
-            result.isLast()
-        );
-
-        return ResponseEntity.ok(response);
-    }
-
-    @Override
-    public ResponseEntity<Geolocalisation> updateGeolocalisation(UUID id, GeolocalisationUpdate request) {
-        var entity = mapper.toEntity(request);
-        var updated = service.update(id, entity);
-        return ResponseEntity.ok(mapper.toApi(updated));
-    }
-
-    @Override
-    public ResponseEntity<Geolocalisation> patchGeolocalisation(UUID id, GeolocalisationUpdate request) {
-        var entity = mapper.toEntity(request);
-        var updated = service.update(id, entity);
-        return ResponseEntity.ok(mapper.toApi(updated));
+    public ResponseEntity<Geolocalisation> createGeolocalisation(GeolocalisationCreate geolocalisationCreate) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(geolocalisationCreate));
     }
 
     @Override
@@ -73,24 +31,40 @@ public class GeolocalisationController implements GeolocalisationsApi {
     }
 
     @Override
-    public ResponseEntity<Geolocalisation> getPatrimoineGeolocalisation(UUID patrimoineId) {
-        return ResponseEntity.ok(mapper.toApi(service.getByPatrimoineId(patrimoineId)));
+    public ResponseEntity<Geolocalisation> getGeolocalisation(UUID id) {
+        return ResponseEntity.ok(service.getById(id));
     }
 
     @Override
-    public ResponseEntity<Geolocalisation> updatePatrimoineGeolocalisation(UUID patrimoineId, GeolocalisationUpdate geolocalisationUpdate) {
-        // Récupère la géolocalisation existante par patrimoineId, puis la met à jour
-        GeolocalisationEntity existing = service.getByPatrimoineId(patrimoineId);
-        var entity = mapper.toEntity(geolocalisationUpdate);
-        var updated = service.update(existing.getId(), entity);
-        return ResponseEntity.ok(mapper.toApi(updated));
+    public ResponseEntity<PageGeolocalisation> getGeolocalisations(Integer page, Integer size, String departement, String commune) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(service.getAll(pageable));
+    }
+
+    @Override
+    public ResponseEntity<Geolocalisation> getPatrimoineGeolocalisation(UUID patrimoineId) {
+        return ResponseEntity.ok(service.getByPatrimoineId(patrimoineId));
+    }
+
+    @Override
+    public ResponseEntity<Geolocalisation> patchGeolocalisation(UUID id, GeolocalisationUpdate geolocalisationUpdate) {
+        return ResponseEntity.ok(service.patch(id, geolocalisationUpdate));
     }
 
     @Override
     public ResponseEntity<Geolocalisation> patchPatrimoineGeolocalisation(UUID patrimoineId, GeolocalisationUpdate geolocalisationUpdate) {
-        GeolocalisationEntity existing = service.getByPatrimoineId(patrimoineId);
-        var entity = mapper.toEntity(geolocalisationUpdate);
-        var updated = service.update(existing.getId(), entity);
-        return ResponseEntity.ok(mapper.toApi(updated));
+        return ResponseEntity.ok(service.patchByPatrimoineId(patrimoineId, geolocalisationUpdate));
     }
+
+    @Override
+    public ResponseEntity<Geolocalisation> updateGeolocalisation(UUID id, GeolocalisationUpdate geolocalisationUpdate) {
+        return ResponseEntity.ok(service.update(id, geolocalisationUpdate));
+    }
+
+    @Override
+    public ResponseEntity<Geolocalisation> updatePatrimoineGeolocalisation(UUID patrimoineId, GeolocalisationUpdate geolocalisationUpdate) {
+        Geolocalisation current = service.getByPatrimoineId(patrimoineId);
+        return ResponseEntity.ok(service.update(current.getId(), geolocalisationUpdate));
+    }
+
 }

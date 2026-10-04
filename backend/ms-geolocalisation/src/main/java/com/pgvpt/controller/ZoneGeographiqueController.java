@@ -2,20 +2,14 @@ package com.pgvpt.controller;
 
 import com.pgvpt.api.*;
 import com.pgvpt.dto.*;
-import com.pgvpt.mapper.ZoneGeographiqueApiMapper;
-import com.pgvpt.model.ZoneGeographiqueEntity;
-import com.pgvpt.service.ZoneGeographiqueService;
+import com.pgvpt.service.ZoneService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.UUID;
 
 
@@ -23,57 +17,33 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ZoneGeographiqueController implements ZoneGeographiqueApi {
 
-    private final ZoneGeographiqueService zoneGeographiqueService;
-    private final ZoneGeographiqueApiMapper mapper;
+    private final ZoneService service;
 
     @Override
     public ResponseEntity<ZoneGeographique> createZoneGeographique(ZoneGeographiqueCreate zoneGeographiqueCreate) {
-        ZoneGeographiqueEntity entity = mapper.toEntity(zoneGeographiqueCreate);
-        ZoneGeographiqueEntity created = zoneGeographiqueService.createZoneGeographique(entity, zoneGeographiqueCreate.getRegionIds());
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toApi(created));
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.createGeo(zoneGeographiqueCreate));
     }
 
     @Override
     public ResponseEntity<Void> deleteZoneGeographique(UUID id) {
-        zoneGeographiqueService.deleteZoneGeographique(id);
+        service.deleteGeo(id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<ZoneGeographique> getZoneGeographique(UUID id) {
-        return ResponseEntity.ok(mapper.toApi(zoneGeographiqueService.getZoneGeographiqueById(id)));
+        return ResponseEntity.ok(service.getByIdGeo(id));
     }
 
     @Override
     public ResponseEntity<PageZoneGeographique> getZonesGeographiques(Integer page, Integer size) {
-        int pageIndex = (page != null) ? page : 0;
-        int pageSize = (size != null) ? size : 20;
-        Pageable pageable = PageRequest.of(pageIndex, pageSize, Sort.by("nom").ascending());
-
-        Page<ZoneGeographiqueEntity> pageEntity = zoneGeographiqueService.getZonesGeographiques(pageable);
-        List<ZoneGeographique> dtos = pageEntity.getContent().stream().map(mapper::toApi).toList();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(pageEntity.getTotalElements()));
-        headers.add("X-Total-Pages", String.valueOf(pageEntity.getTotalPages()));
-
-        PageZoneGeographique pageResponse = new PageZoneGeographique();
-        pageResponse.setContent(dtos);
-        pageResponse.setPage(pageEntity.getNumber());
-        pageResponse.setSize(pageEntity.getSize());
-        pageResponse.setTotalElements(pageEntity.getTotalElements());
-        pageResponse.setTotalPages(pageEntity.getTotalPages());
-        pageResponse.setFirst(pageEntity.isFirst());
-        pageResponse.setLast(pageEntity.isLast());
-
-        return ResponseEntity.ok().headers(headers).body(pageResponse);
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(service.getAllGeo(pageable));
     }
 
     @Override
     public ResponseEntity<ZoneGeographique> updateZoneGeographique(UUID id, ZoneGeographiqueUpdate zoneGeographiqueUpdate) {
-        ZoneGeographiqueEntity entity = mapper.toEntity(zoneGeographiqueUpdate);
-        ZoneGeographiqueEntity updated = zoneGeographiqueService.updateZoneGeographique(id, entity, zoneGeographiqueUpdate.getRegionIds());
-        return ResponseEntity.ok(mapper.toApi(updated));
+        return ResponseEntity.ok(service.updateGeo(id, zoneGeographiqueUpdate));
     }
 }
 

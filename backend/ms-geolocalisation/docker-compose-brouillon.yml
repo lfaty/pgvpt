@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgis/postgis:15-3.4-alpine
+    container_name: ms-geolocalisation
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: geolocalisation_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_geo_data:/var/lib/postgresql/data
+
+  app:
+    image: ms-geolocalisation:latest
+    container_name: geolocalisation-app
+    restart: on-failure
+    depends_on:
+      - db
+    ports:
+      - "3002:3002"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/geolocalisation_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=admin
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
+volumes:
+  pg_geo_data:

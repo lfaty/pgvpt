@@ -1,8 +1,9 @@
 package com.pgvpt.model;
 
 import com.pgvpt.common.BaseEntity;
-import com.pgvpt.enums.TypePointAcces;
+import com.pgvpt.enums.TypePointAcceMetier;
 import jakarta.persistence.*;
+import org.locationtech.jts.geom.Point;
 import lombok.*;
 
 import java.util.UUID;
@@ -11,15 +12,7 @@ import java.util.UUID;
 @Table(name = "points_acces")
 @Getter
 @Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class PointAccesEntity extends BaseEntity {
-
-    @Id
-    @GeneratedValue
-    private UUID id;
-
     @Column(name = "patrimoine_id", nullable = false)
     private UUID patrimoineId;
 
@@ -28,26 +21,28 @@ public class PointAccesEntity extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TypePointAcces type;
+    private TypePointAcceMetier type;
 
     private String description;
-
-    @Column(nullable = false)
     private Double latitude;
-
-    @Column(nullable = false)
     private Double longitude;
-
     private String adresse;
 
+    @Column(name = "distance_patrimoine_metres")
     private Double distancePatrimoineMetres;
 
+    @Column(name = "accessible_pmr")
     private Boolean accessiblePMR;
 
+    @Column(name = "parking_disponible")
     private Boolean parkingDisponible;
 
+    @Column(name = "transport_public")
     private Boolean transportPublic;
 
     private String horaires;
+
+    @Column(columnDefinition = "geometry(Point, 4326)")
+    private Point geom;
 
 }

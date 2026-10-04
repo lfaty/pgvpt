@@ -1,28 +1,42 @@
 package com.pgvpt.service;
 
-import com.pgvpt.dto.Patrimoine;
-import com.pgvpt.dto.PatrimoineCreate;
-import com.pgvpt.dto.PatrimoineUpdate;
-import com.pgvpt.dto.PagePatrimoine;
-import com.pgvpt.dto.CategoriePatrimoine;
-import com.pgvpt.dto.TypePatrimoine;
-import com.pgvpt.dto.StatutPatrimoine;
-import com.pgvpt.dto.EtatConservation;
+import com.pgvpt.dto.*;
+import com.pgvpt.record.PatrimoineSearchCriteria;
+
+import java.util.List;
 import java.util.UUID;
 
 public interface PatrimoineService {
+    PagePatrimoine getAllPatrimoines(int page, int size);
 
-    Patrimoine create(PatrimoineCreate patrimoineCreate);
+    PagePatrimoine getPatrimoines(int page, int size, String sort, PatrimoineSearchCriteria criteria);
 
-    Patrimoine getPatrimoine(UUID id);
+    Patrimoine getById(UUID id);
 
-    void deletePatrimoine(UUID id);
+    void delete(UUID id);
 
-    Patrimoine updatePatrimoine(UUID id, PatrimoineUpdate patrimoineUpdate);
+    Patrimoine createPatrimoine(PatrimoineCreate dot);
 
-    PagePatrimoine getPatrimoines(Integer page, Integer size, String sort, 
-        CategoriePatrimoine categorie, TypePatrimoine type, String region, 
-        String departement, String commune, StatutPatrimoine statut, 
-        EtatConservation etatConservation, Boolean accessiblePublic, 
-        Boolean inscritUnesco, Boolean classePatrimoine, String q);
+    Patrimoine updatePatrimoine(UUID id, PatrimoineUpdate dot);
+
+    Patrimoine updateStatutPatrimoine(UUID id, PatrimoineStatutUpdate dto);
+
+    Patrimoine depublier(UUID id);
+
+    List<HoraireOuverture> getHoraires(UUID id);
+
+    List<HoraireOuverture> updateHoraires(UUID id, List<HoraireOuverture> dtos);
+
+    Conservation getConservation(UUID id);
+
+    Conservation updateConservation(UUID id, Conservation dto);
+
+    void updatePhotoPrincipale(UUID id, com.pgvpt.dto.PhotoPrincipale photoPrincipale);
+
+    com.pgvpt.dto.PhotoPrincipale getPhotoPrincipale(UUID id);
+
+    void deletePhotoPrincipale(UUID id);
+
+    Patrimoine patchPatrimoine(UUID id, PatrimoinePatch dto);
+
 }

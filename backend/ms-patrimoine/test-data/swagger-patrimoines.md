@@ -28,7 +28,7 @@ Dans Swagger, exécutez d'abord **POST /patrimoines**, puis copiez l'`id` retour
   "valeurSpirituelle": "Lieu de mémoire et de recueillement.",
   "traditionsAssociees": ["Commémorations", "Visites pédagogiques"],
   "langues": ["Français", "Wolof", "Anglais"],
-  "etatConservation": "BON",
+  "etatConservationMetier": "BON",
   "statut": "BROUILLON",
   "classePatrimoine": true,
   "referenceClassement": "ARRETE-1966-42",
@@ -97,7 +97,7 @@ Dans Swagger, exécutez d'abord **POST /patrimoines**, puis copiez l'`id` retour
 Utilisez par exemple les paramètres :
 
 ```text
-page=0&size=10&sort=nom,asc&type=MONUMENT&categorie=PATRIMOINE_MEMORIEL&statut=BROUILLON&etatConservation=BON&accessiblePublic=true&inscritUnesco=true&classePatrimoine=true&q=Esclaves
+page=0&size=10&sort=nom,asc&type=MONUMENT&categorie=PATRIMOINE_MEMORIEL&statut=BROUILLON&etatConservationMetier=BON&accessiblePublic=true&inscritUnesco=true&classePatrimoine=true&q=Esclaves
 ```
 
 ## GET /patrimoines/{id}
@@ -114,7 +114,7 @@ Dans Swagger, remplacez `{id}` par l'identifiant de la réponse de création.
   "categorie": "PATRIMOINE_MEMORIEL",
   "description": "Lieu historique de mémoire situé sur l'île de Gorée, avec médiation renforcée.",
   "descriptionCourte": "Monument mémoriel de Gorée, récemment documenté.",
-  "etatConservation": "BON",
+  "etatConservationMetier": "BON",
   "statut": "EN_VALIDATION",
   "langues": ["Français", "Wolof", "Anglais"],
   "styleArchitectural": "Architecture coloniale afro-portugaise",

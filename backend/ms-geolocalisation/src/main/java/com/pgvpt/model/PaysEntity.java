@@ -14,37 +14,17 @@ import java.util.UUID;
 @Table(name = "pays")
 @Getter
 @Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class PaysEntity extends BaseEntity {
-    @Id
-    @GeneratedValue
-
-    private UUID id;
-
     private String nom;
-
     private String code;
-
-    private @Nullable String codeIso2;
-
-    private @Nullable String codeIso3;
-
+    private  String codeIso2;
+    private String codeIso3;
     private String devise;
-
-    private @Nullable String codeDevise;
-
-    private @Nullable String indicatifTelephonique;
-
-    private @Nullable String langueOfficielle;
-
-    private @Nullable String continent;
-
+    private String codeDevise;
+    private String indicatifTelephonique;
+    private String langueOfficielle;
+    private String continent;
     private Boolean actif = true;
-
-//    @OneToMany
-//    private List<RegionReference> regionReferences;
 
 }
 

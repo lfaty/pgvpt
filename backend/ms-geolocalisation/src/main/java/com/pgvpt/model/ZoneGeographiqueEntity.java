@@ -12,14 +12,7 @@ import java.util.*;
 @Table(name = "zones_geographiques")
 @Getter
 @Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class ZoneGeographiqueEntity extends BaseEntity {
-    @Id
-    @GeneratedValue
-    private UUID id;
-
     private String code;
 
     private String nom;
@@ -32,15 +25,9 @@ public class ZoneGeographiqueEntity extends BaseEntity {
 
     private @Nullable Double longitudeCentre;
 
-    @Builder.Default
     private Boolean actif = true;
 
-    /**
-     * Relation vers l'entité de jointure ZoneGeographiqueRegionEntity.
-     * Remplace l'ancien @ManyToMany pour exposer id, createdAt, updatedAt sur chaque lien zone-région.
-     */
     @OneToMany(mappedBy = "zoneGeographique", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<ZoneGeographiqueRegionEntity> regionLinks = new ArrayList<>();
+    private List<ZoneGeographiqueRegionEntity> regionLinks ;
 
 }
