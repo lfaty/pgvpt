@@ -1,8 +1,8 @@
 # @
 
-API Contract-First du microservice de gestion du patrimoine touristique de la Plateforme de Gestion et de Valorisation du Patrimoine Touristique (PGVPT) du Sénégal.  Le microservice ms-patrimoine assure la gestion complète des patrimoines touristiques matériels et naturels :   - Sites naturels   - Musées   - Monuments  Il gère également les informations historiques, culturelles, touristiques, géographiques, administratives, environnementales, les horaires, l\'accessibilité, les tarifs, les photographies et autres médias. 
+Référentiel propriétaire des patrimoines touristiques matériels et naturels. Le microservice gère l\'identité et les caractéristiques patrimoniales, la conservation et les horaires. Les médias, géolocalisations et informations opérationnelles de visite sont gérés par leurs microservices propriétaires et référencés par UUID. Aucune relation JPA inter-microservices.
 
-The version of the OpenAPI document: 1.0.0
+The version of the OpenAPI document: 2.0.0
 
 ## Building
 

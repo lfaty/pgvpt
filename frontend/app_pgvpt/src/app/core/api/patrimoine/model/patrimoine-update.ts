@@ -1,5 +1,5 @@
 /**
- * MS Patrimoine - API
+ * PGVPT - MS Patrimoine API
  *
  * Contact: contact@pgvpt.sn
  *
@@ -7,19 +7,15 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { EtatConservation } from './etat-conservation';
-import { Tarification } from './tarification';
-import { Conservation } from './conservation';
-import { GeolocalisationDTO } from './geolocalisation-dto';
-import { Media } from './media';
-import { Menace } from './menace';
-import { Photo } from './photo';
-import { CategoriePatrimoine } from './categorie-patrimoine';
-import { Contact } from './contact';
 import { Accessibilite } from './accessibilite';
 import { PeriodeHistorique } from './periode-historique';
 import { HoraireOuverture } from './horaire-ouverture';
 import { StatutPatrimoine } from './statut-patrimoine';
+import { TypePatrimoine } from './type-patrimoine';
+import { Conservation } from './conservation';
+import { Menace } from './menace';
+import { CategoriePatrimoine } from './categorie-patrimoine';
+import { PhotoPrincipale } from './photo-principale';
 
 
 export interface PatrimoineUpdate { 
@@ -34,7 +30,7 @@ export interface PatrimoineUpdate {
      */
     nomLocal?: string;
     nomHistorique?: string;
-    type: string;
+    type: TypePatrimoine;
     categorie: CategoriePatrimoine;
     sousCategorie?: string;
     periode?: PeriodeHistorique;
@@ -50,7 +46,6 @@ export interface PatrimoineUpdate {
     valeurSpirituelle?: string;
     traditionsAssociees?: Array<string>;
     langues?: Array<string>;
-    etatConservation?: EtatConservation;
     statut?: StatutPatrimoine;
     /**
      * Indique si le patrimoine bénéficie d\'un classement officiel
@@ -65,26 +60,17 @@ export interface PatrimoineUpdate {
     organismeGestionnaire?: string;
     proprietaire?: string;
     gestionnaire?: string;
-    contact?: Contact;
     siteWeb?: string;
     email?: string;
     telephone?: string;
     accessibilite?: Accessibilite;
-    tarification?: Tarification;
     horaires?: Array<HoraireOuverture>;
-    photos?: Array<Photo>;
-    medias?: Array<Media>;
     conservation?: Conservation;
-    geolocalisation?: GeolocalisationDTO;
     menaces?: Array<Menace>;
-    recommandationsVisiteur?: Array<string>;
-    reglesVisite?: Array<string>;
-    activitesTouristiques?: Array<string>;
-    meilleurePeriodeVisite?: string;
-    dureeVisiteEstimeeMinutes?: number;
     readonly createdAt?: string;
     readonly updatedAt?: string;
     readonly publishedAt?: string;
+    photoPrincipale?: PhotoPrincipale;
 }
 export namespace PatrimoineUpdate {
 }

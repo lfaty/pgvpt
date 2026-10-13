@@ -6,3 +6,7 @@ spring:
 
   config:
     import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:9999}"
+
+logging:
+  file:
+    name: c:/Users/HP/Documents/projets/pgvpt/backend/ms-media.log

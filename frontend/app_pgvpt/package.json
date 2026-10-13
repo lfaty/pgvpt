@@ -7,15 +7,10 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "generate-api:circuit": "npx @openapitools/openapi-generator-cli generate -i ../../contrats_api/ms-circuit-api.yml -g typescript-angular -o src/app/core/api/circuit --additional-properties=ngVersion=17,fileNaming=kebab-case",
-    "generate-api:contenu": "npx @openapitools/openapi-generator-cli generate -i ../../contrats_api/ms-contenu-api.yml -g typescript-angular -o src/app/core/api/contenu --additional-properties=ngVersion=17,fileNaming=kebab-case",
-    "generate-api:evenement": "npx @openapitools/openapi-generator-cli generate -i ../../contrats_api/ms-evenement-api.yml -g typescript-angular -o src/app/core/api/evenement --additional-properties=ngVersion=17,fileNaming=kebab-case",
-    "generate-api:geolocalisation": "npx @openapitools/openapi-generator-cli generate -i ../../contrats_api/ms-geolocalisation-api.yml -g typescript-angular -o src/app/core/api/geolocalisation --additional-properties=ngVersion=17,fileNaming=kebab-case",
-    "generate-api:media": "npx @openapitools/openapi-generator-cli generate -i ../../contrats_api/ms-media-api.yml -g typescript-angular -o src/app/core/api/media --additional-properties=ngVersion=17,fileNaming=kebab-case",
-    "generate-api:patrimoine": "npx @openapitools/openapi-generator-cli generate -i ../../contrats_api/ms-patrimoine-api.yml -g typescript-angular -o src/app/core/api/patrimoine --additional-properties=ngVersion=17,fileNaming=kebab-case",
-    "generate-api:reservation": "npx @openapitools/openapi-generator-cli generate -i ../../contrats_api/ms-reservation-api.yml -g typescript-angular -o src/app/core/api/reservation --additional-properties=ngVersion=17,fileNaming=kebab-case",
-    "generate-api:tourisme": "npx @openapitools/openapi-generator-cli generate -i ../../contrats_api/ms-tourisme-api.yml -g typescript-angular -o src/app/core/api/tourisme --additional-properties=ngVersion=17,fileNaming=kebab-case",
-    "generate-api": "npm run generate-api:circuit && npm run generate-api:contenu && npm run generate-api:evenement && npm run generate-api:geolocalisation && npm run generate-api:media && npm run generate-api:patrimoine && npm run generate-api:reservation && npm run generate-api:tourisme"
+    "generate-api:geolocalisation": "npx @openapitools/openapi-generator-cli generate -i ../../contrat_api_update/ms-geolocalisation-api-v2.yml -g typescript-angular -o src/app/core/api/geolocalisation --additional-properties=ngVersion=17,fileNaming=kebab-case",
+    "generate-api:media": "npx @openapitools/openapi-generator-cli generate -i ../../contrat_api_update/ms-media-api-v2.yml -g typescript-angular -o src/app/core/api/media --additional-properties=ngVersion=17,fileNaming=kebab-case",
+    "generate-api:patrimoine": "npx @openapitools/openapi-generator-cli generate -i ../../contrat_api_update/ms-patrimoine-api-v2.yml -g typescript-angular -o src/app/core/api/patrimoine --additional-properties=ngVersion=17,fileNaming=kebab-case",
+    "generate-api": "npm run generate-api:geolocalisation && npm run generate-api:media && npm run generate-api:patrimoine"
   },
   "private": true,
   "dependencies": {

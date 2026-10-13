@@ -1,5 +1,5 @@
 /**
- * MS Patrimoine - API
+ * PGVPT - MS Patrimoine API
  *
  * Contact: contact@pgvpt.sn
  *
@@ -18,9 +18,12 @@ export interface PatrimoineSummary {
     type?: TypePatrimoine;
     categorie?: CategoriePatrimoine;
     descriptionCourte?: string;
-    photoPrincipale?: string;
     etatConservation?: EtatConservation;
     inscritUnesco?: boolean;
+    /**
+     * Identifiant du média principal géré par ms-media.
+     */
+    photoPrincipaleMediaId?: string;
 }
 export namespace PatrimoineSummary {
 }

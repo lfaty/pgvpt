@@ -1,5 +1,5 @@
 /**
- * MS Patrimoine - API
+ * PGVPT - MS Patrimoine API
  *
  * Contact: contact@pgvpt.sn
  *
@@ -8,12 +8,18 @@
  * Do not edit the class manually.
  */
 import { EtatConservation } from './etat-conservation';
+import { ContactConservateur } from './contact-conservateur';
 
 
+/**
+ * Entité de conservation du patrimoine. Porte l’état de conservation et référence le conservateur et le patrimoine concernés.
+ */
 export interface Conservation { 
-    etat?: EtatConservation;
+    readonly id?: string;
+    patrimoineId?: string;
+    contactConservateur?: ContactConservateur;
+    etat: EtatConservation;
     dateEvaluation?: string;
-    evaluateur?: string;
     descriptionEtat?: string;
     degradations?: Array<string>;
     causesDegradation?: Array<string>;
@@ -23,6 +29,8 @@ export interface Conservation {
     organismeConservation?: string;
     budgetEstime?: number;
     recommandations?: Array<string>;
+    readonly createdAt?: string;
+    readonly updatedAt?: string;
 }
 export namespace Conservation {
 }

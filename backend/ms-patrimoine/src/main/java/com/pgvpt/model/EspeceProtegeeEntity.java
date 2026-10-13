@@ -18,15 +18,21 @@ public class EspeceProtegeeEntity extends BaseEntity {
     @JoinColumn(name = "site_naturel_id", nullable = false)
     private SiteNaturelEntity siteNaturel;
 
+    @Column(columnDefinition = "TEXT")
     private String nomCommun;
+    @Column(columnDefinition = "TEXT")
     private String nomScientifique;
+    @Column(columnDefinition = "TEXT")
     private String nomLocal;
 
     @Enumerated(EnumType.STRING)
     private TypeEspeceMetier type;
 
+    @Column(columnDefinition = "TEXT")
     private String statutConservation;
+    @Column(columnDefinition = "TEXT")
     private String niveauProtection;
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     /*

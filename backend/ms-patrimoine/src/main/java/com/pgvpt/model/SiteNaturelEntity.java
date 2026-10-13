@@ -22,10 +22,18 @@ public class SiteNaturelEntity extends PatrimoineEntity {
     @Enumerated(EnumType.STRING)
     private NatureSiteNaturelMetier natureSite;
 
+    @Column(columnDefinition = "TEXT")
     private String ecosysteme;
+    @Column(columnDefinition = "TEXT")
     private String biodiversite;
     private boolean zoneProtegee;
+    @Column(columnDefinition = "TEXT")
     private String categorieProtection;
+
+    @ElementCollection
+    @CollectionTable(name = "site_naturel_risques", joinColumns = @JoinColumn(name = "site_naturel_id"))
+    @Column(name = "risque", columnDefinition = "TEXT")
+    private List<String> risquesEnvironnementaux = new ArrayList<>();
 
 
     @OneToMany(mappedBy = "siteNaturel", cascade = CascadeType.ALL, orphanRemoval = true)

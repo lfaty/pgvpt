@@ -7,6 +7,9 @@ import lombok.Setter;
 import com.pgvpt.contenu.common.BaseEntity;
 import com.pgvpt.contenu.enums.StatutContenuMetier;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -23,7 +26,11 @@ public class ContenuEntity extends BaseEntity {
 
     private String langue;
     private String titre;
+
+    @Column(columnDefinition = "TEXT")
     private String resume;
+
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String corps;
 
     @Column(name = "auteur_acteur_id")
@@ -31,11 +38,13 @@ public class ContenuEntity extends BaseEntity {
 
     @ElementCollection
     @CollectionTable(name = "contenu_mots_cles", joinColumns = @JoinColumn(name = "contenu_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @Column(name = "mot_cle")
     private List<String> motsCles;
 
     @ElementCollection
     @CollectionTable(name = "contenu_media_ids", joinColumns = @JoinColumn(name = "contenu_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @Column(name = "media_id")
     private List<UUID> mediaIds;
 

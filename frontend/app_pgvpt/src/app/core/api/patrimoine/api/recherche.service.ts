@@ -1,5 +1,5 @@
 /**
- * MS Patrimoine - API
+ * PGVPT - MS Patrimoine API
  *
  * Contact: contact@pgvpt.sn
  *
@@ -114,6 +114,9 @@ export class RechercheService extends BaseService {
 
 
         let localVarHeaders = this.defaultHeaders;
+
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'

@@ -18,7 +18,7 @@ public class ExpositionEntity extends BaseEntity {
     @JoinColumn(name = "musee_id", nullable = false)
     private MuseeEntity musee;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String titre;
 
     @Column(columnDefinition = "TEXT")
@@ -28,8 +28,10 @@ public class ExpositionEntity extends BaseEntity {
 
     private LocalDate dateFin;
 
+    @Column(columnDefinition = "TEXT")
     private String commissaire;
 
+    @Column(columnDefinition = "TEXT")
     private String lieu;
 
     private boolean expositionPermanente;

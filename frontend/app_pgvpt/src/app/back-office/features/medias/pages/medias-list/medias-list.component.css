@@ -1,0 +1,65 @@
+/* Barre de recherche et filtres modernes */
+.filter-card {
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.filter-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 0.35rem 0.75rem;
+  transition: all 0.15s ease-in-out;
+  min-height: 40px;
+}
+
+.filter-pill:hover {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.filter-pill:focus-within {
+  background-color: #ffffff;
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.12);
+}
+
+.filter-pill-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.filter-pill-select {
+  width: 100% !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  padding: 0.2rem 0 !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  cursor: pointer;
+  text-overflow: ellipsis;
+}
+
+.filter-pill-select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  font-weight: 500 !important;
+  padding: 6px 10px !important;
+}

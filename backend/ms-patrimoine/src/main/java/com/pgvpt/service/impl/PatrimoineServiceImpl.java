@@ -188,13 +188,6 @@ public class PatrimoineServiceImpl implements PatrimoineService {
         
         patrimoineMapper.updateConservationEntity(dto, entity.getConservation());
         
-        // Gérer le Contact Conservateur (obligatoire pour ConservationEntity)
-        if (dto.getContactConservateurId() != null) {
-            ContactConservateurEntity contact = contactConservateurRepository.findById(dto.getContactConservateurId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Contact conservateur introuvable avec l'ID: " + dto.getContactConservateurId()));
-            entity.getConservation().setContactConservateur(contact);
-        }
-        
         patrimoineRepository.save(entity);
         return patrimoineMapper.toConservationDto(entity.getConservation());
     }

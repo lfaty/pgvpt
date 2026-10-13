@@ -1,5 +1,5 @@
 /**
- * MS Géolocalisation des patrimoines - API
+ * PGVPT - MS Géolocalisation API
  *
  * Contact: contact@pgvpt.sn
  *
@@ -18,6 +18,8 @@ import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 
 // @ts-ignore
 import { ApiError } from '../model/api-error';
+// @ts-ignore
+import { CategoriePatrimoine } from '../model/categorie-patrimoine';
 // @ts-ignore
 import { Distance } from '../model/distance';
 // @ts-ignore
@@ -117,6 +119,9 @@ export class GeospatialService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
+
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
         ]);
@@ -197,6 +202,9 @@ export class GeospatialService extends BaseService {
 
 
         let localVarHeaders = this.defaultHeaders;
+
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -383,6 +391,9 @@ export class GeospatialService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
+
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/geo+json',
             'application/json'
@@ -426,16 +437,16 @@ export class GeospatialService extends BaseService {
      * Obtenir les patrimoines pour affichage cartographique
      * @endpoint get /cartographie/patrimoines
      * @param region 
-     * @param typePatrimoine 
+     * @param type 
      * @param categorie 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public getPatrimoinesCarte(region?: string, typePatrimoine?: string, categorie?: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<FeaturePatrimoine>>;
-    public getPatrimoinesCarte(region?: string, typePatrimoine?: string, categorie?: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<FeaturePatrimoine>>>;
-    public getPatrimoinesCarte(region?: string, typePatrimoine?: string, categorie?: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<FeaturePatrimoine>>>;
-    public getPatrimoinesCarte(region?: string, typePatrimoine?: string, categorie?: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public getPatrimoinesCarte(region?: string, type?: TypePatrimoine, categorie?: CategoriePatrimoine, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<FeaturePatrimoine>>;
+    public getPatrimoinesCarte(region?: string, type?: TypePatrimoine, categorie?: CategoriePatrimoine, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<FeaturePatrimoine>>>;
+    public getPatrimoinesCarte(region?: string, type?: TypePatrimoine, categorie?: CategoriePatrimoine, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<FeaturePatrimoine>>>;
+    public getPatrimoinesCarte(region?: string, type?: TypePatrimoine, categorie?: CategoriePatrimoine, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
 
@@ -450,8 +461,8 @@ export class GeospatialService extends BaseService {
 
         localVarQueryParameters = this.addToHttpParams(
             localVarQueryParameters,
-            'typePatrimoine',
-            <any>typePatrimoine,
+            'type',
+            <any>type,
             QueryParamStyle.Form,
             true,
         );
@@ -467,6 +478,9 @@ export class GeospatialService extends BaseService {
 
 
         let localVarHeaders = this.defaultHeaders;
+
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -524,6 +538,9 @@ export class GeospatialService extends BaseService {
         }
 
         let localVarHeaders = this.defaultHeaders;
+
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -651,6 +668,9 @@ export class GeospatialService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
+
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
         ]);
@@ -696,7 +716,7 @@ export class GeospatialService extends BaseService {
      * @param latitude 
      * @param longitude 
      * @param rayonKm 
-     * @param typePatrimoine 
+     * @param type 
      * @param categorie 
      * @param page Numéro de page, indexé à partir de 0.
      * @param size Nombre maximal d’éléments par page.
@@ -704,10 +724,10 @@ export class GeospatialService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public rechercherDansRayon(latitude: number, longitude: number, rayonKm: number, typePatrimoine?: string, categorie?: string, page?: number, size?: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PagePatrimoineGeographique>;
-    public rechercherDansRayon(latitude: number, longitude: number, rayonKm: number, typePatrimoine?: string, categorie?: string, page?: number, size?: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PagePatrimoineGeographique>>;
-    public rechercherDansRayon(latitude: number, longitude: number, rayonKm: number, typePatrimoine?: string, categorie?: string, page?: number, size?: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PagePatrimoineGeographique>>;
-    public rechercherDansRayon(latitude: number, longitude: number, rayonKm: number, typePatrimoine?: string, categorie?: string, page?: number, size?: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public rechercherDansRayon(latitude: number, longitude: number, rayonKm: number, type?: TypePatrimoine, categorie?: CategoriePatrimoine, page?: number, size?: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PagePatrimoineGeographique>;
+    public rechercherDansRayon(latitude: number, longitude: number, rayonKm: number, type?: TypePatrimoine, categorie?: CategoriePatrimoine, page?: number, size?: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PagePatrimoineGeographique>>;
+    public rechercherDansRayon(latitude: number, longitude: number, rayonKm: number, type?: TypePatrimoine, categorie?: CategoriePatrimoine, page?: number, size?: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PagePatrimoineGeographique>>;
+    public rechercherDansRayon(latitude: number, longitude: number, rayonKm: number, type?: TypePatrimoine, categorie?: CategoriePatrimoine, page?: number, size?: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (latitude === null || latitude === undefined) {
             throw new Error('Required parameter latitude was null or undefined when calling rechercherDansRayon.');
         }
@@ -749,8 +769,8 @@ export class GeospatialService extends BaseService {
 
         localVarQueryParameters = this.addToHttpParams(
             localVarQueryParameters,
-            'typePatrimoine',
-            <any>typePatrimoine,
+            'type',
+            <any>type,
             QueryParamStyle.Form,
             true,
         );
@@ -784,6 +804,9 @@ export class GeospatialService extends BaseService {
 
 
         let localVarHeaders = this.defaultHeaders;
+
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -836,7 +859,7 @@ export class GeospatialService extends BaseService {
      * @param maxLongitude 
      * @param localite 
      * @param motCle 
-     * @param typePatrimoine 
+     * @param type 
      * @param categorie 
      * @param page 
      * @param size 
@@ -844,10 +867,10 @@ export class GeospatialService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public searchGeolocalisations(latitude?: number, longitude?: number, rayonKm?: number, minLatitude?: number, maxLatitude?: number, minLongitude?: number, maxLongitude?: number, localite?: string, motCle?: string, typePatrimoine?: TypePatrimoine, categorie?: string, page?: number, size?: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PagePatrimoineGeographique>;
-    public searchGeolocalisations(latitude?: number, longitude?: number, rayonKm?: number, minLatitude?: number, maxLatitude?: number, minLongitude?: number, maxLongitude?: number, localite?: string, motCle?: string, typePatrimoine?: TypePatrimoine, categorie?: string, page?: number, size?: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PagePatrimoineGeographique>>;
-    public searchGeolocalisations(latitude?: number, longitude?: number, rayonKm?: number, minLatitude?: number, maxLatitude?: number, minLongitude?: number, maxLongitude?: number, localite?: string, motCle?: string, typePatrimoine?: TypePatrimoine, categorie?: string, page?: number, size?: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PagePatrimoineGeographique>>;
-    public searchGeolocalisations(latitude?: number, longitude?: number, rayonKm?: number, minLatitude?: number, maxLatitude?: number, minLongitude?: number, maxLongitude?: number, localite?: string, motCle?: string, typePatrimoine?: TypePatrimoine, categorie?: string, page?: number, size?: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public searchGeolocalisations(latitude?: number, longitude?: number, rayonKm?: number, minLatitude?: number, maxLatitude?: number, minLongitude?: number, maxLongitude?: number, localite?: string, motCle?: Array<string>, type?: TypePatrimoine, categorie?: CategoriePatrimoine, page?: number, size?: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PagePatrimoineGeographique>;
+    public searchGeolocalisations(latitude?: number, longitude?: number, rayonKm?: number, minLatitude?: number, maxLatitude?: number, minLongitude?: number, maxLongitude?: number, localite?: string, motCle?: Array<string>, type?: TypePatrimoine, categorie?: CategoriePatrimoine, page?: number, size?: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PagePatrimoineGeographique>>;
+    public searchGeolocalisations(latitude?: number, longitude?: number, rayonKm?: number, minLatitude?: number, maxLatitude?: number, minLongitude?: number, maxLongitude?: number, localite?: string, motCle?: Array<string>, type?: TypePatrimoine, categorie?: CategoriePatrimoine, page?: number, size?: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PagePatrimoineGeographique>>;
+    public searchGeolocalisations(latitude?: number, longitude?: number, rayonKm?: number, minLatitude?: number, maxLatitude?: number, minLongitude?: number, maxLongitude?: number, localite?: string, motCle?: Array<string>, type?: TypePatrimoine, categorie?: CategoriePatrimoine, page?: number, size?: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
 
@@ -934,8 +957,8 @@ export class GeospatialService extends BaseService {
 
         localVarQueryParameters = this.addToHttpParams(
             localVarQueryParameters,
-            'typePatrimoine',
-            <any>typePatrimoine,
+            'type',
+            <any>type,
             QueryParamStyle.Form,
             true,
         );
@@ -969,6 +992,9 @@ export class GeospatialService extends BaseService {
 
 
         let localVarHeaders = this.defaultHeaders;
+
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'

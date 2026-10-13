@@ -18,6 +18,8 @@ public class MuseeEntity extends PatrimoineEntity {
     private Integer nombreCollections;
     private Integer nombreOeuvres;
     private Integer capaciteAccueil;
+    
+    @Column(columnDefinition = "TEXT")
     private String museographie;
 
     @OneToMany(mappedBy = "musee",cascade = CascadeType.ALL, orphanRemoval = true)

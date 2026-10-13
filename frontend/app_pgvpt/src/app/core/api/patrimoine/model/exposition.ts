@@ -1,5 +1,5 @@
 /**
- * MS Patrimoine - API
+ * PGVPT - MS Patrimoine API
  *
  * Contact: contact@pgvpt.sn
  *
@@ -18,6 +18,9 @@ export interface Exposition {
     commissaire?: string;
     lieu?: string;
     expositionPermanente?: boolean;
-    imageUrl?: string;
+    /**
+     * Identifiant du média image géré par ms-media.
+     */
+    imageMediaId?: string;
 }
 

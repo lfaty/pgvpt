@@ -1,5 +1,5 @@
 /**
- * MS Géolocalisation des patrimoines - API
+ * PGVPT - MS Géolocalisation API
  *
  * Contact: contact@pgvpt.sn
  *
@@ -13,7 +13,7 @@ import { Configuration } from './configuration';
 import { OpenApiHttpParams, QueryParamStyle, concatHttpParamsObject} from './query.params';
 
 export class BaseService {
-    protected basePath = 'http://localhost:3002/api/v1';
+    protected basePath = 'http://localhost:3002/api/v1/geolocalisations';
     public defaultHeaders = new HttpHeaders();
     public configuration: Configuration;
     public encoder: HttpParameterCodec;

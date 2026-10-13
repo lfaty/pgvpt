@@ -1,5 +1,5 @@
 /**
- * MS Géolocalisation des patrimoines - API
+ * PGVPT - MS Géolocalisation API
  *
  * Contact: contact@pgvpt.sn
  *
@@ -29,7 +29,7 @@ export interface Geolocalisation {
     dateAcquisition?: string;
     methodeAcquisition?: Geolocalisation.MethodeAcquisitionEnum;
     niveauFiabilite?: Geolocalisation.NiveauFiabiliteEnum;
-    zoneTouristiqueId?: string;
+    zoneTouristiqueId: string;
     villageId?: string | null;
     quartierId?: string | null;
     /**

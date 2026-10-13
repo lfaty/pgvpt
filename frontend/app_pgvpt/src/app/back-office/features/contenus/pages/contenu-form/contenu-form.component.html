@@ -1,0 +1,199 @@
+<main>
+  <div class="card-form">
+    <h2>{{ isEditMode ? 'Modifier le contenu' : 'Créer un nouveau contenu' }}</h2>
+
+    <form [formGroup]="contenuForm" (ngSubmit)="onSubmit()">
+      
+      <div class="grid-form">
+        <!-- Patrimoine rattaché (Affichage si connu) -->
+        <div class="full" *ngIf="nomPatrimoine">
+          <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Patrimoine rattaché</p>
+          <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900 font-medium flex items-center justify-between">
+            <span class="flex items-center gap-2"><i class="fas fa-landmark text-emerald-600"></i> {{ nomPatrimoine }}</span>
+          </div>
+        </div>
+
+        <!-- Sélection du patrimoine si création directe sans ID d'URL -->
+        <div class="full" *ngIf="!nomPatrimoine && !isEditMode">
+          <label>Patrimoine rattaché <span>*</span></label>
+          <select formControlName="patrimoineId" (change)="onPatrimoineChange($event)" required>
+            <option [ngValue]="null" disabled selected>-- Sélectionnez un patrimoine --</option>
+            <option *ngFor="let p of patrimoinesList" [value]="p.id">{{ p.nom }}</option>
+          </select>
+          <div *ngIf="contenuForm.get('patrimoineId')?.invalid && contenuForm.get('patrimoineId')?.touched" class="text-red-500 text-xs mt-1">
+            Veuillez rattacher ce contenu à un patrimoine.
+          </div>
+        </div>
+
+        <div class="full">
+          <label>Titre <span>*</span></label>
+          <input type="text" formControlName="titre" required placeholder="Ex: Histoire et fondation du site">
+        </div>
+
+        <div>
+          <label>Type <span>*</span></label>
+          <select formControlName="type" required>
+            <option *ngFor="let type of types" [value]="type">{{ type }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Langue <span>*</span></label>
+          <select formControlName="langue" required>
+            <option *ngFor="let langue of langues" [value]="langue.code">{{ langue.label }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Statut <span>*</span></label>
+          <select formControlName="statut" required>
+            <option *ngFor="let statut of statuts" [value]="statut">{{ statut }}</option>
+          </select>
+        </div>
+        
+        <div class="full">
+          <label>Mots-clés (séparés par des virgules)</label>
+          <input type="text" formControlName="motsCles" placeholder="ex: histoire, musée, dakar, esclavage">
+        </div>
+
+        <div class="full">
+          <label>Résumé</label>
+          <textarea formControlName="resume" rows="2" placeholder="Bref résumé d'introduction..."></textarea>
+        </div>
+
+        <div class="full">
+          <label>Corps <span>*</span></label>
+          <textarea formControlName="corps" rows="10" required placeholder="Rédigez ici le contenu détaillé de l'article ou du récit..."></textarea>
+        </div>
+
+        <!-- Section Sélection des Médias d'illustration (Après rédaction) -->
+        <div class="full mt-4 pt-4 border-t border-gray-200">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+            <div>
+              <label class="mb-0 text-base font-bold text-gray-800 flex items-center">
+                <i class="fas fa-photo-video text-purple-600 mr-2"></i>
+                Médias d'illustration
+              </label>
+              <p class="text-xs text-gray-500 mt-0.5">
+                Cliquez sur les photos et médias pour les lier à cette rédaction ({{ selectedMediaIds.length }} sélectionné{{ selectedMediaIds.length > 1 ? 's' : '' }}) :
+              </p>
+            </div>
+            
+            <a *ngIf="patrimoineId" [routerLink]="['/admin/patrimoines', patrimoineId, 'medias']" target="_blank"
+               class="text-xs px-3 py-1.5 bg-purple-50 text-purple-700 border border-purple-200 rounded-lg hover:bg-purple-100 font-semibold transition-colors inline-flex items-center gap-1 self-start sm:self-auto">
+              <i class="fas fa-plus-circle"></i> Gérer la médiathèque
+            </a>
+          </div>
+
+          <!-- Galerie de sélection cliquable -->
+          <div *ngIf="availableMedias.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            <div *ngFor="let m of availableMedias"
+                 (click)="toggleMedia(m.id)"
+                 class="relative group cursor-pointer rounded-xl border-2 overflow-hidden transition-all duration-200 bg-white select-none flex flex-col justify-between"
+                 [ngClass]="isMediaSelected(m.id) 
+                   ? 'border-purple-600 ring-2 ring-purple-500/30 shadow-md scale-[1.02]' 
+                   : 'border-gray-200 hover:border-purple-300 opacity-80 hover:opacity-100'">
+              
+              <!-- Badge Coche de sélection -->
+              <div class="absolute top-2 right-2 z-10 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-md transition-all"
+                   [ngClass]="isMediaSelected(m.id) ? 'bg-purple-600 text-white' : 'bg-black/40 text-transparent group-hover:text-white/60'">
+                <i class="fas fa-check"></i>
+              </div>
+
+              <!-- Aperçu du média -->
+              <div class="h-28 bg-gray-100 relative overflow-hidden flex items-center justify-center">
+                <img *ngIf="m.url && m.type === 'PHOTO'" [src]="m.url" [alt]="m.nom" class="w-full h-full object-cover">
+                <div *ngIf="!m.url || m.type !== 'PHOTO'" class="flex flex-col items-center justify-center text-gray-400">
+                  <i class="fas text-3xl mb-1" 
+                     [ngClass]="{
+                       'fa-video': m.type === 'VIDEO',
+                       'fa-file-alt': m.type === 'DOCUMENT',
+                       'fa-volume-up': m.type === 'AUDIO',
+                       'fa-cube': m.type === 'MODELE_3D',
+                       'fa-image': m.type === 'PHOTO'
+                     }"></i>
+                </div>
+                <span class="absolute bottom-1.5 left-1.5 bg-black/70 backdrop-blur-sm text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+                  {{ m.type }}
+                </span>
+              </div>
+
+              <!-- Détails -->
+              <div class="p-2 bg-white">
+                <p class="text-xs font-medium text-gray-800 truncate" [title]="m.nom">{{ m.nom }}</p>
+                <p class="text-[10px] text-gray-400 truncate" *ngIf="m.auteur">{{ m.auteur }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Si aucun média trouvé -->
+          <div *ngIf="availableMedias.length === 0" class="p-4 bg-gray-50 border border-dashed border-gray-300 rounded-xl text-center">
+            <i class="fas fa-images text-gray-400 text-2xl mb-1"></i>
+            <p class="text-xs text-gray-600 font-medium">Aucun média enregistré pour ce patrimoine.</p>
+            <p class="text-[11px] text-gray-400 mb-2">Vous pouvez ajouter des photos ou documents dans l'espace Médias du site.</p>
+            <a *ngIf="patrimoineId" [routerLink]="['/admin/patrimoines', patrimoineId, 'medias']" target="_blank"
+               class="inline-flex items-center gap-1.5 text-xs text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 px-3 py-1.5 rounded-lg font-semibold transition-colors">
+              <i class="fas fa-plus"></i> Ajouter des médias à ce patrimoine
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="secondary" routerLink="/admin/contenus">Annuler</button>
+        <button type="submit" class="primary" [disabled]="saveStatus === 'saving'">
+          <i *ngIf="saveStatus === 'saving'" class="fas fa-spinner fa-spin mr-2"></i>
+          {{ isEditMode ? 'Mettre à jour' : 'Enregistrer' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Modal d'état d'enregistrement (Cercle qui tourne / Succès / Erreur) -->
+  <div *ngIf="saveStatus !== 'idle'" 
+       class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity"
+       aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    
+    <div class="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center border border-gray-100 transform transition-all">
+      
+      <!-- ÉTAT 1 : Enregistrement en cours (Cercle qui tourne) -->
+      <div *ngIf="saveStatus === 'saving'" class="flex flex-col items-center py-4">
+        <div class="w-16 h-16 rounded-full border-4 border-emerald-100 border-t-emerald-600 animate-spin flex items-center justify-center mb-4">
+          <i class="fas fa-circle-notch text-emerald-600 text-xl"></i>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900 mb-1">Enregistrement en cours</h3>
+        <p class="text-xs text-gray-500">Validation et enregistrement du contenu dans le système...</p>
+      </div>
+
+      <!-- ÉTAT 2 : Succès -->
+      <div *ngIf="saveStatus === 'success'" class="flex flex-col items-center py-4">
+        <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-4 shadow-inner">
+          <i class="fas fa-check text-2xl"></i>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900 mb-1">Succès !</h3>
+        <p class="text-xs text-gray-600 mb-4">Le contenu a été enregistré avec succès.</p>
+        <button type="button" (click)="navigateToContenus()"
+                class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
+          Voir la liste des contenus
+        </button>
+      </div>
+
+      <!-- ÉTAT 3 : Erreur -->
+      <div *ngIf="saveStatus === 'error'" class="flex flex-col items-center py-4">
+        <div class="w-16 h-16 rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-4 shadow-inner">
+          <i class="fas fa-exclamation-triangle text-2xl"></i>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900 mb-1">Erreur d'enregistrement</h3>
+        <p class="text-xs text-red-600 bg-red-50 p-2.5 rounded-lg border border-red-200 mb-4 text-left break-words w-full">
+          {{ errorMessage }}
+        </p>
+        <button type="button" (click)="closeStatusModal()"
+                class="w-full py-2.5 px-4 bg-gray-800 hover:bg-gray-900 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm">
+          Fermer et modifier
+        </button>
+      </div>
+
+    </div>
+  </div>
+</main>

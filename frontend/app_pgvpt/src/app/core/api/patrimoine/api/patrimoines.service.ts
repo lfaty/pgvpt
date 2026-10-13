@@ -1,5 +1,5 @@
 /**
- * MS Patrimoine - API
+ * PGVPT - MS Patrimoine API
  *
  * Contact: contact@pgvpt.sn
  *
@@ -28,6 +28,8 @@ import { PagePatrimoine } from '../model/page-patrimoine';
 import { Patrimoine } from '../model/patrimoine';
 // @ts-ignore
 import { PatrimoineCreate } from '../model/patrimoine-create';
+// @ts-ignore
+import { PatrimoinePatch } from '../model/patrimoine-patch';
 // @ts-ignore
 import { PatrimoineUpdate } from '../model/patrimoine-update';
 // @ts-ignore
@@ -68,6 +70,9 @@ export class PatrimoinesService extends BaseService {
         }
 
         let localVarHeaders = this.defaultHeaders;
+
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -135,6 +140,9 @@ export class PatrimoinesService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
+
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
         ]);
@@ -174,6 +182,84 @@ export class PatrimoinesService extends BaseService {
     }
 
     /**
+     * Lister les patrimoines
+     * @endpoint get /patrimoines/all
+     * @param page 
+     * @param size 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public getAllPatrimoines(page?: number, size?: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PagePatrimoine>;
+    public getAllPatrimoines(page?: number, size?: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PagePatrimoine>>;
+    public getAllPatrimoines(page?: number, size?: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PagePatrimoine>>;
+    public getAllPatrimoines(page?: number, size?: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+
+        let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'page',
+            <any>page,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'size',
+            <any>size,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        let localVarHeaders = this.defaultHeaders;
+
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/patrimoines/all`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<PagePatrimoine>('get', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                params: localVarQueryParameters.toHttpParams(),
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
      * Obtenir le détail d\&#39;un patrimoine
      * @endpoint get /patrimoines/{id}
      * @param id Identifiant unique du patrimoine
@@ -190,6 +276,9 @@ export class PatrimoinesService extends BaseService {
         }
 
         let localVarHeaders = this.defaultHeaders;
+
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -230,16 +319,13 @@ export class PatrimoinesService extends BaseService {
     }
 
     /**
-     * Lister les patrimoines
+     * Lister et filtrer les patrimoines
      * @endpoint get /patrimoines
      * @param page 
      * @param size 
      * @param sort 
      * @param categorie 
      * @param type 
-     * @param region 
-     * @param departement 
-     * @param commune 
      * @param statut 
      * @param etatConservation 
      * @param accessiblePublic 
@@ -250,10 +336,10 @@ export class PatrimoinesService extends BaseService {
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public getPatrimoines(page?: number, size?: number, sort?: string, categorie?: CategoriePatrimoine, type?: TypePatrimoine, region?: string, departement?: string, commune?: string, statut?: StatutPatrimoine, etatConservation?: EtatConservation, accessiblePublic?: boolean, inscritUnesco?: boolean, classePatrimoine?: boolean, q?: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PagePatrimoine>;
-    public getPatrimoines(page?: number, size?: number, sort?: string, categorie?: CategoriePatrimoine, type?: TypePatrimoine, region?: string, departement?: string, commune?: string, statut?: StatutPatrimoine, etatConservation?: EtatConservation, accessiblePublic?: boolean, inscritUnesco?: boolean, classePatrimoine?: boolean, q?: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PagePatrimoine>>;
-    public getPatrimoines(page?: number, size?: number, sort?: string, categorie?: CategoriePatrimoine, type?: TypePatrimoine, region?: string, departement?: string, commune?: string, statut?: StatutPatrimoine, etatConservation?: EtatConservation, accessiblePublic?: boolean, inscritUnesco?: boolean, classePatrimoine?: boolean, q?: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PagePatrimoine>>;
-    public getPatrimoines(page?: number, size?: number, sort?: string, categorie?: CategoriePatrimoine, type?: TypePatrimoine, region?: string, departement?: string, commune?: string, statut?: StatutPatrimoine, etatConservation?: EtatConservation, accessiblePublic?: boolean, inscritUnesco?: boolean, classePatrimoine?: boolean, q?: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public getPatrimoines(page?: number, size?: number, sort?: string, categorie?: CategoriePatrimoine, type?: TypePatrimoine, statut?: StatutPatrimoine, etatConservation?: EtatConservation, accessiblePublic?: boolean, inscritUnesco?: boolean, classePatrimoine?: boolean, q?: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PagePatrimoine>;
+    public getPatrimoines(page?: number, size?: number, sort?: string, categorie?: CategoriePatrimoine, type?: TypePatrimoine, statut?: StatutPatrimoine, etatConservation?: EtatConservation, accessiblePublic?: boolean, inscritUnesco?: boolean, classePatrimoine?: boolean, q?: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PagePatrimoine>>;
+    public getPatrimoines(page?: number, size?: number, sort?: string, categorie?: CategoriePatrimoine, type?: TypePatrimoine, statut?: StatutPatrimoine, etatConservation?: EtatConservation, accessiblePublic?: boolean, inscritUnesco?: boolean, classePatrimoine?: boolean, q?: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PagePatrimoine>>;
+    public getPatrimoines(page?: number, size?: number, sort?: string, categorie?: CategoriePatrimoine, type?: TypePatrimoine, statut?: StatutPatrimoine, etatConservation?: EtatConservation, accessiblePublic?: boolean, inscritUnesco?: boolean, classePatrimoine?: boolean, q?: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
 
@@ -297,33 +383,6 @@ export class PatrimoinesService extends BaseService {
             localVarQueryParameters,
             'type',
             <any>type,
-            QueryParamStyle.Form,
-            true,
-        );
-
-
-        localVarQueryParameters = this.addToHttpParams(
-            localVarQueryParameters,
-            'region',
-            <any>region,
-            QueryParamStyle.Form,
-            true,
-        );
-
-
-        localVarQueryParameters = this.addToHttpParams(
-            localVarQueryParameters,
-            'departement',
-            <any>departement,
-            QueryParamStyle.Form,
-            true,
-        );
-
-
-        localVarQueryParameters = this.addToHttpParams(
-            localVarQueryParameters,
-            'commune',
-            <any>commune,
             QueryParamStyle.Form,
             true,
         );
@@ -385,6 +444,9 @@ export class PatrimoinesService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
+
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
         ]);
@@ -425,6 +487,79 @@ export class PatrimoinesService extends BaseService {
     }
 
     /**
+     * Mise à jour partielle du patrimoine
+     * @endpoint patch /patrimoines/{id}
+     * @param id 
+     * @param patrimoinePatch 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public patchPatrimoine(id: string, patrimoinePatch: PatrimoinePatch, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Patrimoine>;
+    public patchPatrimoine(id: string, patrimoinePatch: PatrimoinePatch, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Patrimoine>>;
+    public patchPatrimoine(id: string, patrimoinePatch: PatrimoinePatch, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Patrimoine>>;
+    public patchPatrimoine(id: string, patrimoinePatch: PatrimoinePatch, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling patchPatrimoine.');
+        }
+        if (patrimoinePatch === null || patrimoinePatch === undefined) {
+            throw new Error('Required parameter patrimoinePatch was null or undefined when calling patchPatrimoine.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+        }
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/patrimoines/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: "uuid"})}`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<Patrimoine>('patch', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                body: patrimoinePatch,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
      * Modifier un patrimoine
      * @endpoint put /patrimoines/{id}
      * @param id Identifiant unique du patrimoine
@@ -445,6 +580,9 @@ export class PatrimoinesService extends BaseService {
         }
 
         let localVarHeaders = this.defaultHeaders;
+
+        // authentication (bearerAuth) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('bearerAuth', 'Authorization', localVarHeaders, 'Bearer ');
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'

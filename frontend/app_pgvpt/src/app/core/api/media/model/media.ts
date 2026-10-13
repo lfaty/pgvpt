@@ -27,8 +27,17 @@ export interface Media {
     credit?: string;
     latitude?: number;
     longitude?: number;
+    statut?: Media.StatutEnum;
+    checksumSha256?: string;
 }
 export namespace Media {
+    export const StatutEnum = {
+        Brouillon: 'BROUILLON',
+        Valide: 'VALIDE',
+        Publie: 'PUBLIE',
+        Archive: 'ARCHIVE',
+    } as const;
+    export type StatutEnum = typeof StatutEnum[keyof typeof StatutEnum];
 }
 
 

@@ -609,9 +609,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Menace"
-        photoPrincipaleUrl:
-          type: string
-          format: uri
+        photoPrincipale:
+          $ref: "#/components/schemas/PhotoPrincipale"
         superficie:
           type: number
           format: double
@@ -1148,8 +1147,6 @@ components:
         Entité de conservation du patrimoine. Porte l’état de conservation
         et référence le conservateur et le patrimoine concernés.
       required:
-        - patrimoineId
-        - contactConservateurId
         - etat
       properties:
         id:
@@ -1159,9 +1156,8 @@ components:
         patrimoineId:
           type: string
           format: uuid
-        contactConservateurId:
-          type: string
-          format: uuid
+        contactConservateur:
+          $ref: "#/components/schemas/ContactConservateur"
         etat:
           $ref: "#/components/schemas/EtatConservation"
         dateEvaluation:

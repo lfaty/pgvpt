@@ -1,4 +1,47 @@
+# Logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build and compiled output
+**/target/
 target/
-frontend/app_pgvpt/node_modules/
+**/dist/
+dist/
+**/out-tsc/
+**/.angular/
+
+# Dependencies
+**/node_modules/
+
+# Maven & Java
+**/.maven-user/
+.mvn/wrapper/maven-wrapper.jar
 backend/temp-config-repo/
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS and Temporary files
+*.tmp
+*.bak
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Generated shell scripts
+**/git_push.sh
+git_push.sh

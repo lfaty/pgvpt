@@ -1,0 +1,68 @@
+/* ========================================================
+   PAGE DE DÉTAIL MÉDIA - STUDIO D'INSPECTION PATRIMONIALE
+   ======================================================== */
+
+.media-viewer-stage {
+  background: radial-gradient(circle at center, #1a232c 0%, #0d1318 100%);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+.media-zoomable-img {
+  transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1);
+  transform-origin: center center;
+}
+
+/* Floating controls bar */
+.viewer-controls-bar {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(13, 19, 24, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  padding: 6px 14px;
+  z-index: 20;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.viewer-control-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background: rgba(255, 255, 255, 0.08);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.viewer-control-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #D16933;
+  transform: scale(1.08);
+}
+
+.viewer-control-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Audio waveform simulation */
+.audio-visual-pulse {
+  animation: audioPulse 2s ease-in-out infinite alternate;
+}
+@keyframes audioPulse {
+  0% { transform: scale(0.96); opacity: 0.8; }
+  100% { transform: scale(1.04); opacity: 1; }
+}

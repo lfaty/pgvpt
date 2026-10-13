@@ -1,5 +1,5 @@
 /**
- * MS Patrimoine - API
+ * PGVPT - MS Patrimoine API
  *
  * Contact: contact@pgvpt.sn
  *
@@ -18,7 +18,10 @@ export interface EspeceProtegee {
     statutConservation?: string;
     niveauProtection?: string;
     description?: string;
-    photoUrl?: string;
+    /**
+     * Identifiant du média photo géré par ms-media.
+     */
+    photoMediaId?: string;
 }
 export namespace EspeceProtegee {
     export const TypeEnum = {

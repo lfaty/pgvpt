@@ -1,0 +1,53 @@
+<div class="card" [routerLink]="['/patrimoines', patrimoine.id]">
+  
+  <!-- Image Container -->
+  <div class="card-image">
+    <img #img [src]="patrimoine.imageUrl || 'assets/images/activite_saloum.jpg'" 
+         (error)="img.src='assets/images/activite_saloum.jpg'"
+         [alt]="patrimoine.nom" class="card-img">
+    
+    <!-- Hover overlay -->
+    <div class="card-image-overlay"></div>
+
+    <!-- Category Badge -->
+    <div class="badge-top-left">
+      <span class="category-badge"
+            [class.badge-historique]="patrimoine.type === 'MONUMENT'"
+            [class.badge-naturel]="patrimoine.type === 'SITE_NATUREL'"
+            [class.badge-culturel]="patrimoine.type === 'MUSEE'">
+        {{ patrimoine.categorie }}
+      </span>
+    </div>
+    
+    <!-- Rating Badge -->
+    <div *ngIf="patrimoine.note" class="badge-top-right">
+      <div class="rating-badge">
+        <i class="fa-solid fa-star star-icon"></i>
+        <span class="rating-text">{{ patrimoine.note }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="card-body">
+    
+    <!-- Location -->
+    <div class="card-location">
+      <i class="fa-solid fa-location-dot location-icon"></i>
+      <span>{{ patrimoine.region || 'Sénégal' }}{{ patrimoine.departement ? ', ' + patrimoine.departement : '' }}</span>
+    </div>
+
+    <!-- Title & Description -->
+    <h3 class="card-title">{{ patrimoine.nom }}</h3>
+    <p class="card-description">{{ patrimoine.descriptionCourte || patrimoine.description }}</p>
+
+    <!-- Action -->
+    <div class="card-footer">
+      <span class="card-link-text">Découvrir le site</span>
+      <div class="card-link-arrow">
+        <i class="fa-solid fa-arrow-right"></i>
+      </div>
+    </div>
+    
+  </div>
+</div>

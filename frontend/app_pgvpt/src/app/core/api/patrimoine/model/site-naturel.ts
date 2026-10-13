@@ -1,5 +1,5 @@
 /**
- * MS Patrimoine - API
+ * PGVPT - MS Patrimoine API
  *
  * Contact: contact@pgvpt.sn
  *
@@ -7,15 +7,6 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { EtatConservation } from './etat-conservation';
-import { Tarification } from './tarification';
-import { Conservation } from './conservation';
-import { GeolocalisationDTO } from './geolocalisation-dto';
-import { Media } from './media';
-import { Menace } from './menace';
-import { Photo } from './photo';
-import { CategoriePatrimoine } from './categorie-patrimoine';
-import { Contact } from './contact';
 import { Accessibilite } from './accessibilite';
 import { PeriodeHistorique } from './periode-historique';
 import { EspeceProtegee } from './espece-protegee';
@@ -23,6 +14,11 @@ import { NatureSiteNaturel } from './nature-site-naturel';
 import { HoraireOuverture } from './horaire-ouverture';
 import { Patrimoine } from './patrimoine';
 import { StatutPatrimoine } from './statut-patrimoine';
+import { TypePatrimoine } from './type-patrimoine';
+import { Conservation } from './conservation';
+import { Menace } from './menace';
+import { CategoriePatrimoine } from './categorie-patrimoine';
+import { PhotoPrincipale } from './photo-principale';
 
 
 export interface SiteNaturel extends Patrimoine { 

@@ -1,5 +1,5 @@
 /**
- * MS Géolocalisation des patrimoines - API
+ * PGVPT - MS Géolocalisation API
  *
  * Contact: contact@pgvpt.sn
  *
@@ -10,7 +10,7 @@
 
 
 export interface QuartierCreate { 
-    communeId: string;
+    communeId?: string | null;
     villageId?: string | null;
     code: string;
     nom: string;

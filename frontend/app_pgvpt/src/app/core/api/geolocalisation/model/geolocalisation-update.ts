@@ -1,5 +1,5 @@
 /**
- * MS Géolocalisation des patrimoines - API
+ * PGVPT - MS Géolocalisation API
  *
  * Contact: contact@pgvpt.sn
  *
@@ -9,34 +9,6 @@
  */
 
 
-export namespace GeolocalisationUpdate {
-    export const SourceEnum = {
-        Gps: 'GPS',
-        Administration: 'ADMINISTRATION',
-        Sig: 'SIG',
-        OpenData: 'OPEN_DATA',
-        Import: 'IMPORT',
-        Autre: 'AUTRE',
-    } as const;
-    export type SourceEnum = typeof SourceEnum[keyof typeof SourceEnum];
-    export const MethodeAcquisitionEnum = {
-        Gps: 'GPS',
-        ReleveTerrain: 'RELEVE_TERRAIN',
-        Satellite: 'SATELLITE',
-        Drone: 'DRONE',
-        Geocodage: 'GEOCODAGE',
-        ImportSig: 'IMPORT_SIG',
-        Autre: 'AUTRE',
-    } as const;
-    export type MethodeAcquisitionEnum = typeof MethodeAcquisitionEnum[keyof typeof MethodeAcquisitionEnum];
-    export const NiveauFiabiliteEnum = {
-        Faible: 'FAIBLE',
-        Moyen: 'MOYEN',
-        Eleve: 'ELEVE',
-        TresEleve: 'TRES_ELEVE',
-    } as const;
-    export type NiveauFiabiliteEnum = typeof NiveauFiabiliteEnum[keyof typeof NiveauFiabiliteEnum];
-}
 /**
  * Une géolocalisation doit référencer exactement une ressource : un patrimoine ou une entreprise.
  */

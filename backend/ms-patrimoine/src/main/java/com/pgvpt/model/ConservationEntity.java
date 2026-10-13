@@ -27,37 +27,40 @@ public class ConservationEntity extends BaseEntity {
     private PatrimoineEntity patrimoine;
 
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "contact_conservateur_id", nullable = false)
     private ContactConservateurEntity contactConservateur;
 
     @Enumerated(EnumType.STRING)
     private EtatConservationMetier etat;
     private LocalDate dateEvaluation;
+    @Column(columnDefinition = "TEXT")
     private String descriptionEtat;
 
     @ElementCollection
     @CollectionTable(name = "conservation_degradation", joinColumns = @JoinColumn(name = "conservation_id"))
-    @Column(name = "degradation")
+    @Column(name = "degradation", columnDefinition = "TEXT")
     private List<String> degradations ;
 
     @ElementCollection
     @CollectionTable(name = "conservation_cause_degradation", joinColumns = @JoinColumn(name = "conservation_id"))
-    @Column(name = "cause")
+    @Column(name = "cause", columnDefinition = "TEXT")
     private List<String> causesDegradation ;
 
     @ElementCollection
     @CollectionTable(name = "conservation_travaux", joinColumns = @JoinColumn(name = "conservation_id"))
-    @Column(name = "travail")
+    @Column(name = "travail", columnDefinition = "TEXT")
     private List<String> travauxNecessaires ;
 
+    @Column(columnDefinition = "TEXT")
     private String dernierTravaux;
     private LocalDate dateDerniersTravaux;
+    @Column(columnDefinition = "TEXT")
     private String organismeConservation;
     private BigDecimal budgetEstime;
 
     @ElementCollection
     @CollectionTable(name = "conservation_recommandation", joinColumns = @JoinColumn(name = "conservation_id"))
-    @Column(name = "recommandation")
+    @Column(name = "recommandation", columnDefinition = "TEXT")
     private List<String> recommandations;
 }

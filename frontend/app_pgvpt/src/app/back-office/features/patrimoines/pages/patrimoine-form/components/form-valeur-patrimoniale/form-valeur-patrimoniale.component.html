@@ -1,0 +1,77 @@
+<div [formGroup]="parentForm">
+  <div class="grid-form">
+    
+    <div class="full">
+      <label>Historique complet</label>
+      <textarea formControlName="historique" rows="4" placeholder="Origine, fondation, événements marquants..."></textarea>
+    </div>
+
+    <div>
+      <label>Importance Historique</label>
+      <textarea formControlName="importanceHistorique" rows="3" placeholder="En quoi ce site est-il historiquement important ?"></textarea>
+    </div>
+
+    <div>
+      <label>Importance Culturelle</label>
+      <textarea formControlName="importanceCulturelle" rows="3" placeholder="Rôle dans la culture locale..."></textarea>
+    </div>
+    
+    <div>
+      <label>Valeur Spirituelle / Religieuse</label>
+      <textarea formControlName="valeurSpirituelle" rows="3" placeholder="Mythes, croyances, rôle religieux..."></textarea>
+    </div>
+
+    <div>
+      <label>Attractivité Touristique</label>
+      <textarea formControlName="importanceTouristique" rows="3" placeholder="Pourquoi les touristes devraient-ils visiter ?"></textarea>
+    </div>
+
+    <div class="full">
+      <label>Valeur Patrimoniale</label>
+      <textarea formControlName="valeurPatrimoniale" rows="3" placeholder="Valeur architecturale, esthétique ou patrimoniale intrinsèque..."></textarea>
+    </div>
+    
+    <!-- Traditions Associées (Tags) -->
+    <div class="full">
+      <label>Traditions Associées</label>
+      <div class="notice" style="padding: 5px; margin-top: -5px; margin-bottom: 5px; font-size: 12px;">Cérémonies, fêtes, ou événements traditionnels liés au site.</div>
+      
+      <div style="padding: 8px; border: 1px solid var(--border); border-radius: 9px; background: #fff; display: flex; flex-wrap: wrap; gap: 8px;">
+        <div *ngFor="let control of getArray('traditionsAssociees').controls; let i = index" class="badge">
+          <span>{{ control.value }}</span>
+          <button type="button" (click)="removeChip('traditionsAssociees', i)" style="padding: 0 4px; background: none; color: inherit; font-size: 14px; cursor: pointer;">×</button>
+        </div>
+        <input type="text" style="flex: 1; border: none; padding: 4px; outline: none; min-width: 150px;" placeholder="Ajouter une tradition (Entrée)" (keydown.enter)="addChip($event, 'traditionsAssociees')">
+      </div>
+    </div>
+
+    <!-- Langues -->
+    <div class="full">
+      <label>Langues Parlées / Utilisées</label>
+      <div class="notice" style="padding: 5px; margin-top: -5px; margin-bottom: 5px; font-size: 12px;">Sélectionnez les langues locales ou vernaculaires liées à ce patrimoine.</div>
+      <div style="padding: 8px; border: 1px solid var(--border); border-radius: 9px; background: #fff; display: flex; flex-wrap: wrap; gap: 8px; position: relative;">
+        
+        <div *ngFor="let control of getArray('langues').controls; let i = index" class="badge">
+          <span>{{ control.value }}</span>
+          <button type="button" (click)="removeChip('langues', i)" style="padding: 0 4px; background: none; color: inherit; font-size: 14px; cursor: pointer;">×</button>
+        </div>
+        
+        <button type="button" (click)="showLangDropdown = !showLangDropdown" class="secondary" style="padding: 6px 12px; font-size: 13px;">
+          + Ajouter une langue
+        </button>
+        
+        <div *ngIf="showLangDropdown" style="position: absolute; top: 100%; left: 0; background: #fff; border: 1px solid var(--border); border-radius: 9px; z-index: 50; max-height: 200px; overflow-y: auto; width: 200px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+          <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 40;" (click)="showLangDropdown = false"></div>
+          <div style="position: relative; z-index: 50;">
+            <div *ngFor="let lang of availableLanguages" 
+                 (click)="!getArray('langues').value.includes(lang) && addLanguage(lang)"
+                 style="padding: 8px 12px; cursor: pointer; border-bottom: 1px solid var(--border);"
+                 [style.opacity]="getArray('langues').value.includes(lang) ? 0.5 : 1">
+              {{ lang }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

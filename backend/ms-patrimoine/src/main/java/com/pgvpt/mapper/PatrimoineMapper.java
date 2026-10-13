@@ -30,8 +30,19 @@ public interface PatrimoineMapper {
         throw new IllegalArgumentException("Type de patrimoine inconnu");
     }
 
+    @Mapping(target = "contact.telephone", source = "telephone")
+    @Mapping(target = "contact.email", source = "email")
+    @Mapping(target = "contact.siteWeb", source = "siteWeb")
     SiteNaturelEntity toSiteNaturelEntity(SiteNaturelCreate dto);
+
+    @Mapping(target = "contact.telephone", source = "telephone")
+    @Mapping(target = "contact.email", source = "email")
+    @Mapping(target = "contact.siteWeb", source = "siteWeb")
     MuseeEntity toMuseeEntity(MuseeCreate dto);
+
+    @Mapping(target = "contact.telephone", source = "telephone")
+    @Mapping(target = "contact.email", source = "email")
+    @Mapping(target = "contact.siteWeb", source = "siteWeb")
     MonumentEntity toMonumentEntity(MonumentCreate dto);
 
     // --- Vers DTO (Lecture) ---
@@ -43,9 +54,24 @@ public interface PatrimoineMapper {
         return toBaseDto(entity);
     }
 
+    @Mapping(target = "telephone", source = "contact.telephone")
+    @Mapping(target = "email", source = "contact.email")
+    @Mapping(target = "siteWeb", source = "contact.siteWeb")
     SiteNaturel toSiteNaturelDto(SiteNaturelEntity entity);
+
+    @Mapping(target = "telephone", source = "contact.telephone")
+    @Mapping(target = "email", source = "contact.email")
+    @Mapping(target = "siteWeb", source = "contact.siteWeb")
     Musee toMuseeDto(MuseeEntity entity);
+
+    @Mapping(target = "telephone", source = "contact.telephone")
+    @Mapping(target = "email", source = "contact.email")
+    @Mapping(target = "siteWeb", source = "contact.siteWeb")
     Monument toMonumentDto(MonumentEntity entity);
+
+    @Mapping(target = "telephone", source = "contact.telephone")
+    @Mapping(target = "email", source = "contact.email")
+    @Mapping(target = "siteWeb", source = "contact.siteWeb")
     Patrimoine toBaseDto(PatrimoineEntity entity);
 
     // --- Updates In-Place (CORRIGÉ POUR LE POLYMORPHISME) ---
@@ -62,8 +88,19 @@ public interface PatrimoineMapper {
         }
     }
 
+    @Mapping(target = "contact.telephone", source = "telephone")
+    @Mapping(target = "contact.email", source = "email")
+    @Mapping(target = "contact.siteWeb", source = "siteWeb")
     void updateSiteNaturelEntity(SiteNaturelUpdate dto, @MappingTarget SiteNaturelEntity entity);
+
+    @Mapping(target = "contact.telephone", source = "telephone")
+    @Mapping(target = "contact.email", source = "email")
+    @Mapping(target = "contact.siteWeb", source = "siteWeb")
     void updateMuseeEntity(MuseeUpdate dto, @MappingTarget MuseeEntity entity);
+
+    @Mapping(target = "contact.telephone", source = "telephone")
+    @Mapping(target = "contact.email", source = "email")
+    @Mapping(target = "contact.siteWeb", source = "siteWeb")
     void updateMonumentEntity(MonumentUpdate dto, @MappingTarget MonumentEntity entity);
 
     // --- Sub-Objects Mappings ---
@@ -75,12 +112,13 @@ public interface PatrimoineMapper {
     List<HoraireOuvertureEmbeddable> toHoraireEmbeddableList(List<HoraireOuverture> dtos);
 
     @Mapping(target = "patrimoineId", source = "patrimoine.id")
-    @Mapping(target = "contactConservateurId", source = "contactConservateur.id")
     Conservation toConservationDto(ConservationEntity entity);
 
     @Mapping(target = "patrimoine", ignore = true)
-    @Mapping(target = "contactConservateur", ignore = true)
     void updateConservationEntity(Conservation dto, @MappingTarget ConservationEntity entity);
+
+    ContactConservateur toContactConservateurDto(ContactConservateurEntity entity);
+    ContactConservateurEntity toContactConservateurEntity(ContactConservateur dto);
 
     PatrimoineSummary toSummaryDto(PatrimoineEntity entity);
     List<PatrimoineSummary> toSummaryDtoList(List<PatrimoineEntity> list);
@@ -91,7 +129,8 @@ public interface PatrimoineMapper {
     StatutPatrimoineMetier toStatut(StatutPatrimoine source);
     EtatConservationMetier toEtat(EtatConservation source);
 
-    PatrimoineSearchCriteria toCriteria(
+    // Méthode par défaut : MapStruct renvoie null si toutes les sources sont nulles (GET sans filtre)
+    default PatrimoineSearchCriteria toCriteria(
             CategoriePatrimoine categorie,
             TypePatrimoine type,
             StatutPatrimoine statut,
@@ -100,9 +139,27 @@ public interface PatrimoineMapper {
             Boolean inscritUnesco,
             Boolean classePatrimoine,
             String q
-    );
+    ) {
+        return new PatrimoineSearchCriteria(
+                toCategorie(categorie),
+                toType(type),
+                toStatut(statut),
+                toEtat(etatConservation),
+                accessiblePublic,
+                inscritUnesco,
+                classePatrimoine,
+                q
+        );
+    }
 
     // --- LIAISON BIDIRECTIONNELLE AUTOMATIQUE MAPSTRUCT ---
+    @AfterMapping
+    default void lierConservationAuPatrimoine(@MappingTarget PatrimoineEntity patrimoine) {
+        if (patrimoine != null && patrimoine.getConservation() != null) {
+            patrimoine.getConservation().setPatrimoine(patrimoine);
+        }
+    }
+
     @AfterMapping
     default void lierEspecesAuSiteNaturel(@MappingTarget SiteNaturelEntity site) {
         if (site != null && site.getEspecesProtegees() != null) {

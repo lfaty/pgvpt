@@ -1,5 +1,5 @@
 /**
- * MS Géolocalisation des patrimoines - API
+ * PGVPT - MS Géolocalisation API
  *
  * Contact: contact@pgvpt.sn
  *
@@ -9,17 +9,12 @@
  */
 
 
-/**
- * Format d’erreur commun à l’ensemble des microservices PGVPT.
- */
 export interface ApiError { 
     timestamp: string;
     status: number;
     code: string;
-    error?: string;
     message: string;
     path: string;
-    details?: Array<string>;
-    traceId?: string;
+    details?: { [key: string]: any; };
 }
 

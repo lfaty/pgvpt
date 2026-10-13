@@ -1,0 +1,574 @@
+<div class="space-y-6 pb-12 font-sans">
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- TOAST DE NOTIFICATION FLOTTANT                              -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div *ngIf="notificationMessage"
+       class="fixed bottom-6 right-6 z-50 bg-gray-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-gray-700 animate-bounce">
+    <div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs">
+      <i class="fas fa-check"></i>
+    </div>
+    <span class="text-xs font-medium">{{ notificationMessage }}</span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 1. EN-TÊTE : Titre & Action Principale                      -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+    <div>
+      <div class="flex items-center gap-2 mb-1">
+        <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Contenus Éditoriaux & Récits</h1>
+        <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#0b5d5e]/10 text-[#0b5d5e]">
+          Sénégal
+        </span>
+      </div>
+      <p class="text-sm text-gray-500">
+        Articles historiques, guides de visite, récits et témoignages rattachés aux patrimoines sénégalais.
+      </p>
+    </div>
+
+    <!-- Bouton Création -->
+    <div class="flex items-center gap-3">
+      <a routerLink="/admin/contenus/nouveau"
+         class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-xl shadow-sm hover:shadow transition-all duration-150">
+        <i class="fas fa-plus text-xs"></i>
+        <span>Nouveau Contenu</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 2. MINI-CARTES D'ÉTAT : KPIs & Filtres en 1 clic            -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+    <!-- Tous les contenus -->
+    <button (click)="filterByStatutCard('TOUS')"
+            class="text-left bg-white p-4 rounded-xl border transition-all duration-150 cursor-pointer"
+            [ngClass]="selectedStatut === 'TOUS' ? 'border-purple-600 ring-2 ring-purple-500/20 shadow-sm' : 'border-gray-100 hover:border-gray-200'">
+      <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
+        <span class="font-medium">Tous les contenus</span>
+        <i class="fas fa-newspaper text-purple-600"></i>
+      </div>
+      <div class="text-2xl font-extrabold text-gray-900">{{ contenus.length }}</div>
+      <div class="text-[11px] text-gray-400 mt-1">Articles et guides rédigés</div>
+    </button>
+
+    <!-- Publiés -->
+    <button (click)="filterByStatutCard('PUBLIE')"
+            class="text-left bg-white p-4 rounded-xl border transition-all duration-150 cursor-pointer"
+            [ngClass]="selectedStatut === 'PUBLIE' ? 'border-emerald-500 ring-2 ring-emerald-500/20 shadow-sm' : 'border-gray-100 hover:border-gray-200'">
+      <div class="flex items-center justify-between text-xs text-emerald-700 mb-1">
+        <span class="font-medium">Publiés en ligne</span>
+        <i class="fas fa-check-circle text-emerald-600"></i>
+      </div>
+      <div class="text-2xl font-extrabold text-emerald-700">{{ getCountByStatut('PUBLIE') }}</div>
+      <div class="text-[11px] text-gray-400 mt-1">Visibles aux touristes</div>
+    </button>
+
+    <!-- Validés -->
+    <button (click)="filterByStatutCard('VALIDE')"
+            class="text-left bg-white p-4 rounded-xl border transition-all duration-150 cursor-pointer"
+            [ngClass]="selectedStatut === 'VALIDE' ? 'border-blue-500 ring-2 ring-blue-500/20 shadow-sm' : 'border-gray-100 hover:border-gray-200'">
+      <div class="flex items-center justify-between text-xs text-blue-700 mb-1">
+        <span class="font-medium">Validés</span>
+        <i class="fas fa-check-double text-blue-500"></i>
+      </div>
+      <div class="text-2xl font-extrabold text-blue-700">{{ getCountByStatut('VALIDE') }}</div>
+      <div class="text-[11px] text-gray-400 mt-1">Prêts pour diffusion</div>
+    </button>
+
+    <!-- Brouillons -->
+    <button (click)="filterByStatutCard('BROUILLON')"
+            class="text-left bg-white p-4 rounded-xl border transition-all duration-150 cursor-pointer"
+            [ngClass]="selectedStatut === 'BROUILLON' ? 'border-gray-500 ring-2 ring-gray-500/20 shadow-sm' : 'border-gray-100 hover:border-gray-200'">
+      <div class="flex items-center justify-between text-xs text-gray-600 mb-1">
+        <span class="font-medium">Brouillons</span>
+        <i class="fas fa-pen text-gray-400"></i>
+      </div>
+      <div class="text-2xl font-extrabold text-gray-700">{{ getCountByStatut('BROUILLON') }}</div>
+      <div class="text-[11px] text-gray-400 mt-1">En cours de rédaction</div>
+    </button>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 3. BARRE DE RECHERCHE & FILTRES COMBINÉS                    -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="filter-card space-y-3">
+    <!-- Ligne 1 : Recherche + Compteur + Reset -->
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      
+      <!-- Champ Recherche -->
+      <div class="relative flex-1">
+        <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+        <input type="text"
+               [(ngModel)]="searchQuery"
+               (input)="applyFilters()"
+               placeholder="Rechercher par titre, résumé, extrait ou mots-clés..."
+               class="w-full pl-9 pr-8 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0b5d5e]/20 focus:border-[#0b5d5e] transition-all">
+        <button *ngIf="searchQuery" (click)="searchQuery = ''; applyFilters()" 
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs"
+                title="Effacer le texte">
+          <i class="fas fa-times-circle"></i>
+        </button>
+      </div>
+
+      <!-- Compteur + Reset + Bascules Tableau/Cartes -->
+      <div class="flex items-center justify-end gap-2.5 shrink-0">
+        <span class="text-xs text-gray-400 font-medium hidden md:inline">
+          {{ filteredContenus.length }} contenu{{ filteredContenus.length > 1 ? 's' : '' }}
+        </span>
+
+        <!-- Bouton Réinitialiser (affiché seulement si des filtres sont actifs) -->
+        <button *ngIf="hasActiveFilters()" (click)="resetFilters()"
+                class="px-3 py-2 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200/80 rounded-xl transition-colors flex items-center gap-1.5"
+                title="Réinitialiser tous les filtres">
+          <i class="fas fa-undo-alt text-[10px]"></i>
+          <span>Effacer filtres</span>
+        </button>
+
+        <!-- Toggle Affichage : Tableau / Cartes -->
+        <div class="flex items-center bg-gray-100 p-1 rounded-xl">
+          <button type="button" (click)="viewMode = 'list'"
+                  class="p-1.5 rounded-lg text-xs transition-all"
+                  [ngClass]="viewMode === 'list' ? 'bg-white text-[#0b5d5e] shadow-sm font-bold' : 'text-gray-400 hover:text-gray-700'"
+                  title="Vue Tableau">
+            <i class="fas fa-list-ul w-4 text-center"></i>
+          </button>
+          <button type="button" (click)="viewMode = 'grid'"
+                  class="p-1.5 rounded-lg text-xs transition-all"
+                  [ngClass]="viewMode === 'grid' ? 'bg-white text-[#0b5d5e] shadow-sm font-bold' : 'text-gray-400 hover:text-gray-700'"
+                  title="Vue Cartes / Grille">
+            <i class="fas fa-th-large w-4 text-center"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ligne 2 : Sélecteurs de filtres combinés en pilules élégantes -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2.5 border-t border-gray-100">
+      
+      <!-- Filtre Type -->
+      <div class="filter-pill">
+        <span class="filter-pill-label">
+          <i class="fas fa-layer-group text-[#0b5d5e]"></i> Type :
+        </span>
+        <select [(ngModel)]="selectedType" (change)="applyFilters()" class="filter-pill-select">
+          <option value="TOUS">Tous les types</option>
+          <option value="ARTICLE_HISTORIQUE">📜 Article Historique</option>
+          <option value="GUIDE_VISITE">🧭 Guide de Visite</option>
+          <option value="LEGENDE_MYTHE">✨ Légende & Mythe</option>
+          <option value="RECETTE_TRADITIONNELLE">🍲 Recette Traditionnelle</option>
+          <option value="BIOGRAPHIE">👤 Biographie</option>
+          <option value="EVENEMENT_CULTUREL">🎭 Événement Culturel</option>
+        </select>
+      </div>
+
+      <!-- Filtre Statut -->
+      <div class="filter-pill">
+        <span class="filter-pill-label">
+          <i class="fas fa-shield-alt text-[#0b5d5e]"></i> Statut :
+        </span>
+        <select [(ngModel)]="selectedStatut" (change)="applyFilters()" class="filter-pill-select">
+          <option value="TOUS">Tous les statuts</option>
+          <option value="PUBLIE">🟢 Publié</option>
+          <option value="VALIDE">🟡 Validé</option>
+          <option value="BROUILLON">⚪ Brouillon</option>
+          <option value="ARCHIVE">📦 Archivé</option>
+        </select>
+      </div>
+
+      <!-- Filtre Langue -->
+      <div class="filter-pill">
+        <span class="filter-pill-label">
+          <i class="fas fa-globe text-[#0b5d5e]"></i> Langue :
+        </span>
+        <select [(ngModel)]="selectedLangue" (change)="applyFilters()" class="filter-pill-select">
+          <option value="TOUTES">Toutes les langues</option>
+          <option value="FR">🇫🇷 Français (FR)</option>
+          <option value="EN">🇬🇧 English (EN)</option>
+          <option value="WO">🇸🇳 Wolof (WO)</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 4. TABLEAU DES CONTENUS ÉDITORIAUX                          -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    
+    <!-- Spinner Chargement -->
+    <div *ngIf="loading" class="py-16 text-center">
+      <div class="w-10 h-10 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-3"></div>
+      <p class="text-xs text-gray-500 font-medium">Chargement des contenus éditoriaux...</p>
+    </div>
+
+    <!-- 4.A VUE TABLEAU ADMINISTRATIVE -->
+    <div *ngIf="!loading && filteredContenus.length > 0 && viewMode === 'list'" class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-gray-50/80 border-b border-gray-100 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+            <th class="py-3 px-6">Titre & Résumé</th>
+            <th class="py-3 px-4">Type</th>
+            <th class="py-3 px-4">Langue</th>
+            <th class="py-3 px-4">Statut</th>
+            <th class="py-3 px-4">Médias</th>
+            <th class="py-3 px-4">Création</th>
+            <th class="py-3 px-6 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 text-xs">
+          <tr *ngFor="let c of filteredContenus" class="hover:bg-purple-50/30 transition-colors group">
+            
+            <!-- Titre & Résumé -->
+            <td class="py-4 px-6 max-w-md">
+              <div class="font-bold text-gray-900 group-hover:text-[#0b5d5e] transition-colors mb-0.5 line-clamp-1 cursor-pointer"
+                   (click)="openPreview(c)">
+                {{ c.titre }}
+              </div>
+              <div class="text-[11px] text-gray-500 line-clamp-2" *ngIf="c.resume || c.corps">
+                {{ c.resume || c.corps }}
+              </div>
+              <!-- Mots-clés -->
+              <div *ngIf="c.motsCles && c.motsCles.length > 0" class="flex flex-wrap gap-1 mt-1.5">
+                <span *ngFor="let k of c.motsCles.slice(0, 3)" class="text-[9px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded font-medium">
+                  #{{ k }}
+                </span>
+                <span *ngIf="c.motsCles.length > 3" class="text-[9px] text-gray-400">
+                  +{{ c.motsCles.length - 3 }}
+                </span>
+              </div>
+            </td>
+
+            <!-- Type -->
+            <td class="py-4 px-4 whitespace-nowrap">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border"
+                    [ngClass]="getTypeBadgeClass(c.type)">
+                <i class="fas" [ngClass]="getTypeIcon(c.type)"></i>
+                <span>{{ getTypeLabel(c.type) }}</span>
+              </span>
+            </td>
+
+            <!-- Langue -->
+            <td class="py-4 px-4 whitespace-nowrap">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 font-bold text-[10px] rounded uppercase border border-gray-200">
+                {{ c.langue }}
+              </span>
+            </td>
+
+            <!-- Statut -->
+            <td class="py-4 px-4 whitespace-nowrap">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold border"
+                    [ngClass]="getStatutBadgeClass(c.statut)">
+                <span class="w-1.5 h-1.5 rounded-full"
+                      [ngClass]="{
+                        'bg-emerald-500': c.statut === 'PUBLIE',
+                        'bg-blue-500': c.statut === 'VALIDE',
+                        'bg-amber-500': c.statut === 'EN_REVISION',
+                        'bg-gray-400': c.statut === 'BROUILLON',
+                        'bg-rose-500': c.statut === 'ARCHIVE'
+                      }"></span>
+                <span>{{ getStatutLabel(c.statut) }}</span>
+              </span>
+            </td>
+
+            <!-- Médias rattachés -->
+            <td class="py-4 px-4 whitespace-nowrap text-gray-600">
+              <span *ngIf="c.mediaIds && c.mediaIds.length > 0" 
+                    class="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-50 text-purple-700 border border-purple-200 rounded-full text-[11px] font-medium">
+                <i class="fas fa-images text-[10px]"></i>
+                {{ c.mediaIds.length }} média{{ c.mediaIds.length > 1 ? 's' : '' }}
+              </span>
+              <span *ngIf="!c.mediaIds || c.mediaIds.length === 0" class="text-gray-400 text-[11px]">
+                0 média
+              </span>
+            </td>
+
+            <!-- Date Création -->
+            <td class="py-4 px-4 whitespace-nowrap text-gray-500 text-[11px]">
+              <i class="far fa-calendar-alt mr-1 text-gray-400"></i>
+              {{ (c.createdAt | date:'dd/MM/yyyy') || 'Récent' }}
+            </td>
+
+            <!-- Actions -->
+            <td class="py-4 px-6 text-right whitespace-nowrap">
+              <div class="inline-flex items-center gap-1.5">
+                <button type="button"
+                        (click)="openPreview(c)"
+                        class="p-2 rounded-lg text-gray-400 hover:text-[#0b5d5e] hover:bg-[#0b5d5e]/10 transition-colors"
+                        title="Aperçu & Lecture">
+                  <i class="far fa-eye text-xs"></i>
+                </button>
+
+                <a [routerLink]="['/admin/contenus/modifier', c.id]"
+                   class="px-2.5 py-1.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 hover:border-gray-300 rounded-lg text-xs font-medium shadow-2xs transition-all inline-flex items-center gap-1"
+                   title="Modifier ce contenu">
+                  <i class="fas fa-edit text-[#0b5d5e]"></i>
+                  <span>Modifier</span>
+                </a>
+
+                <button type="button"
+                        (click)="openDeleteModal(c)"
+                        class="px-2.5 py-1.5 bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 hover:border-rose-300 rounded-lg text-xs font-medium shadow-2xs transition-all inline-flex items-center gap-1"
+                        title="Supprimer ce contenu">
+                  <i class="fas fa-trash-alt"></i>
+                  <span>Supprimer</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4.B VUE CARTES (GALERIE ÉDITORIALE) -->
+    <div *ngIf="!loading && filteredContenus.length > 0 && viewMode === 'grid'" class="p-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div *ngFor="let c of filteredContenus"
+             class="group bg-white rounded-2xl border border-gray-200 p-5 shadow-2xs hover:shadow-md hover:border-[#0b5d5e]/40 transition-all flex flex-col justify-between">
+          
+          <div>
+            <!-- En-tête de la carte : Badges Type, Statut & Langue -->
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold border"
+                    [ngClass]="getTypeBadgeClass(c.type)">
+                <i class="fas" [ngClass]="getTypeIcon(c.type)"></i>
+                <span>{{ getTypeLabel(c.type) }}</span>
+              </span>
+
+              <div class="flex items-center gap-1.5">
+                <!-- Badge Langue -->
+                <span class="px-1.5 py-0.5 bg-gray-100 text-gray-700 font-bold text-[9px] rounded uppercase border border-gray-200">
+                  {{ c.langue }}
+                </span>
+                
+                <!-- Badge Statut -->
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border inline-flex items-center gap-1"
+                      [ngClass]="getStatutBadgeClass(c.statut)">
+                  <span class="w-1.5 h-1.5 rounded-full"
+                        [ngClass]="{
+                          'bg-emerald-500': c.statut === 'PUBLIE',
+                          'bg-blue-500': c.statut === 'VALIDE',
+                          'bg-amber-500': c.statut === 'EN_REVISION',
+                          'bg-gray-400': c.statut === 'BROUILLON',
+                          'bg-rose-500': c.statut === 'ARCHIVE'
+                        }"></span>
+                  <span>{{ getStatutLabel(c.statut) }}</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Titre -->
+            <h3 class="font-bold text-gray-900 group-hover:text-[#0b5d5e] transition-colors text-sm mb-2 line-clamp-2 cursor-pointer"
+                (click)="openPreview(c)">
+              {{ c.titre }}
+            </h3>
+
+            <!-- Résumé / Extrait -->
+            <p class="text-xs text-gray-500 line-clamp-3 mb-4 leading-relaxed">
+              {{ c.resume || c.corps || 'Aucun texte rédigé.' }}
+            </p>
+
+            <!-- Mots-clés / Tags -->
+            <div *ngIf="c.motsCles && c.motsCles.length > 0" class="flex flex-wrap gap-1 mb-4">
+              <span *ngFor="let k of c.motsCles.slice(0, 3)" class="text-[9px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md font-medium">
+                #{{ k }}
+              </span>
+              <span *ngIf="c.motsCles.length > 3" class="text-[9px] text-gray-400 font-medium">
+                +{{ c.motsCles.length - 3 }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Pied de carte : Métadonnées & Actions -->
+          <div class="pt-3 border-t border-gray-100 flex items-center justify-between">
+            <div class="flex items-center gap-3 text-[11px] text-gray-400">
+              <span *ngIf="c.mediaIds && c.mediaIds.length > 0" class="inline-flex items-center gap-1 text-purple-600 font-medium">
+                <i class="fas fa-images text-[10px]"></i>
+                {{ c.mediaIds.length }}
+              </span>
+              <span>
+                <i class="far fa-calendar-alt mr-0.5 text-gray-300"></i>
+                {{ (c.createdAt | date:'dd/MM/yyyy') || 'Récent' }}
+              </span>
+            </div>
+
+            <div class="flex items-center gap-1.5">
+              <button type="button" (click)="openPreview(c)"
+                      class="p-1.5 rounded-lg text-gray-400 hover:text-[#0b5d5e] hover:bg-gray-100 transition-colors"
+                      title="Lecture rapide">
+                <i class="far fa-eye text-xs"></i>
+              </button>
+              <a [routerLink]="['/admin/contenus/modifier', c.id]"
+                 class="p-1.5 rounded-lg text-gray-500 hover:text-[#0b5d5e] hover:bg-gray-100 transition-colors"
+                 title="Modifier">
+                <i class="fas fa-edit text-xs"></i>
+              </a>
+              <button type="button" (click)="openDeleteModal(c)"
+                      class="p-1.5 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                      title="Supprimer">
+                <i class="fas fa-trash-alt text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- État Vide -->
+    <div *ngIf="!loading && filteredContenus.length === 0" class="py-16 text-center px-4">
+      <div class="w-16 h-16 bg-purple-50 text-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl">
+        <i class="fas fa-newspaper"></i>
+      </div>
+      <h3 class="text-sm font-bold text-gray-900 mb-1">Aucun contenu trouvé</h3>
+      <p class="text-xs text-gray-500 max-w-sm mx-auto mb-4">
+        Aucun contenu ne correspond à vos critères de recherche actuels.
+      </p>
+      <div class="flex items-center justify-center gap-3">
+        <button type="button" (click)="resetFilters()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-xl transition-colors">
+          Réinitialiser les filtres
+        </button>
+        <a routerLink="/admin/contenus/nouveau" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-medium rounded-xl transition-colors inline-flex items-center gap-1.5">
+          <i class="fas fa-plus"></i> Créer un contenu
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 5. MODAL DE LECTURE & APERÇU RAPIDE                         -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div *ngIf="previewContenu"
+       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity"
+       aria-modal="true" role="dialog">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6 text-left border border-gray-100 animate-scale-up max-h-[90vh] flex flex-col justify-between">
+      
+      <!-- En-tête du modal -->
+      <div class="flex items-start justify-between gap-4 pb-4 border-b border-gray-100">
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold border"
+                  [ngClass]="getTypeBadgeClass(previewContenu.type)">
+              <i class="fas" [ngClass]="getTypeIcon(previewContenu.type)"></i>
+              <span>{{ getTypeLabel(previewContenu.type) }}</span>
+            </span>
+
+            <span class="px-2 py-0.5 bg-gray-100 text-gray-700 font-bold text-[10px] rounded uppercase border border-gray-200">
+              {{ getLanguageLabel(previewContenu.langue) }}
+            </span>
+
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border inline-flex items-center gap-1"
+                  [ngClass]="getStatutBadgeClass(previewContenu.statut)">
+              <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+              <span>{{ getStatutLabel(previewContenu.statut) }}</span>
+            </span>
+          </div>
+
+          <h2 class="text-xl font-bold text-gray-900 leading-snug">
+            {{ previewContenu.titre }}
+          </h2>
+          <p class="text-[11px] text-gray-400 mt-1">
+            Créé le {{ (previewContenu.createdAt | date:'dd MMMM yyyy') || 'Date non disponible' }}
+          </p>
+        </div>
+
+        <button type="button" (click)="closePreview()"
+                class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 flex items-center justify-center transition-colors shrink-0">
+          <i class="fas fa-times text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Corps du contenu / Récit défilable -->
+      <div class="py-4 space-y-4 overflow-y-auto max-h-[50vh] pr-1">
+        <!-- Résumé / Chapeau -->
+        <div *ngIf="previewContenu.resume" class="p-3.5 bg-emerald-50/60 rounded-xl border border-emerald-100 text-xs text-emerald-950 italic leading-relaxed">
+          <span class="font-bold block not-italic mb-1 text-[11px] text-emerald-800 uppercase tracking-wide">Résumé éditorial :</span>
+          {{ previewContenu.resume }}
+        </div>
+
+        <!-- Corps complet -->
+        <div>
+          <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Contenu intégral :</h4>
+          <div class="text-xs text-gray-700 leading-relaxed whitespace-pre-line bg-gray-50/50 p-4 rounded-xl border border-gray-100">
+            {{ previewContenu.corps || 'Aucun texte rédigé pour le moment.' }}
+          </div>
+        </div>
+
+        <!-- Mots-clés -->
+        <div *ngIf="previewContenu.motsCles && previewContenu.motsCles.length > 0">
+          <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Mots-clés associés :</h4>
+          <div class="flex flex-wrap gap-1.5">
+            <span *ngFor="let k of previewContenu.motsCles" class="text-[10px] bg-gray-100 text-gray-700 px-2.5 py-1 rounded-lg font-medium border border-gray-200">
+              #{{ k }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pied de modal -->
+      <div class="pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
+        <div class="text-xs text-gray-400">
+          <span *ngIf="previewContenu.mediaIds?.length > 0" class="text-purple-600 font-medium">
+            <i class="fas fa-images mr-1"></i> {{ previewContenu.mediaIds.length }} média(s) attaché(s)
+          </span>
+          <span *ngIf="!previewContenu.mediaIds?.length">Aucun média rattaché</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button type="button" (click)="closePreview()"
+                  class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
+            Fermer
+          </button>
+          <a [routerLink]="['/admin/contenus/modifier', previewContenu.id]"
+             (click)="closePreview()"
+             class="px-4 py-2 bg-[#0b5d5e] hover:bg-[#084b4c] text-white text-xs font-semibold rounded-xl shadow-sm transition-colors flex items-center gap-1.5">
+            <i class="fas fa-edit text-xs"></i>
+            <span>Modifier</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 6. MODAL DE CONFIRMATION DE SUPPRESSION                     -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div *ngIf="deleteModalContenu"
+       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity"
+       aria-modal="true" role="dialog">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 text-center border border-gray-100 animate-scale-up">
+      <div class="w-14 h-14 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
+        <i class="fas fa-trash-alt"></i>
+      </div>
+      <h3 class="text-lg font-bold text-gray-900 mb-2">Confirmer la suppression</h3>
+      <p class="text-xs text-gray-500 mb-2">
+        Êtes-vous sûr de vouloir supprimer définitivement le contenu éditorial :
+      </p>
+      <div class="p-3 bg-gray-50 rounded-xl border border-gray-200 text-xs font-semibold text-gray-800 mb-6 truncate">
+        {{ deleteModalContenu?.titre }}
+      </div>
+      <div class="flex items-center justify-end gap-3">
+        <button type="button"
+                (click)="closeDeleteModal()"
+                [disabled]="isDeleting"
+                class="flex-1 py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
+          Annuler
+        </button>
+        <button type="button"
+                (click)="confirmSuppression()"
+                [disabled]="isDeleting"
+                class="flex-1 py-2.5 px-4 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2">
+          <i *ngIf="isDeleting" class="fas fa-spinner fa-spin"></i>
+          <span>{{ isDeleting ? 'Suppression...' : 'Supprimer' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -7,6 +7,7 @@ import org.mapstruct.*;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.net.URI;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ConservationMapper {
@@ -27,5 +28,13 @@ public interface ConservationMapper {
         return value != null
                 ? value.atOffset(ZoneOffset.UTC)
                 : null;
+    }
+
+    default String map(URI value) {
+        return value == null ? null : value.toString();
+    }
+
+    default URI map(String value) {
+        return value == null ? null : URI.create(value);
     }
 }

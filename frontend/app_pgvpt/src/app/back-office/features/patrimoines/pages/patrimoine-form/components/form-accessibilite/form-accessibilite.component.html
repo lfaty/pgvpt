@@ -1,0 +1,82 @@
+<div [formGroup]="parentForm" class="bg-white rounded-xl relative z-10 shadow-sm border border-slate-200 p-6 md:p-8 mb-8 fade-in">
+  
+  <div class="mb-6 border-b border-slate-100 pb-4">
+    <h2 class="text-lg font-bold text-slate-800">Accessibilité & Services</h2>
+    <p class="text-sm text-slate-500 mt-1">Équipements et conditions d'accès au site</p>
+  </div>
+
+  <div class="space-y-6">
+    
+    <div class="grid relative z-10 grid-cols-1 md:grid-cols-2 gap-4">
+      <label class="flex items-center gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+        <input type="checkbox" formControlName="accessiblePublic" class="w-5 h-5 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">
+        <div>
+          <span class="block font-semibold text-slate-800">Accessible au public</span>
+          <span class="block text-xs text-slate-500 mt-0.5">Le site est ouvert aux visiteurs</span>
+        </div>
+      </label>
+      
+      <label class="flex items-center gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+        <input type="checkbox" formControlName="accessibilitePMR" class="w-5 h-5 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">
+        <div>
+          <span class="block font-semibold text-slate-800">Accessible PMR</span>
+          <span class="block text-xs text-slate-500 mt-0.5">Adapté aux personnes à mobilité réduite</span>
+        </div>
+      </label>
+      
+      <label class="flex items-center gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+        <input type="checkbox" formControlName="accesFauteuilRoulant" class="w-5 h-5 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">
+        <div>
+          <span class="block font-semibold text-slate-800">Accès Fauteuil Roulant</span>
+          <span class="block text-xs text-slate-500 mt-0.5">Rampes et ascenseurs disponibles</span>
+        </div>
+      </label>
+      
+      <label class="flex items-center gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+        <input type="checkbox" formControlName="accesTransportPublic" class="w-5 h-5 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">
+        <div>
+          <span class="block font-semibold text-slate-800">Transport Public</span>
+          <span class="block text-xs text-slate-500 mt-0.5">Desservi par les bus/taxis</span>
+        </div>
+      </label>
+      
+      <label class="flex items-center gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+        <input type="checkbox" formControlName="parking" class="w-5 h-5 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">
+        <div>
+          <span class="block font-semibold text-slate-800">Parking</span>
+          <span class="block text-xs text-slate-500 mt-0.5">Stationnement disponible à proximité</span>
+        </div>
+      </label>
+      
+      <label class="flex items-center gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+        <input type="checkbox" formControlName="accesEnfant" class="w-5 h-5 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">
+        <div>
+          <span class="block font-semibold text-slate-800">Adapté aux enfants</span>
+          <span class="block text-xs text-slate-500 mt-0.5">Sécurisé et intéressant pour les jeunes</span>
+        </div>
+      </label>
+      
+      <label class="flex items-center gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+        <input type="checkbox" formControlName="guideDisponible" class="w-5 h-5 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">
+        <div>
+          <span class="block font-semibold text-slate-800">Visites Guidées</span>
+          <span class="block text-xs text-slate-500 mt-0.5">Guides officiels sur place</span>
+        </div>
+      </label>
+      
+      <label class="flex items-center gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+        <input type="checkbox" formControlName="guideAudio" class="w-5 h-5 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">
+        <div>
+          <span class="block font-semibold text-slate-800">Audioguide</span>
+          <span class="block text-xs text-slate-500 mt-0.5">Application ou appareil disponible</span>
+        </div>
+      </label>
+    </div>
+
+    <div>
+      <label class="block text-sm font-semibold text-slate-700 mb-2">Conditions d'accès spécifiques</label>
+      <textarea formControlName="conditionsAcces" rows="3" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none resize-none" placeholder="Ex: Autorisation préalable requise, tenue correcte exigée..."></textarea>
+    </div>
+
+  </div>
+</div>

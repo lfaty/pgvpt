@@ -1,8 +1,8 @@
 # @
 
-Gestion des photographies, vidéos, audios, documents, panoramas 360 et ressources 3D du patrimoine.
+Propriétaire des métadonnées des photos, vidéos, audios, documents, panoramas 360, modèles 3D, cartes et archives numérisées du patrimoine.
 
-The version of the OpenAPI document: 1.0.0
+The version of the OpenAPI document: 2.0.0
 
 ## Building
 

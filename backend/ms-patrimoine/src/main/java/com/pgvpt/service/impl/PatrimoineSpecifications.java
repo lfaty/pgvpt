@@ -19,6 +19,10 @@ public final class PatrimoineSpecifications {
 
             List<Predicate> predicates = new ArrayList<>();
 
+            if (criteria == null) {
+                return cb.conjunction();
+            }
+
             if (criteria.q() != null && !criteria.q().isBlank()) {
 
                 String pattern =

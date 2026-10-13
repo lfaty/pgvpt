@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 public class MenaceEmbeddable {
 
-    @Column(nullable = false, length = 150)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String type;
 
     @Enumerated(EnumType.STRING)

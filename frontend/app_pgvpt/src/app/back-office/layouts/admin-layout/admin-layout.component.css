@@ -1,0 +1,4 @@
+/* Reset des anciens styles — le design est piloté par Tailwind dans le template */
+:host {
+  display: block;
+}

@@ -29,7 +29,7 @@ public class AccessibiliteEmbeddable {
 
     @ElementCollection
     @CollectionTable(name = "patrimoine_langue_visite", joinColumns = @JoinColumn(name = "patrimoine_id"))
-    @Column(name = "langue")
+    @Column(name = "langue", columnDefinition = "TEXT")
     private Set<String> langueVisite = new HashSet<>();
 
     // Correction ici : type Boolean (Objet)
@@ -40,7 +40,7 @@ public class AccessibiliteEmbeddable {
 
     @ElementCollection
     @CollectionTable(name = "patrimoine_restriction_acces", joinColumns = @JoinColumn(name = "patrimoine_id"))
-    @Column(name = "restriction")
+    @Column(name = "restriction", columnDefinition = "TEXT")
     private Set<String> restrictions = new HashSet<>();
 
 }

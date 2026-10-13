@@ -1,4 +1,98 @@
+@import 'leaflet/dist/leaflet.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* --- VARIABLES DE THÈME (Prototypes PGVPT) --- */
+:root {
+  --primary: #0b5d5e;
+  --primary2: #087f5b;
+  --bg: #f4f7f8;
+  --card: #fff;
+  --text: #1f2937;
+  --muted: #667085;
+  --border: #d9e2e5;
+  --danger: #b42318;
+  --ok: #027a48;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* --- GRILLES & LAYOUT --- */
+.grid-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.grid-form-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.full { grid-column: 1 / -1; }
+
+.card-form {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 8px #1018280d;
+}
+
+/* --- TYPOGRAPHIE --- */
+h2 { margin: 0 0 6px; font-size: 20px; }
+.subtitle { color: var(--muted); margin: 0 0 18px; }
+
+/* --- FORMULAIRES & BOUTONS PAR DÉFAUT --- */
+@layer base {
+  label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+  label span { color: var(--danger); }
+
+  input[type="text"], input[type="number"], select, textarea {
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    font: inherit;
+    background: #fff;
+  }
+
+  textarea { min-height: 110px; resize: vertical; }
+
+  button {
+    cursor: pointer;
+  }
+}
+
+/* Styles pour les formulaires d'administration */
+.grid-form input[type="text"],
+.grid-form input[type="number"],
+.grid-form select,
+.grid-form textarea,
+.card-form input[type="text"],
+.card-form input[type="number"],
+.card-form select,
+.card-form textarea {
+  width: 100%;
+  padding: 11px 12px;
+}
+
+.card-form button,
+.grid-form button,
+.actions button {
+  border: 0;
+  border-radius: 9px;
+  padding: 11px 16px;
+  font-weight: 700;
+}
+.actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+.primary { background: var(--primary); color: #fff; }
+.secondary { background: #eef2f4; color: #344054; }
+.danger { background: #fff0f0; color: var(--danger); }
+
+/* --- UTILITAIRES (Alertes, Badges) --- */
+.notice { padding: 12px 14px; border-radius: 9px; background: #eef8f5; border-left: 4px solid var(--primary2); margin: 12px 0; }
+.error { color: var(--danger); font-size: 13px; margin-top: 5px; }
+.success { color: var(--ok); font-weight: 700; }
+.badge { display: inline-block; padding: 5px 9px; border-radius: 99px; background: #e8f4f1; color: var(--primary); font-size: 12px; font-weight: 700; }
+/* --- RESPONSIVE --- */
+@media(max-width: 760px) {
+  .grid-form, .grid-form-3 { grid-template-columns: 1fr; }
+}

@@ -35,13 +35,25 @@ public class MediaServiceImpl implements MediaService {
     @Override
     @Transactional(readOnly = true)
     public List<Media> findByPatrimoineIdAndType(UUID patrimoineId, TypeMedia type) {
+        TypeMediaMetier typeMediaMetier = type != null ? mapper.toTypeMetier(type) : null;
+        
+        if (patrimoineId == null) {
+            if (typeMediaMetier == null) {
+                return mapper.toDtoList(repository.findAll());
+            } else {
+                return mapper.toDtoList(repository.findByType(typeMediaMetier));
+            }
+        }
+
         validerPatrimoine(patrimoineId);
 
-        TypeMediaMetier typeMediaMetier = type != null ? mapper.toTypeMetier(type) : null;
         List<MediaEntity> entities;
-
-        if (typeMediaMetier == null) { entities = repository.findByPatrimoineId(patrimoineId); }
-        else { entities = repository.findByPatrimoineIdAndType(patrimoineId, typeMediaMetier); }
+        if (typeMediaMetier == null) { 
+            entities = repository.findByPatrimoineId(patrimoineId); 
+        } else { 
+            entities = repository.findByPatrimoineIdAndType(patrimoineId, typeMediaMetier); 
+        }
+        
         return mapper.toDtoList(entities);
     }
 
@@ -54,6 +66,7 @@ public class MediaServiceImpl implements MediaService {
     @Override
     @Transactional
     public Media create(MediaCreate dto) {
+        log.info("Tentative de création de média: {}", dto);
         validerPatrimoine(dto.getPatrimoineId());
 
         MediaEntity entity = mapper.toEntity(dto);

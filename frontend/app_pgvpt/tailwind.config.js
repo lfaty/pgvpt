@@ -21,6 +21,25 @@ module.exports = {
         },
         background: {
           DEFAULT: '#FAFAF9', // Sable clair
+        },
+        forest: {
+          DEFAULT: '#1c231d',
+          deep: '#101612',
+        },
+        paper: {
+          DEFAULT: '#f3f1e9',
+        },
+        ivory: {
+          DEFAULT: '#ebe8de',
+        },
+        clay: {
+          DEFAULT: '#8b8070',
+        },
+        gold: {
+          DEFAULT: '#cfa661',
+        },
+        ink: {
+          DEFAULT: '#151515',
         }
       },
       fontFamily: {

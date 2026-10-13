@@ -1,0 +1,348 @@
+<div class="space-y-8 pb-10">
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 1. EN-TÊTE : Bienvenue & Actions Rapides                    -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+    <div>
+      <div class="flex items-center gap-2 mb-1">
+        <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Tableau de bord</h1>
+        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#0b5d5e]/10 text-[#0b5d5e]">
+          Sénégal Tourisme
+        </span>
+      </div>
+      <p class="text-sm text-gray-500">
+        Supervision globale du patrimoine, des activités guidées et des circuits touristiques.
+      </p>
+    </div>
+
+    <!-- Actions rapides avec mise en avant d'Activités & Patrimoine -->
+    <div class="flex flex-wrap items-center gap-2.5">
+      <a routerLink="/admin/patrimoines/nouveau"
+        class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#0b5d5e] hover:bg-[#084b4c] text-white text-xs font-semibold rounded-xl shadow-sm hover:shadow transition-all duration-150">
+        <i class="fas fa-landmark text-xs"></i>
+        <span>Nouveau Patrimoine</span>
+      </a>
+
+      <a routerLink="/admin/activites"
+        class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl shadow-sm hover:shadow transition-all duration-150">
+        <i class="fas fa-hiking text-xs"></i>
+        <span>Nouvelle Activité</span>
+      </a>
+
+      <a routerLink="/admin/circuits"
+        class="inline-flex items-center gap-2 px-3.5 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200 text-xs font-semibold rounded-xl transition-all duration-150">
+        <i class="fas fa-route text-xs text-amber-600"></i>
+        <span>Nouveau Circuit</span>
+      </a>
+
+      <a routerLink="/admin/contenus/nouveau"
+        class="inline-flex items-center gap-2 px-3.5 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200 text-xs font-semibold rounded-xl transition-all duration-150">
+        <i class="fas fa-file-alt text-xs text-amber-600"></i>
+        <span>Nouveau Contenu</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 2. RUBAN KPIS : LES 4 PILIERS DE LA PLATEFORME              -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+    <a *ngFor="let stat of stats" [routerLink]="stat.lien"
+      class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between group">
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-semibold text-gray-500 tracking-wide uppercase">{{ stat.titre }}</span>
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110"
+            [ngClass]="[stat.bgCouleur, stat.textCouleur]">
+            <i [class]="stat.icon"></i>
+          </div>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="text-3xl font-extrabold text-gray-900 tracking-tight">{{ stat.total }}</span>
+          <span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+            {{ stat.evolution }}
+          </span>
+        </div>
+      </div>
+      <div class="mt-4 pt-3 border-t border-gray-50 flex items-center justify-between text-xs text-gray-400">
+        <span>{{ stat.sousTitre }}</span>
+        <i class="fas fa-arrow-right text-[10px] text-gray-300 group-hover:text-gray-600 group-hover:translate-x-1 transition-all"></i>
+      </div>
+    </a>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 3. ZONE CENTRALE : Carte Leaflet & Bloc Activités           -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Carte Interactive du Sénégal (2 colonnes sur desktop) -->
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+      <div class="p-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-[#0b5d5e]/10 text-[#0b5d5e] flex items-center justify-center">
+            <i class="fas fa-map-marked-alt text-sm"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-gray-900">Carte des sites & activités</h2>
+            <p class="text-xs text-gray-500">Points patrimoniaux et activités associées sur le territoire</p>
+          </div>
+        </div>
+
+        <!-- Filtre Région -->
+        <div class="flex items-center gap-2">
+          <label for="filtreRegion" class="text-xs font-medium text-gray-500 whitespace-nowrap">Région :</label>
+          <select id="filtreRegion"
+            (change)="filtrerParRegion($any($event.target).value)"
+            class="text-xs font-medium bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#0b5d5e] focus:border-[#0b5d5e]">
+            <option value="TOUTES">Toutes les régions</option>
+            <option value="Dakar">Dakar</option>
+            <option value="Saint-Louis">Saint-Louis</option>
+            <option value="Fatick">Fatick (Saloum)</option>
+            <option value="Tambacounda">Tambacounda</option>
+            <option value="Kaolack">Kaolack</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Conteneur Leaflet -->
+      <div class="relative w-full bg-gray-50" style="height: 380px;" #mapContainer></div>
+
+      <!-- Mini-fiche site sélectionné (au clic sur un marqueur) -->
+      <div *ngIf="selectedSite" class="p-4 bg-[#0b5d5e]/5 border-t border-[#0b5d5e]/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-bold text-gray-900">{{ selectedSite.name }}</span>
+            <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-[#0b5d5e] text-white">
+              {{ selectedSite.region }}
+            </span>
+          </div>
+          <p class="text-xs text-gray-600 mt-1">
+            <strong>Activités disponibles :</strong> {{ selectedSite.activitesExemples.join(', ') }}
+          </p>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <a routerLink="/admin/patrimoines" class="px-3 py-1.5 text-xs font-semibold text-[#0b5d5e] bg-white border border-[#0b5d5e]/30 hover:bg-[#0b5d5e] hover:text-white rounded-lg transition-colors">
+            Voir le patrimoine
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Colonne de droite : Activités Phares & Répartition (1 colonne) -->
+    <div class="space-y-6 flex flex-col">
+
+      <!-- Carte : Activités Touristiques les plus demandées -->
+      <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex-1">
+        <div class="flex items-center justify-between pb-3 mb-4 border-b border-gray-100">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <i class="fas fa-fire text-sm"></i>
+            </div>
+            <h3 class="text-sm font-bold text-gray-900">Activités en vedette</h3>
+          </div>
+          <a routerLink="/admin/activites" class="text-xs text-emerald-700 hover:underline font-semibold">
+            Tout voir
+          </a>
+        </div>
+
+        <div class="space-y-3.5">
+          <div *ngFor="let act of topActivites"
+            class="p-3 rounded-xl border border-gray-100 hover:border-emerald-200 hover:bg-emerald-50/20 transition-all flex items-start gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-xs text-gray-600 shrink-0 mt-0.5">
+              <i [class]="act.icon"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="text-xs font-bold text-gray-800 truncate">{{ act.titre }}</h4>
+              <p class="text-[11px] text-gray-500 mt-0.5"><i class="fa-solid fa-location-dot text-rose-500 mr-1 text-[10px]"></i>{{ act.site }} ({{ act.region }})</p>
+              <div class="flex items-center gap-2 mt-1.5">
+                <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded" [ngClass]="act.bgBadge">
+                  <i class="fa-regular fa-clock text-[10px] mr-1"></i>{{ act.duree }}
+                </span>
+                <span class="text-[11px] font-bold text-gray-700 ml-auto">
+                  {{ act.prix }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Carte : Répartition des Activités -->
+      <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+        <div class="flex items-center gap-2 pb-3 mb-3 border-b border-gray-100">
+          <div class="w-8 h-8 rounded-lg bg-[#0b5d5e]/10 text-[#0b5d5e] flex items-center justify-center">
+            <i class="fas fa-chart-pie text-sm"></i>
+          </div>
+          <h3 class="text-sm font-bold text-gray-900">Types d'activités (65)</h3>
+        </div>
+
+        <div class="space-y-3">
+          <div *ngFor="let rep of repartitionActivites">
+            <div class="flex justify-between items-center text-xs mb-1">
+              <span class="font-medium text-gray-700 flex items-center gap-1.5">
+                <i [class]="rep.icon + ' text-gray-400 text-[10px]'"></i>
+                {{ rep.type }}
+              </span>
+              <span class="font-bold text-gray-800">{{ rep.total }} ({{ rep.pourcentage }}%)</span>
+            </div>
+            <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <div class="h-full rounded-full transition-all duration-500" [ngClass]="rep.color"
+                [style.width.%]="rep.pourcentage"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 4. DERNIERS AJOUTS : Onglets interactifs                    -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <div class="p-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h3 class="text-base font-bold text-gray-900">Derniers enregistrements</h3>
+        <p class="text-xs text-gray-500">Mises à jour récentes du catalogue patrimonial et de l'offre touristique</p>
+      </div>
+
+      <!-- Onglets pour basculer facilement -->
+      <div class="flex items-center bg-gray-100 p-1 rounded-xl gap-1 self-start sm:self-auto">
+        <button (click)="setTab('patrimoines')"
+          class="px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all"
+          [ngClass]="activeTab === 'patrimoines' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-800'">
+          <i class="fa-solid fa-landmark mr-1.5 text-[#0b5d5e]"></i>Patrimoines
+        </button>
+        <button (click)="setTab('activites')"
+          class="px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all"
+          [ngClass]="activeTab === 'activites' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-800'">
+          <i class="fa-solid fa-compass mr-1.5 text-emerald-600"></i>Activités
+        </button>
+        <button (click)="setTab('circuits')"
+          class="px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all"
+          [ngClass]="activeTab === 'circuits' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-800'">
+          <i class="fa-solid fa-route mr-1.5 text-amber-600"></i>Circuits
+        </button>
+      </div>
+    </div>
+
+    <!-- TABLEAU PATRIMOINES -->
+    <div *ngIf="activeTab === 'patrimoines'" class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-gray-50/75 text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100">
+            <th class="py-3 px-5">Nom du Site</th>
+            <th class="py-3 px-5">Région</th>
+            <th class="py-3 px-5">Catégorie</th>
+            <th class="py-3 px-5">Activités liées</th>
+            <th class="py-3 px-5">Date</th>
+            <th class="py-3 px-5">Statut</th>
+            <th class="py-3 px-5 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 text-xs">
+          <tr *ngFor="let p of recentsPatrimoines" class="hover:bg-gray-50/50 transition-colors">
+            <td class="py-3.5 px-5 font-bold text-gray-900">{{ p.nom }}</td>
+            <td class="py-3.5 px-5 text-gray-600"><i class="fa-solid fa-location-dot text-rose-500 mr-1 text-xs"></i>{{ p.region }}</td>
+            <td class="py-3.5 px-5 text-gray-600">{{ p.categorie }}</td>
+            <td class="py-3.5 px-5">
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-semibold text-[11px]">
+                <i class="fas fa-hiking text-[10px]"></i> {{ p.activitesCount }} activités
+              </span>
+            </td>
+            <td class="py-3.5 px-5 text-gray-400">{{ p.date }}</td>
+            <td class="py-3.5 px-5">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border" [ngClass]="p.statutBadge">
+                {{ p.statut }}
+              </span>
+            </td>
+            <td class="py-3.5 px-5 text-right">
+              <a routerLink="/admin/patrimoines" class="text-[#0b5d5e] hover:text-[#084b4c] font-semibold text-xs">
+                Gérer
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TABLEAU ACTIVITÉS -->
+    <div *ngIf="activeTab === 'activites'" class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-gray-50/75 text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100">
+            <th class="py-3 px-5">Intitulé de l'Activité</th>
+            <th class="py-3 px-5">Site Rattaché</th>
+            <th class="py-3 px-5">Catégorie</th>
+            <th class="py-3 px-5">Durée</th>
+            <th class="py-3 px-5">Tarif estimatif</th>
+            <th class="py-3 px-5">Disponibilité</th>
+            <th class="py-3 px-5 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 text-xs">
+          <tr *ngFor="let a of recentsActivites" class="hover:bg-gray-50/50 transition-colors">
+            <td class="py-3.5 px-5 font-bold text-gray-900">{{ a.nom }}</td>
+            <td class="py-3.5 px-5 text-gray-600"><i class="fa-solid fa-landmark text-gray-400 mr-1 text-xs"></i>{{ a.site }} ({{ a.region }})</td>
+            <td class="py-3.5 px-5 text-gray-600">{{ a.type }}</td>
+            <td class="py-3.5 px-5 text-gray-600 font-medium"><i class="fa-regular fa-clock text-gray-400 mr-1 text-xs"></i>{{ a.duree }}</td>
+            <td class="py-3.5 px-5 font-bold text-gray-800">{{ a.prix }}</td>
+            <td class="py-3.5 px-5">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border" [ngClass]="a.statutBadge">
+                {{ a.statut }}
+              </span>
+            </td>
+            <td class="py-3.5 px-5 text-right">
+              <a routerLink="/admin/activites" class="text-emerald-700 hover:text-emerald-800 font-semibold text-xs">
+                Consulter
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TABLEAU CIRCUITS -->
+    <div *ngIf="activeTab === 'circuits'" class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-gray-50/75 text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100">
+            <th class="py-3 px-5">Nom du Circuit</th>
+            <th class="py-3 px-5">Itinéraire / Étapes</th>
+            <th class="py-3 px-5">Durée</th>
+            <th class="py-3 px-5">Activités incluses</th>
+            <th class="py-3 px-5">Statut</th>
+            <th class="py-3 px-5 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 text-xs">
+          <tr *ngFor="let c of recentsCircuits" class="hover:bg-gray-50/50 transition-colors">
+            <td class="py-3.5 px-5 font-bold text-gray-900">{{ c.nom }}</td>
+            <td class="py-3.5 px-5 text-gray-600"><i class="fa-solid fa-route text-amber-500 mr-1 text-xs"></i>{{ c.etapes }}</td>
+            <td class="py-3.5 px-5 text-gray-600 font-medium"><i class="fa-regular fa-calendar text-gray-400 mr-1 text-xs"></i>{{ c.duree }}</td>
+            <td class="py-3.5 px-5">
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-semibold text-[11px]">
+                <i class="fas fa-hiking text-[10px]"></i> {{ c.activitesCount }} étapes & activités
+              </span>
+            </td>
+            <td class="py-3.5 px-5">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border" [ngClass]="c.statutBadge">
+                {{ c.statut }}
+              </span>
+            </td>
+            <td class="py-3.5 px-5 text-right">
+              <a routerLink="/admin/circuits" class="text-amber-700 hover:text-amber-800 font-semibold text-xs">
+                Voir détails
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>

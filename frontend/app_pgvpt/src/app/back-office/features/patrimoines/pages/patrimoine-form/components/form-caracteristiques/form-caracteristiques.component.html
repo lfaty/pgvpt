@@ -1,0 +1,217 @@
+<div [formGroup]="parentForm" class="bg-white rounded-xl relative z-10 shadow-sm border border-slate-200 p-6 md:p-8 mb-8 fade-in">
+  
+  <div class="mb-6 border-b border-slate-100 pb-4">
+    <h2 class="text-lg font-bold text-slate-800">Caractéristiques Spécifiques</h2>
+    <p class="text-sm text-slate-500 mt-1">
+      <span *ngIf="!currentType">Sélectionnez d'abord un type de patrimoine dans l'onglet Identité.</span>
+      <span *ngIf="currentType === 'MUSEE'">Attributs spécifiques aux Musées</span>
+      <span *ngIf="currentType === 'SITE_NATUREL'">Attributs spécifiques aux Sites Naturels</span>
+      <span *ngIf="currentType === 'MONUMENT'">Attributs spécifiques aux Monuments</span>
+    </p>
+  </div>
+
+  <div *ngIf="parentForm.get('caracteristiques')" formGroupName="caracteristiques" class="space-y-6">
+    
+    <!-- SECTION MUSÉE -->
+    <div *ngIf="currentType === 'MUSEE'" class="grid relative z-10 grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-2">Nombre de collections</label>
+        <input type="number" formControlName="nombreCollections" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+      </div>
+
+      <div class="md:col-span-2">
+        <div class="flex items-center justify-between mb-2">
+          <label class="block text-sm font-semibold text-slate-700">Collections principales</label>
+          <button type="button" (click)="addCollection()" class="text-xs text-emerald-600 font-bold bg-emerald-50 px-2 py-1 rounded hover:bg-emerald-100 transition-colors">
+            <i class="fas fa-plus mr-1"></i> Ajouter
+          </button>
+        </div>
+        
+        <div formArrayName="collections" class="space-y-4">
+          <div *ngFor="let coll of getFormArray('collections').controls; let i=index" [formGroupName]="i" class="p-4 border border-slate-200 rounded-lg bg-slate-50 relative">
+            <button type="button" (click)="removeObjectItem('collections', i)" class="absolute top-2 right-2 text-slate-400 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
+            <div class="grid relative z-10 grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Nom de la collection</label>
+                <input type="text" formControlName="nom" class="w-full px-3 py-1.5 border border-slate-300 rounded text-sm outline-none focus:border-emerald-500">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Nombre d'œuvres</label>
+                <input type="number" formControlName="nombreOeuvres" class="w-full px-3 py-1.5 border border-slate-300 rounded text-sm outline-none focus:border-emerald-500">
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Thèmes (séparés par des virgules)</label>
+                <input type="text" formControlName="themes" placeholder="Ex: Art contemporain, Sculpture..." class="w-full px-3 py-1.5 border border-slate-300 rounded text-sm outline-none focus:border-emerald-500">
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Description</label>
+                <textarea formControlName="description" rows="2" class="w-full px-3 py-1.5 border border-slate-300 rounded text-sm outline-none focus:border-emerald-500"></textarea>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="getFormArray('collections').controls.length === 0" class="text-sm text-slate-500 italic text-center py-4 border border-dashed border-slate-300 rounded-lg">
+            Aucune collection ajoutée.
+          </div>
+        </div>
+      </div>
+
+      <div class="md:col-span-2">
+        <div class="flex items-center justify-between mb-2">
+          <label class="block text-sm font-semibold text-slate-700">Expositions</label>
+          <button type="button" (click)="addExposition()" class="text-xs text-emerald-600 font-bold bg-emerald-50 px-2 py-1 rounded hover:bg-emerald-100 transition-colors">
+            <i class="fas fa-plus mr-1"></i> Ajouter
+          </button>
+        </div>
+        
+        <div formArrayName="expositions" class="space-y-4">
+          <div *ngFor="let expo of getFormArray('expositions').controls; let i=index" [formGroupName]="i" class="p-4 border border-slate-200 rounded-lg bg-slate-50 relative">
+            <button type="button" (click)="removeObjectItem('expositions', i)" class="absolute top-2 right-2 text-slate-400 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
+            <div class="grid relative z-10 grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Titre de l'exposition</label>
+                <input type="text" formControlName="titre" class="w-full px-3 py-1.5 border border-slate-300 rounded text-sm outline-none focus:border-emerald-500">
+              </div>
+              <div class="flex items-end pb-1.5">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" formControlName="expositionPermanente" class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">
+                  <span class="text-xs font-semibold text-slate-700">Exposition Permanente</span>
+                </label>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Date de début</label>
+                <input type="date" formControlName="dateDebut" class="w-full px-3 py-1.5 border border-slate-300 rounded text-sm outline-none focus:border-emerald-500">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Date de fin</label>
+                <input type="date" formControlName="dateFin" class="w-full px-3 py-1.5 border border-slate-300 rounded text-sm outline-none focus:border-emerald-500">
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Description</label>
+                <textarea formControlName="description" rows="2" class="w-full px-3 py-1.5 border border-slate-300 rounded text-sm outline-none focus:border-emerald-500"></textarea>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="getFormArray('expositions').controls.length === 0" class="text-sm text-slate-500 italic text-center py-4 border border-dashed border-slate-300 rounded-lg">
+            Aucune exposition ajoutée.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SECTION SITE NATUREL -->
+    <div *ngIf="currentType === 'SITE_NATUREL'" class="grid relative z-10 grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-2">Nature du Site</label>
+        <input type="text" formControlName="natureSite" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none" placeholder="Ex: Forêt, fleuve, montagne...">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-2">Superficie (ha ou km²)</label>
+        <input type="text" formControlName="superficie" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-2">Écosystème</label>
+        <input type="text" formControlName="ecosysteme" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+      </div>
+
+      <div class="md:col-span-2">
+        <div class="flex items-center justify-between mb-2">
+          <label class="block text-sm font-semibold text-slate-700">Espèces protégées (Faune & Flore)</label>
+          <button type="button" (click)="addEspeceProtegee()" class="text-xs text-emerald-600 font-bold bg-emerald-50 px-2 py-1 rounded hover:bg-emerald-100 transition-colors">
+            <i class="fas fa-plus mr-1"></i> Ajouter
+          </button>
+        </div>
+        
+        <div formArrayName="especesProtegees" class="space-y-4">
+          <div *ngFor="let esp of getFormArray('especesProtegees').controls; let i=index" [formGroupName]="i" class="p-4 border border-slate-200 rounded-lg bg-slate-50 relative">
+            <button type="button" (click)="removeObjectItem('especesProtegees', i)" class="absolute top-2 right-2 text-slate-400 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
+            <div class="grid relative z-10 grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Nom commun *</label>
+                <input type="text" formControlName="nomCommun" class="w-full px-3 py-1.5 border border-slate-300 rounded text-sm outline-none focus:border-emerald-500">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Type</label>
+                <select formControlName="type" class="w-full px-3 py-1.5 border border-slate-300 rounded text-sm outline-none focus:border-emerald-500">
+                  <option value="FAUNE">Faune</option>
+                  <option value="FLORE">Flore</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Nom scientifique</label>
+                <input type="text" formControlName="nomScientifique" class="w-full px-3 py-1.5 border border-slate-300 rounded text-sm outline-none focus:border-emerald-500">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Statut de conservation</label>
+                <input type="text" formControlName="statutConservation" class="w-full px-3 py-1.5 border border-slate-300 rounded text-sm outline-none focus:border-emerald-500">
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Description</label>
+                <textarea formControlName="description" rows="2" class="w-full px-3 py-1.5 border border-slate-300 rounded text-sm outline-none focus:border-emerald-500"></textarea>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="getFormArray('especesProtegees').controls.length === 0" class="text-sm text-slate-500 italic text-center py-4 border border-dashed border-slate-300 rounded-lg">
+            Aucune espèce protégée ajoutée.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SECTION MONUMENT -->
+    <div *ngIf="currentType === 'MONUMENT'" class="grid relative z-10 grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-2">Style Architectural</label>
+        <input type="text" formControlName="styleArchitectural" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-2">Nature du Monument</label>
+        <input type="text" formControlName="natureMonument" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none" placeholder="Ex: Statut, édifice religieux, fort...">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-2">Année de construction</label>
+        <input type="text" formControlName="anneeConstruction" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-2">Commanditaire</label>
+        <input type="text" formControlName="commanditaire" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-sm font-semibold text-slate-700 mb-2">Matériaux de construction</label>
+        <div class="p-2 border border-slate-300 rounded-lg bg-white focus-within:ring-2 focus-within:ring-emerald-500 focus-within:border-emerald-500 transition-all flex flex-wrap gap-2">
+          <div *ngFor="let control of getArray('materiauxConstruction').controls; let i = index" class="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full text-sm font-medium border border-emerald-100 shadow-sm">
+            <span>{{ control.value }}</span>
+            <button type="button" (click)="removeChip('materiauxConstruction', i)" class="text-emerald-400 hover:text-emerald-700 focus:outline-none"><i class="fas fa-times"></i></button>
+          </div>
+          <input type="text" class="flex-1 min-w-[150px] outline-none text-sm text-slate-800 placeholder-slate-400 py-1" placeholder="Ajouter un matériau (Entrée)" (keydown.enter)="addChip($event, 'materiauxConstruction')">
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-2">Dimensions (Hauteur / Surface)</label>
+        <input type="text" formControlName="dimensions" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-sm font-semibold text-slate-700 mb-2">Contexte Historique</label>
+        <textarea formControlName="contexteHistorique" rows="2" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"></textarea>
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-sm font-semibold text-slate-700 mb-2">Personnages Historiques Associés</label>
+        <div class="p-2 border border-slate-300 rounded-lg bg-white focus-within:ring-2 focus-within:ring-emerald-500 focus-within:border-emerald-500 transition-all flex flex-wrap gap-2">
+          <div *ngFor="let control of getArray('personnagesAssocies').controls; let i = index" class="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full text-sm font-medium border border-emerald-100 shadow-sm">
+            <span>{{ control.value }}</span>
+            <button type="button" (click)="removeChip('personnagesAssocies', i)" class="text-emerald-400 hover:text-emerald-700 focus:outline-none"><i class="fas fa-times"></i></button>
+          </div>
+          <input type="text" class="flex-1 min-w-[150px] outline-none text-sm text-slate-800 placeholder-slate-400 py-1" placeholder="Ajouter un personnage (Entrée)" (keydown.enter)="addChip($event, 'personnagesAssocies')">
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="currentType && currentType !== 'MUSEE' && currentType !== 'SITE_NATUREL' && currentType !== 'MONUMENT'" class="text-center py-6 text-slate-500 bg-slate-50 rounded-lg">
+      <i class="fas fa-info-circle text-2xl mb-2 text-slate-400"></i>
+      <p>Aucune caractéristique spécifique n'est requise pour ce type de patrimoine.</p>
+    </div>
+
+  </div>
+</div>

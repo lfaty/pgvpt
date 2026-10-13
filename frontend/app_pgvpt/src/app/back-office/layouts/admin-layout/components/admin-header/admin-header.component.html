@@ -1,0 +1,208 @@
+<nav class="bg-[#0b5d5e] h-16 sticky top-0 z-50 shadow-lg">
+  <div class="max-w-7xl mx-auto px-4 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+
+      <!-- ─── GAUCHE : Logo ─── -->
+      <a routerLink="/admin/dashboard" class="flex items-center gap-2.5 shrink-0 group">
+        <div
+          class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white font-bold text-base group-hover:bg-white/30 transition-colors">
+          P
+        </div>
+        <span class="text-base font-bold text-white hidden sm:inline tracking-tight">PGVPT</span>
+        <span
+          class="text-[10px] font-semibold uppercase tracking-widest text-white/70 bg-white/10 px-1.5 py-0.5 rounded hidden sm:inline">Admin</span>
+      </a>
+
+      <!-- ─── CENTRE : Navigation Principale ─── -->
+      <div class="hidden lg:flex items-center gap-0.5 h-full">
+
+        <!-- Tableau de bord -->
+        <a routerLink="/admin/dashboard" routerLinkActive="bg-white/15 text-white"
+          [routerLinkActiveOptions]="{exact: true}"
+          class="px-3 py-1.5 rounded-md text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors">
+          Tableau de bord
+        </a>
+
+        <!-- Patrimoine Dropdown -->
+        <div class="relative group">
+          <button
+            class="px-3 py-1.5 rounded-md text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1.5">
+            Patrimoine
+            <i class="fa-solid fa-chevron-down text-[10px] text-white/50 group-hover:text-white group-hover:rotate-180 transition-all duration-200"></i>
+          </button>
+          <div
+            class="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
+            <div class="w-52 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5">
+              <a routerLink="/admin/patrimoines"
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors">
+                <i class="fas fa-th-list w-4 text-center text-gray-400"></i> Lister
+              </a>
+              <a routerLink="/admin/patrimoines/nouveau"
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors">
+                <i class="fas fa-plus w-4 text-center text-gray-400"></i> Ajouter
+              </a>
+              <a routerLink="/admin/medias"
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors">
+                <i class="fas fa-camera-retro w-4 text-center text-gray-400"></i> Médias
+              </a>
+              <a routerLink="/admin/contenus"
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors">
+                <i class="fas fa-file-alt w-4 text-center text-gray-400"></i> Contenus
+              </a>
+              <a routerLink="/admin/patrimoines/localisation"
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors">
+                <i class="fas fa-map-marked-alt w-4 text-center text-gray-400"></i> Géolocalisation
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Circuit Dropdown -->
+        <div class="relative group">
+          <button
+            class="px-3 py-1.5 rounded-md text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1.5">
+            Circuit
+            <i class="fa-solid fa-chevron-down text-[10px] text-white/50 group-hover:text-white group-hover:rotate-180 transition-all duration-200"></i>
+          </button>
+          <div
+            class="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
+            <div class="w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5">
+              <a routerLink="/admin/circuits"
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors">
+                <i class="fas fa-route w-4 text-center text-gray-400"></i> Liste
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activités Dropdown -->
+        <div class="relative group">
+          <button
+            class="px-3 py-1.5 rounded-md text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1.5">
+            Activités
+            <i class="fa-solid fa-chevron-down text-[10px] text-white/50 group-hover:text-white group-hover:rotate-180 transition-all duration-200"></i>
+          </button>
+          <div
+            class="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
+            <div class="w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5">
+              <a routerLink="/admin/activites"
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors">
+                <i class="fas fa-hiking w-4 text-center text-gray-400"></i> Liste
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Réservation Dropdown -->
+        <div class="relative group">
+          <button
+            class="px-3 py-1.5 rounded-md text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1.5">
+            Réservation
+            <i class="fa-solid fa-chevron-down text-[10px] text-white/50 group-hover:text-white group-hover:rotate-180 transition-all duration-200"></i>
+          </button>
+          <div
+            class="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
+            <div class="w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5">
+              <a routerLink="/admin/reservations"
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors">
+                <i class="fas fa-calendar-check w-4 text-center text-gray-400"></i> Liste
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ─── DROITE : Recherche, Langue, Profil ─── -->
+      <div class="flex items-center gap-2">
+
+        <!-- Recherche -->
+        <div class="relative hidden md:block">
+          <input type="text" placeholder="Rechercher..."
+            class="w-48 pl-3 pr-9 py-1.5 text-sm bg-white border border-gray-200 rounded-md text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white transition-all">
+          <i class="fas fa-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+        </div>
+
+        <!-- Séparateur -->
+        <div class="hidden md:block w-px h-5 bg-white/20 mx-1"></div>
+
+        <!-- Langue -->
+        <div class="relative group">
+          <button class="p-2 rounded-md text-white/70 hover:text-white hover:bg-white/10 transition-colors">
+            <i class="fas fa-globe text-sm"></i>
+          </button>
+          <div
+            class="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
+            <div class="w-36 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5">
+              <button
+                class="w-full text-left flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary bg-primary/5">
+                🇫🇷 Français <i class="fas fa-check text-xs ml-auto"></i>
+              </button>
+              <button
+                class="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+                🇬🇧 English
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profil -->
+        <div class="relative group">
+          <button class="flex items-center gap-2 p-1 rounded-md hover:bg-white/10 transition-colors">
+            <img class="w-8 h-8 rounded-full border-2 border-white/30"
+              src="https://ui-avatars.com/api/?name=Admin&background=ffffff&color=0b5d5e&bold=true&size=64"
+              alt="Admin">
+            <i class="fa-solid fa-chevron-down text-[10px] text-white/50 hidden md:block"></i>
+          </button>
+          <div
+            class="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
+            <div class="w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden">
+              <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
+                <p class="text-sm font-bold text-gray-900">Admin User</p>
+                <p class="text-xs text-gray-500">admin&#64;pgvpt.sn</p>
+              </div>
+              <div class="py-1.5">
+                <a href="#"
+                  class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                  <i class="far fa-user w-4 text-center text-gray-400"></i> Mon Profil
+                </a>
+                <div class="h-px bg-gray-100 mx-3 my-1"></div>
+                <a href="#"
+                  class="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                  <i class="fas fa-sign-out-alt w-4 text-center"></i> Déconnexion
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button class="lg:hidden p-2 ml-1 rounded-md text-white/70 hover:text-white hover:bg-white/10 transition-colors" (click)="toggleMobileMenu()">
+          <i class="fas" [ngClass]="isMobileMenuOpen ? 'fa-times' : 'fa-bars'"></i>
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div *ngIf="isMobileMenuOpen" class="lg:hidden absolute top-16 left-0 w-full bg-[#0b5d5e] shadow-xl border-t border-white/10 flex flex-col p-2 max-h-[calc(100vh-4rem)] overflow-y-auto">
+    <a routerLink="/admin/dashboard" (click)="toggleMobileMenu()" class="px-4 py-3 text-white/90 font-medium hover:bg-white/10 rounded-md">Tableau de bord</a>
+    
+    <div class="px-4 py-2 mt-2 text-xs font-bold text-white/50 uppercase tracking-wider">Patrimoines</div>
+    <a routerLink="/admin/patrimoines" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-th-list w-4 mr-2"></i> Lister</a>
+    <a routerLink="/admin/patrimoines/nouveau" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-plus w-4 mr-2"></i> Ajouter</a>
+    <a routerLink="/admin/medias" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-camera-retro w-4 mr-2"></i> Médias</a>
+    <a routerLink="/admin/contenus" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-file-alt w-4 mr-2"></i> Contenus</a>
+    <a routerLink="/admin/patrimoines/localisation" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-map-marked-alt w-4 mr-2"></i> Géolocalisation</a>
+
+    <div class="px-4 py-2 mt-2 text-xs font-bold text-white/50 uppercase tracking-wider">Circuits</div>
+    <a routerLink="/admin/circuits" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-route w-4 mr-2"></i> Liste</a>
+
+    <div class="px-4 py-2 mt-2 text-xs font-bold text-white/50 uppercase tracking-wider">Activités</div>
+    <a routerLink="/admin/activites" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-hiking w-4 mr-2"></i> Liste</a>
+
+    <div class="px-4 py-2 mt-2 text-xs font-bold text-white/50 uppercase tracking-wider">Réservations</div>
+    <a routerLink="/admin/reservations" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-calendar-check w-4 mr-2"></i> Liste</a>
+  </div>
+</nav>

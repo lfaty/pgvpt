@@ -1,0 +1,180 @@
+[
+  {
+    "id": "b1ded692-e12c-4306-ba30-edd2aaa67f2f",
+    "latitude": 13.0,
+    "longitude": -13.0,
+    "altitude": 100,
+    "precisionMetres": 5.5,
+    "adresse": "Parc National du Niokolo-Koba, Tambacounda",
+    "lieuDit": "Campement du Lion",
+    "repere": "Près de la rivière",
+    "systemeReference": "WGS84",
+    "codeEpsg": "EPSG:4326",
+    "source": "GPS",
+    "dateAcquisition": "2024-03-15T10:00:00Z",
+    "methodeAcquisition": "Sur le terrain",
+    "niveauFiabilite": "HAUT",
+    "zoneTouristiqueId": "zt-tambacounda",
+    "patrimoineId": "82ece266-cae4-4538-ade3-c7572bd3cc8a"
+  },
+  {
+    "id": "6187a71e-ea52-4b93-bb0c-a919baf5530b",
+    "latitude": 13.8,
+    "longitude": -16.5,
+    "adresse": "Delta du Saloum",
+    "lieuDit": "Foundiougne",
+    "repere": "Près des mangroves",
+    "region": "Fatick",
+    "departement": "Foundiougne",
+    "commune": "Foundiougne",
+    "quartier": "Centre",
+    "altitude": 5,
+    "precision": 10,
+    "patrimoineId": "fd1a43ac-78db-48ab-b7aa-127e807e640e",
+    "source": "GPS"
+  },
+  {
+    "id": "af802d54-0bbb-4f18-9a86-c2daa24878e6",
+    "latitude": 15.4,
+    "longitude": -16.7,
+    "adresse": "Désert de Lompoul, Louga",
+    "patrimoineId": "45dd817d-5f3c-4ead-bb8d-47b752a323c5",
+    "source": "GPS"
+  },
+  {
+    "id": "8bff3fac-bd8a-4beb-9f50-6b63efae0d5f",
+    "latitude": 14.8,
+    "longitude": -17.2,
+    "adresse": "Le Lac Rose, Dakar",
+    "patrimoineId": "d97f5723-b737-4f9b-b6fe-f7323714c9b8",
+    "source": "GPS"
+  },
+  {
+    "id": "aa4ce835-c0f3-4cc9-8136-b3012e2c0d9a",
+    "latitude": 14.67,
+    "longitude": -17.43,
+    "adresse": "Musée des Civilisations Noires, Dakar",
+    "patrimoineId": "42a6e704-37b6-4555-8e2c-aa30967c80c3",
+    "source": "GPS"
+  },
+  {
+    "id": "afd76250-92ed-4faf-b5d4-ee3f243aaf40",
+    "latitude": 12.5,
+    "longitude": -16.6,
+    "adresse": "Village des Potiers d'Edioungou, Ziguinchor",
+    "patrimoineId": "8c61b843-51cd-4959-a141-f525289687a9",
+    "source": "GPS"
+  },
+  {
+    "id": "eebacba1-9624-48cf-8b30-0fec961a72b4",
+    "latitude": 16.03,
+    "longitude": -16.5,
+    "adresse": "Festival de Jazz de Saint-Louis, Saint-Louis",
+    "patrimoineId": "254f840d-15db-4558-8d86-2c7085101cd0",
+    "source": "GPS"
+  },
+  {
+    "id": "70d75950-5d90-44a6-999d-cd1af2a3ce42",
+    "latitude": 14.69,
+    "longitude": -17.44,
+    "adresse": "Biennale de Dakar (Dak'Art), Dakar",
+    "patrimoineId": "40ec0637-ccba-4209-a2f9-db4a92c13de9",
+    "source": "GPS"
+  },
+  {
+    "id": "5c1255cb-9d37-4b63-93ae-03234721c251",
+    "latitude": 14.67,
+    "longitude": -17.4,
+    "adresse": "Maison des Esclaves, Dakar",
+    "patrimoineId": "8a43d0a6-f2d9-4917-9282-44f3440a2b93",
+    "source": "GPS"
+  },
+  {
+    "id": "c73865e5-bf64-47bd-82ce-c1b711d0728d",
+    "latitude": 14.72,
+    "longitude": -17.49,
+    "adresse": "Monument de la Renaissance, Dakar",
+    "patrimoineId": "5b3f083c-5bf1-4b23-b840-ae18b63412a6",
+    "source": "GPS"
+  },
+  {
+    "id": "a7324b9c-825f-4c67-889d-789627c09f6f",
+    "latitude": 14.75,
+    "longitude": -17.43,
+    "adresse": "Cimetière des Tirailleurs, Dakar",
+    "patrimoineId": "86d54bc4-7dd1-4f38-9e01-8a629fb03466",
+    "source": "GPS"
+  },
+  {
+    "id": "6ce34878-84aa-4b46-bfbd-038380a4fd65",
+    "latitude": 14.68,
+    "longitude": -17.47,
+    "adresse": "Place du Souvenir Africain, Dakar",
+    "patrimoineId": "b6748dd2-15c0-41bc-8d2b-95d67cb769dc",
+    "source": "GPS"
+  },
+  {
+    "id": "5a8d870f-5e86-4b81-b98b-45eede0b0f09",
+    "latitude": 14.86,
+    "longitude": -15.87,
+    "adresse": "Grande Mosquée de Touba, Diourbel",
+    "patrimoineId": "65164237-3b35-4175-b1a9-b3856893f82d",
+    "source": "GPS"
+  },
+  {
+    "id": "b0d0ef1e-452f-498e-9e71-d5c8694f7a6e",
+    "latitude": 14.66,
+    "longitude": -17.43,
+    "adresse": "Cathédrale du Souvenir Africain, Dakar",
+    "patrimoineId": "c55530a1-a829-4c8a-bd77-4348c018f361",
+    "source": "GPS"
+  },
+  {
+    "id": "804853dd-29ba-4b1e-bfa0-8995b097c6de",
+    "latitude": 14.71,
+    "longitude": -17.48,
+    "adresse": "Mosquée de la Divinité, Dakar",
+    "patrimoineId": "d7138fca-90f6-470f-9085-3f0d2f4b3ddc",
+    "source": "GPS"
+  },
+  {
+    "id": "0770ade8-4809-4bb3-a6de-a4498fcc8a1b",
+    "latitude": 14.55,
+    "longitude": -17.11,
+    "adresse": "Basilique de Popenguine, Thiès",
+    "patrimoineId": "b42ba351-6654-482a-aaf4-2c8b83b82490",
+    "source": "GPS"
+  },
+  {
+    "id": "c364ddd7-f001-42c4-906a-b13e8b96d13c",
+    "latitude": 16.03,
+    "longitude": -16.5,
+    "adresse": "Pont Faidherbe, Saint-Louis",
+    "patrimoineId": "b943af76-b11c-48f9-be27-672dc3c7e317",
+    "source": "GPS"
+  },
+  {
+    "id": "601eabd8-44ae-4946-9818-e31d7293d005",
+    "latitude": 14.67,
+    "longitude": -17.43,
+    "adresse": "Gare de Dakar, Dakar",
+    "patrimoineId": "e7785ba1-02cf-427f-b64a-70e2f94fbadf",
+    "source": "GPS"
+  },
+  {
+    "id": "1c8de75c-0355-449c-90cc-dae455189734",
+    "latitude": 16.03,
+    "longitude": -16.5,
+    "adresse": "Gouvernance de Saint-Louis, Saint-Louis",
+    "patrimoineId": "a41b7120-0206-4ea7-8cb3-41b22d14eca1",
+    "source": "GPS"
+  },
+  {
+    "id": "6e017ccc-af3d-4b60-ac6a-4eeb30121040",
+    "latitude": 14.67,
+    "longitude": -17.4,
+    "adresse": "Architecture de Gorée, Dakar",
+    "patrimoineId": "0ea36431-0579-4c99-bf85-145cd87bf8da",
+    "source": "GPS"
+  }
+]

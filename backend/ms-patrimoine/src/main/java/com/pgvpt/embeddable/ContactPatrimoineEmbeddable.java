@@ -9,18 +9,18 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ContactPatrimoineEmbeddable {
-    @Column(name = "contact_nom", length = 255)
+    @Column(name = "contact_nom", columnDefinition = "TEXT")
     private String nom;
 
-    @Column(name = "contact_fonction", length = 150)
+    @Column(name = "contact_fonction", columnDefinition = "TEXT")
     private String fonction;
 
-    @Column(name = "contact_telephone", length = 50)
+    @Column(name = "contact_telephone", columnDefinition = "TEXT")
     private String telephone;
 
-    @Column(name = "contact_email", length = 255)
+    @Column(name = "contact_email", columnDefinition = "TEXT")
     private String email;
 
-    @Column(name = "contact_site_web", length = 500)
+    @Column(name = "contact_site_web", columnDefinition = "TEXT")
     private String siteWeb;
 }

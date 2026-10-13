@@ -20,14 +20,18 @@ public class CollectionMuseeEntity extends BaseEntity {
     @JoinColumn(name = "musee_id", nullable = false)
     private MuseeEntity musee;
 
+    @Column(columnDefinition = "TEXT")
     private String nom;
+    @Column(columnDefinition = "TEXT")
     private String description;
     private Integer nombreOeuvres;
+    @Column(columnDefinition = "TEXT")
     private String periode;
+    @Column(columnDefinition = "TEXT")
     private String origine;
 
     @ElementCollection
     @CollectionTable(name = "collection_theme", joinColumns = @JoinColumn(name = "collection_id"))
-    @Column(name = "theme")
+    @Column(name = "theme", columnDefinition = "TEXT")
     private List<String> themes ;
 }

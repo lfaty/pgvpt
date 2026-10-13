@@ -1,0 +1,189 @@
+<div class="min-h-screen bg-[#FAFAF9] text-gray-800 pb-24 font-sans">
+  
+  <!-- HERO BANNER PRESTIGIEUX -->
+  <section class="relative bg-linear-to-b from-white via-[#FBFBF9] to-[#FAFAF9] pt-16 pb-20 px-6 border-b border-gray-100 overflow-hidden">
+    <!-- Subtils cercles décoratifs d'ambiance -->
+    <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-[#0b5d5e]/5 blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-[#D16933]/5 blur-3xl pointer-events-none"></div>
+
+    <div class="max-w-5xl mx-auto text-center relative z-10">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D16933]/10 text-[#D16933] text-xs font-bold uppercase tracking-wider mb-4 shadow-2xs">
+        <i class="fas fa-feather-pointed"></i>
+        <span>Bibliothèque Éditoriale Nationale</span>
+      </div>
+
+      <h1 class="font-serif text-4xl sm:text-6xl font-bold text-gray-900 leading-tight mb-5 tracking-tight">
+        Récits, Mémoires & Guides de Visite
+      </h1>
+
+      <p class="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed mb-10">
+        Explorez la mémoire vivante du Sénégal à travers les chroniques d'historiens, guides pratiques d'exploration et légendes ancestrales.
+      </p>
+
+      <!-- BARRE DE RECHERCHE FLOTTANTE -->
+      <div class="max-w-2xl mx-auto relative shadow-md rounded-full bg-white border border-gray-200/80 p-1.5 flex items-center transition-all focus-within:ring-2 focus-within:ring-[#0b5d5e]/30 focus-within:border-[#0b5d5e]">
+        <div class="pl-4 pr-2 text-gray-400">
+          <i class="fas fa-search"></i>
+        </div>
+        <input type="text" [(ngModel)]="searchTerm" (input)="applyFilters()"
+               placeholder="Rechercher par mot-clé, titre, lieu (ex: Gorée, Saloum, Lébou)..."
+               class="w-full bg-transparent text-sm text-gray-800 placeholder-gray-400 outline-none px-2 py-2">
+        <button *ngIf="searchTerm" (click)="searchTerm=''; applyFilters()"
+                class="px-3 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
+          <i class="fas fa-times text-xs"></i>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- BARRE DE FILTRES PAR TYPE DE RÉCIT -->
+  <section class="max-w-6xl mx-auto px-6 -mt-6 relative z-20">
+    <div class="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex items-center gap-2 overflow-x-auto hide-scrollbar">
+      
+      <button type="button" (click)="setTypeFilter('TOUS')"
+              class="shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border"
+              [ngClass]="selectedType === 'TOUS' ? 'bg-[#0b5d5e] text-white border-[#0b5d5e] shadow-xs' : 'bg-gray-50 text-gray-700 border-gray-100 hover:bg-gray-100'">
+        Tous les récits ({{ contenus.length }})
+      </button>
+
+      <button type="button" (click)="setTypeFilter('GUIDE_VISITE')"
+              class="shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border flex items-center gap-1.5"
+              [ngClass]="selectedType === 'GUIDE_VISITE' ? 'bg-[#0b5d5e] text-white border-[#0b5d5e] shadow-xs' : 'bg-gray-50 text-gray-700 border-gray-100 hover:bg-gray-100'">
+        <i class="fas fa-compass"></i>
+        <span>Guides de Visite</span>
+      </button>
+
+      <button type="button" (click)="setTypeFilter('ARTICLE')"
+              class="shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border flex items-center gap-1.5"
+              [ngClass]="selectedType === 'ARTICLE' ? 'bg-[#0b5d5e] text-white border-[#0b5d5e] shadow-xs' : 'bg-gray-50 text-gray-700 border-gray-100 hover:bg-gray-100'">
+        <i class="fas fa-feather-pointed"></i>
+        <span>Articles Historiques</span>
+      </button>
+
+      <button type="button" (click)="setTypeFilter('LEGENDE')"
+              class="shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border flex items-center gap-1.5"
+              [ngClass]="selectedType === 'LEGENDE' ? 'bg-[#0b5d5e] text-white border-[#0b5d5e] shadow-xs' : 'bg-gray-50 text-gray-700 border-gray-100 hover:bg-gray-100'">
+        <i class="fas fa-dragon"></i>
+        <span>Légendes & Mythes</span>
+      </button>
+
+      <button type="button" (click)="setTypeFilter('CHRONIQUE')"
+              class="shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border flex items-center gap-1.5"
+              [ngClass]="selectedType === 'CHRONIQUE' ? 'bg-[#0b5d5e] text-white border-[#0b5d5e] shadow-xs' : 'bg-gray-50 text-gray-700 border-gray-100 hover:bg-gray-100'">
+        <i class="fas fa-clock-rotate-left"></i>
+        <span>Chroniques</span>
+      </button>
+
+      <button type="button" (click)="setTypeFilter('TEMOIGNAGE')"
+              class="shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border flex items-center gap-1.5"
+              [ngClass]="selectedType === 'TEMOIGNAGE' ? 'bg-[#0b5d5e] text-white border-[#0b5d5e] shadow-xs' : 'bg-gray-50 text-gray-700 border-gray-100 hover:bg-gray-100'">
+        <i class="fas fa-comments"></i>
+        <span>Témoignages</span>
+      </button>
+
+    </div>
+  </section>
+
+  <!-- GRILLE DES RÉCITS & GUIDES -->
+  <main class="max-w-6xl mx-auto px-6 mt-12">
+    
+    <!-- Indicateur de résultats -->
+    <div class="flex items-center justify-between mb-8 text-xs text-gray-500 font-medium">
+      <span>{{ filteredContenus.length }} publication{{ filteredContenus.length > 1 ? 's' : '' }} disponible{{ filteredContenus.length > 1 ? 's' : '' }}</span>
+      <span *ngIf="selectedType !== 'TOUS'">Filtre : <strong>{{ getContenuTypeLabel(selectedType) }}</strong></span>
+    </div>
+
+    <!-- Spinner de chargement -->
+    <div *ngIf="loading" class="flex flex-col items-center justify-center py-24">
+      <div class="w-12 h-12 border-4 border-[#0b5d5e]/20 border-t-[#0b5d5e] rounded-full animate-spin mb-4"></div>
+      <p class="text-xs text-gray-500">Chargement de la bibliothèque...</p>
+    </div>
+
+    <!-- Grille des cartes -->
+    <div *ngIf="!loading && filteredContenus.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      
+      <a *ngFor="let c of filteredContenus"
+         [routerLink]="['/patrimoines', c.patrimoineId, 'contenus', c.id]"
+         class="bg-white rounded-[28px] overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group no-underline cursor-pointer">
+        
+        <div>
+          <!-- Image de couverture -->
+          <div class="relative h-52 bg-gray-100 overflow-hidden">
+            <img [src]="getArticleImage(c)" [alt]="c.titre"
+                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+            <div class="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent"></div>
+
+            <!-- Badge Type -->
+            <div class="absolute top-3.5 left-3.5 bg-white/95 backdrop-blur-xs text-[#0b5d5e] px-3 py-1 rounded-full text-[11px] font-bold shadow-xs flex items-center gap-1.5">
+              <i class="fas" [ngClass]="getContenuTypeIcon(c.type)"></i>
+              <span>{{ getContenuTypeLabel(c.type) }}</span>
+            </div>
+
+            <!-- Site patrimonial rattaché -->
+            <div class="absolute bottom-3.5 left-3.5 right-3.5 flex items-center justify-between text-white text-xs">
+              <span class="font-bold truncate drop-shadow-sm flex items-center gap-1">
+                <i class="fas fa-landmark text-[#D16933]"></i>
+                {{ getPatrimoineNom(c.patrimoineId) }}
+              </span>
+              <span class="text-[11px] font-medium opacity-90 drop-shadow-sm shrink-0">
+                <i class="far fa-clock mr-1"></i>{{ getReadingTime(c.corps) }} min
+              </span>
+            </div>
+          </div>
+
+          <!-- Corps de la carte -->
+          <div class="p-6">
+            <h3 class="font-serif text-xl font-bold text-gray-900 group-hover:text-[#0b5d5e] transition-colors leading-snug mb-3">
+              {{ c.titre }}
+            </h3>
+
+            <p class="text-xs text-gray-600 line-clamp-3 leading-relaxed mb-4">
+              {{ c.resume || c.corps }}
+            </p>
+
+            <!-- Mots-clés -->
+            <div *ngIf="c.motsCles && c.motsCles.length > 0" class="flex flex-wrap gap-1.5">
+              <span *ngFor="let k of c.motsCles.slice(0, 3)"
+                    class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                #{{ k }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pied de carte -->
+        <div class="px-6 py-4 bg-gray-50/70 border-t border-gray-100 flex items-center justify-between text-xs">
+          <span class="text-gray-400 font-medium">
+            <i class="far fa-calendar-alt mr-1"></i>
+            {{ (c.createdAt | date:'d MMMM y') || 'Récemment' }}
+          </span>
+          <span class="text-[#0b5d5e] font-bold inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+            <span>Lire le récit</span>
+            <i class="fas fa-arrow-right text-[10px]"></i>
+          </span>
+        </div>
+
+      </a>
+
+    </div>
+
+    <!-- État vide : Aucun résultat -->
+    <div *ngIf="!loading && filteredContenus.length === 0"
+         class="py-20 px-6 bg-white rounded-[32px] border border-dashed border-gray-200 text-center max-w-lg mx-auto mt-6">
+      <div class="w-16 h-16 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
+        <i class="fas fa-book-open"></i>
+      </div>
+      <h3 class="font-serif text-2xl font-bold text-gray-900 mb-2">Aucun récit trouvé</h3>
+      <p class="text-xs text-gray-500 leading-relaxed mb-6">
+        Aucune publication ne correspond à vos critères de recherche. Essayez d'ajuster vos filtres ou de réinitialiser la recherche.
+      </p>
+      <button type="button" (click)="selectedType='TOUS'; searchTerm=''; applyFilters()"
+              class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold rounded-xl transition-all cursor-pointer">
+        Réinitialiser la sélection
+      </button>
+    </div>
+
+  </main>
+
+</div>

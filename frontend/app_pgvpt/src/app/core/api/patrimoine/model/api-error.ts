@@ -1,5 +1,5 @@
 /**
- * MS Patrimoine - API
+ * PGVPT - MS Patrimoine API
  *
  * Contact: contact@pgvpt.sn
  *
@@ -10,12 +10,11 @@
 
 
 export interface ApiError { 
-    timestamp?: string;
-    status?: number;
-    error?: string;
-    code?: string;
-    message?: string;
-    path?: string;
-    details?: Array<string>;
+    timestamp: string;
+    status: number;
+    code: string;
+    message: string;
+    path: string;
+    details?: { [key: string]: any; };
 }
 

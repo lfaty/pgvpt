@@ -1,0 +1,329 @@
+<div class="space-y-6 animate-fade-in-up pb-12">
+  <!-- En-tête -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+    <div>
+      <div class="flex items-center gap-2 mb-1">
+        <h2 class="text-2xl font-bold text-gray-900">
+          <i class="fas fa-camera-retro text-purple-600 mr-2"></i>
+          Médias du Patrimoine
+        </h2>
+        <span *ngIf="nomPatrimoine" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200">
+          {{ nomPatrimoine }}
+        </span>
+      </div>
+      <p class="text-xs text-gray-500">
+        Ajoutez et gérez les photos, vidéos, documents et modèles 3D associés à ce site historique.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-3">
+      <!-- Sélecteur de patrimoine si accès direct sans paramètre d'URL -->
+      <div *ngIf="patrimoinesList.length > 0" class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-200">
+        <label class="text-xs font-bold text-gray-700 whitespace-nowrap">
+          <i class="fas fa-landmark text-purple-600 mr-1"></i> Site :
+        </label>
+        <select [value]="patrimoineId" (change)="onSelectPatrimoineChange($event)"
+                class="px-2 py-1 bg-white border border-gray-300 rounded-lg text-xs font-semibold text-gray-800 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none">
+          <option *ngFor="let p of patrimoinesList" [value]="p.id">{{ p.nom }}</option>
+        </select>
+      </div>
+
+      <button type="button" routerLink="/admin/patrimoines" class="px-3.5 py-2 border border-gray-300 text-gray-700 text-xs font-medium rounded-xl hover:bg-gray-50 transition-colors inline-flex items-center gap-1.5">
+        <i class="fas fa-arrow-left"></i> Retour
+      </button>
+    </div>
+  </div>
+
+  <!-- Notification -->
+  <div *ngIf="notificationMessage" class="fixed top-20 right-6 z-50 bg-white border-l-4 border-purple-500 shadow-xl text-gray-800 rounded-lg p-4 flex items-center animate-fade-in-up">
+    <i class="fas fa-info-circle text-xl mr-3 text-purple-500"></i>
+    <span class="font-medium">{{ notificationMessage }}</span>
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <!-- Formulaire d'ajout / modification -->
+    <div class="xl:col-span-1">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden sticky top-6">
+        <div class="px-6 py-4 border-b border-gray-100 bg-purple-50 flex justify-between items-center">
+          <h3 class="text-lg font-semibold text-purple-900 flex items-center">
+            <i class="fas" [ngClass]="editingMediaId ? 'fa-edit' : 'fa-plus-circle'"></i>
+            <span class="ml-2">{{ editingMediaId ? 'Modifier le média' : 'Ajouter un média' }}</span>
+          </h3>
+          <button *ngIf="editingMediaId" type="button" (click)="editingMediaId = null; mediaForm.reset()" class="text-xs text-purple-600 hover:underline">Annuler</button>
+        </div>
+
+        <form [formGroup]="mediaForm" class="p-6 space-y-6">
+          
+          <!-- Bloc 1: Informations Principales -->
+          <div class="space-y-4">
+            <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 border-b border-gray-100 pb-2">Informations Principales</h4>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Nom / Titre <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="nom" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all">
+            </div>
+
+            <div>
+              <div class="flex justify-between items-baseline mb-1">
+                <label class="block text-sm font-medium text-gray-700">Description</label>
+                <span class="text-xs text-gray-400" [ngClass]="{'text-red-500': mediaForm.get('description')?.value?.length > 255}">{{ mediaForm.get('description')?.value?.length || 0 }}/255</span>
+              </div>
+              <textarea formControlName="description" rows="2" maxlength="255" placeholder="Brève description (optionnelle)..." class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all resize-none"></textarea>
+              <div *ngIf="mediaForm.get('description')?.errors?.['maxlength']" class="text-red-500 text-xs mt-1">
+                La description ne doit pas dépasser 255 caractères.
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Type <span class="text-red-500">*</span></label>
+                <select formControlName="type" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all">
+                  <option *ngFor="let t of mediaTypes" [value]="t">{{ t }}</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+                <select formControlName="statut" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all">
+                  <option *ngFor="let s of statuts" [value]="s">{{ s }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bloc 2: Fichier & Source -->
+          <div class="space-y-4">
+            <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 border-b border-gray-100 pb-2">Source du Média</h4>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">URL / Fichier <span class="text-red-500">*</span></label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i class="fas fa-link text-gray-400"></i>
+                </div>
+                <input type="text" formControlName="url" placeholder="https://..." class="w-full pl-10 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all">
+              </div>
+            </div>
+          </div>
+
+          <!-- Bloc 3: Droits & Crédits -->
+          <div class="space-y-4">
+            <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 border-b border-gray-100 pb-2">Crédits & Droits</h4>
+            
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Auteur</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fas fa-user-edit text-gray-400 text-xs"></i>
+                  </div>
+                  <input type="text" formControlName="auteur" placeholder="Ex: Jean Dupont" class="w-full pl-9 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all">
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Crédit</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fas fa-camera text-gray-400 text-xs"></i>
+                  </div>
+                  <input type="text" formControlName="credit" placeholder="Ex: Studio ABC" class="w-full pl-9 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all">
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Droits d'utilisation</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i class="fas fa-copyright text-gray-400 text-xs"></i>
+                </div>
+                <input type="text" formControlName="droitsUtilisation" placeholder="Ex: CC-BY-SA, Domaine public..." class="w-full pl-9 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all">
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-gray-100">
+            <button type="button" (click)="addMediaItem()" [disabled]="mediaForm.invalid"
+                    class="w-full py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-sm disabled:opacity-50 font-medium">
+              <i class="fas" [ngClass]="editingMediaId ? 'fa-check' : 'fa-plus'"></i>
+              <span class="ml-2">{{ editingMediaId ? 'Valider' : 'Ajouter le média' }}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Liste des Médias -->
+    <div class="xl:col-span-2">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex flex-col md:flex-row justify-between md:items-center gap-4">
+          <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+            <span class="w-8 h-8 rounded-lg bg-gray-200 text-gray-700 flex items-center justify-center mr-3 text-sm">
+              <i class="fas fa-list"></i>
+            </span>
+            Médias associés ({{ mediaList.length }})
+          </h3>
+          <!-- Bouton Rapide Upload -->
+          <button type="button" (click)="triggerFileInput()" class="text-sm px-4 py-2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 font-semibold transition-colors flex items-center gap-2">
+             <i class="fas fa-cloud-upload-alt"></i> Upload rapide (Batch)
+          </button>
+        </div>
+        
+        <!-- Zone de Drop -->
+        <div class="px-6 pt-6">
+           <div class="relative group cursor-pointer" 
+                (click)="triggerFileInput()"
+                (dragover)="onDragOver($event)" 
+                (dragleave)="onDragLeave($event)" 
+                (drop)="onDrop($event)">
+             <!-- Dashed border with gradient on hover -->
+             <div class="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" 
+                  [ngClass]="{'opacity-100': isDragging}"
+                  style="padding: 2px;">
+                <div class="w-full h-full bg-white rounded-lg"></div>
+             </div>
+             <div class="relative border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center bg-gray-50 transition-all duration-300"
+                  [ngClass]="isDragging ? 'border-transparent bg-emerald-50/50' : 'border-gray-300 group-hover:border-transparent'">
+               <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-3 group-hover:scale-110 transition-all duration-500">
+                 <i class="fas fa-file-upload text-2xl text-emerald-500"></i>
+               </div>
+               <p class="font-bold text-gray-700">Glissez-déposez vos fichiers ici</p>
+               <p class="text-xs text-gray-500 mt-1">Photos, vidéos, PDF... (Upload multiple supporté)</p>
+             </div>
+           </div>
+        </div>
+
+        <div class="p-6">
+          <div *ngIf="mediaList.length === 0" class="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50">
+            <i class="fas fa-images text-gray-300 text-5xl mb-4"></i>
+            <h4 class="text-lg font-medium text-gray-600">Aucun média associé</h4>
+            <p class="text-gray-500 mt-1 max-w-sm mx-auto">Ajoutez des photos, vidéos ou modèles 3D en utilisant le formulaire ci-contre pour enrichir ce patrimoine.</p>
+          </div>
+
+          <div *ngIf="mediaList.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div *ngFor="let m of mediaList" class="relative group bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md hover:border-purple-300 transition-all">
+              
+              <!-- Aperçu -->
+              <div class="h-40 bg-gray-100 relative overflow-hidden flex items-center justify-center">
+                <img *ngIf="m.type === 'PHOTO' && m.url" [src]="m.url" alt="{{ m.nom }}" class="w-full h-full object-cover">
+                <video *ngIf="m.type === 'VIDEO' && m.url" [src]="getSafeUrl(m.url)" class="w-full h-full object-cover" muted></video>
+                <object *ngIf="m.type === 'DOCUMENT' && m.url" [data]="getSafeUrl(m.url)" type="application/pdf" class="w-full h-full object-cover pointer-events-none"></object>
+                
+                <i *ngIf="(!m.url) || (m.type !== 'PHOTO' && m.type !== 'VIDEO' && m.type !== 'DOCUMENT')" class="fas text-4xl text-gray-300" 
+                   [ngClass]="{
+                     'fa-volume-up': m.type === 'AUDIO',
+                     'fa-cube': m.type === 'MODELE_3D',
+                     'fa-vr-cardboard': m.type === 'PANORAMA_360',
+                     'fa-map': m.type === 'CARTE',
+                     'fa-archive': m.type === 'ARCHIVE_NUMERISEE'
+                   }"></i>
+                
+                <!-- Badge Type -->
+                <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white text-xs font-semibold px-2 py-1 rounded shadow-sm">
+                  {{ m.type }}
+                </div>
+
+                <!-- Badge Statut -->
+                <div class="absolute top-2 right-2 px-2 py-1 rounded text-xs font-bold shadow-sm"
+                     [ngClass]="{
+                       'bg-green-100 text-green-800': m.statut === 'PUBLIE',
+                       'bg-blue-100 text-blue-800': m.statut === 'VALIDE',
+                       'bg-yellow-100 text-yellow-800': m.statut === 'BROUILLON',
+                       'bg-gray-100 text-gray-800': m.statut === 'ARCHIVE'
+                     }">
+                  {{ m.statut }}
+                </div>
+
+                <!-- Actions Overlay (On Hover) -->
+                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
+                  <div class="flex gap-3">
+                    <button type="button" (click)="editMediaItem(m.id)" class="w-10 h-10 rounded-full bg-white text-blue-600 hover:bg-blue-50 hover:scale-110 transition-transform shadow-lg flex items-center justify-center tooltip-trigger" title="Modifier">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button type="button" (click)="removeMediaItem(m.id)" class="w-10 h-10 rounded-full bg-white text-red-600 hover:bg-red-50 hover:scale-110 transition-transform shadow-lg flex items-center justify-center tooltip-trigger" title="Supprimer">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="p-4">
+                <h4 class="font-semibold text-gray-900 truncate mb-1" [title]="m.nom">{{ m.nom }}</h4>
+                <div class="flex justify-between items-center text-xs text-gray-500">
+                  <span class="truncate" *ngIf="m.auteur"><i class="fas fa-user-edit mr-1"></i> {{ m.auteur }}</span>
+                  <span *ngIf="m.droitsUtilisation" class="bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200">{{ m.droitsUtilisation }}</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-end pt-6 mt-8 border-t border-gray-200">
+    <button type="button" (click)="saveMedias()" [disabled]="isSaving || mediaList.length === 0" 
+            class="px-8 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-all shadow-md font-bold text-lg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            [ngClass]="{'transform hover:-translate-y-1': !isSaving && mediaList.length > 0}">
+      <i class="fas" [ngClass]="isSaving ? 'fa-spinner fa-spin' : 'fa-save'"></i> 
+      {{ isSaving ? 'Enregistrement en cours...' : 'Enregistrer les modifications' }}
+    </button>
+  </div>
+
+  <!-- Modal d'état d'enregistrement (Cercle qui tourne / Succès / Erreur) -->
+  <div *ngIf="saveStatus !== 'idle'" 
+       class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity"
+       aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    
+    <div class="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center border border-gray-100 transform transition-all animate-scale-up">
+      
+      <!-- ÉTAT 1 : Enregistrement en cours (Cercle qui tourne) -->
+      <div *ngIf="saveStatus === 'saving'" class="flex flex-col items-center py-4">
+        <div class="w-16 h-16 rounded-full border-4 border-purple-100 border-t-purple-600 animate-spin flex items-center justify-center mb-4">
+          <i class="fas fa-circle-notch text-purple-600 text-xl"></i>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900 mb-1">Enregistrement en cours</h3>
+        <p class="text-xs text-gray-500">Sauvegarde des médias dans la base de données...</p>
+      </div>
+
+      <!-- ÉTAT 2 : Succès -->
+      <div *ngIf="saveStatus === 'success'" class="flex flex-col items-center py-4">
+        <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-4 shadow-inner">
+          <i class="fas fa-check text-2xl"></i>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900 mb-1">Succès !</h3>
+        <p class="text-xs text-gray-600 mb-4">Les médias ont été enregistrés avec succès.</p>
+        
+        <div class="flex flex-col gap-2 w-full">
+          <button type="button" (click)="navigateToPatrimoines()"
+                  class="w-full py-2.5 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-semibold transition-colors shadow-sm">
+            Voir le catalogue des patrimoines
+          </button>
+          <button type="button" (click)="closeStatusModal()"
+                  class="w-full py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-semibold transition-colors">
+            Rester sur la galerie
+          </button>
+        </div>
+      </div>
+
+      <!-- ÉTAT 3 : Erreur -->
+      <div *ngIf="saveStatus === 'error'" class="flex flex-col items-center py-4">
+        <div class="w-16 h-16 rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-4 shadow-inner">
+          <i class="fas fa-exclamation-triangle text-2xl"></i>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900 mb-1">Erreur d'enregistrement</h3>
+        <p class="text-xs text-red-600 bg-red-50 p-2.5 rounded-lg border border-red-200 mb-4 text-left break-words w-full">
+          {{ errorMessage }}
+        </p>
+        <button type="button" (click)="closeStatusModal()"
+                class="w-full py-2.5 px-4 bg-gray-800 hover:bg-gray-900 text-white rounded-xl text-xs font-semibold transition-colors shadow-sm">
+          Fermer et modifier
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+

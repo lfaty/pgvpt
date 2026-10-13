@@ -1,5 +1,6 @@
 export * from './api-error';
 export * from './base-entity';
+export * from './categorie-patrimoine';
 export * from './commune';
 export * from './commune-create';
 export * from './commune-reference';

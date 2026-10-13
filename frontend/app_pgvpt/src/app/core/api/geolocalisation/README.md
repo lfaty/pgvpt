@@ -1,8 +1,8 @@
 # @
 
-API Contract-First du microservice de géolocalisation des patrimoines touristiques du PGVPT.  Ce microservice assure :   - la gestion des coordonnées géographiques des patrimoines ;   - la gestion de la localisation administrative ;   - la recherche spatiale ;   - le calcul des distances ;   - la recherche des patrimoines dans un rayon ;   - la gestion des points d\'intérêt ;   - la gestion des zones géographiques ;   - la gestion des itinéraires et points d\'accès ;   - la production de données cartographiques ;   - l\'exploitation des informations géospatiales;   - Une géolocalisation peut être associée soit à un patrimoine (ms-patrimoine), soit à une entreprise (ms-entreprise), mais jamais aux deux simultanément.\"      Version 13.0.0 : contrat consolidé pour une génération Spring Boot 3 / Jakarta     avec validation, pagination homogène, sécurité JWT, gestion d\'erreurs standardisée     et contraintes métier explicites.  Modèle d\'héritage : `BaseEntity` constitue la classe racine commune des entités persistantes. La géolocalisation est un modèle métier distinct et n\'est pas implémentée par `BaseEntity`.
+Propriétaire des coordonnées, du référentiel administratif, des zones géographiques et touristiques, des points d\'accès et des recherches spatiales. Une géolocalisation cible exactement un patrimoine ou une entreprise; les références sont des UUID.
 
-The version of the OpenAPI document: 13.0.1
+The version of the OpenAPI document: 14.0.0
 
 ## Building
 
