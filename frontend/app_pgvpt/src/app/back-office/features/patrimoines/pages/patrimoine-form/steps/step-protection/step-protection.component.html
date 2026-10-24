@@ -1,0 +1,410 @@
+<section [formGroup]="form" class="space-y-6 animate-fade-in">
+  <div class="border-b border-gray-100 pb-3">
+    <h2 class="text-base font-bold text-gray-900 flex items-center gap-2">
+      <i class="fas fa-shield-alt text-[#0b5d5e]"></i>
+      <span>4. Protection</span>
+    </h2>
+    <p class="text-xs text-gray-500 mt-0.5">Statut de publication et classement administratif.</p>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div>
+      <label class="block text-xs font-bold text-gray-700 mb-1.5">Statut</label>
+      <select formControlName="statut"
+        class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-800">
+        <option *ngFor="let st of statuts" [value]="st">{{ st }}</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-xs font-bold text-gray-700 mb-1.5">Classé patrimoine national</label>
+      <select formControlName="classePatrimoine"
+        class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#0b5d5e] focus:border-[#0b5d5e]">
+        <option value="false">Non</option>
+        <option value="true">Oui (Classé)</option>
+      </select>
+    </div>
+    <!-- Conditionnel : UNESCO -->
+    <div
+      *ngIf="form.get('inscritUnesco')?.value === 'true' || form.get('inscritUnesco')?.value === true"
+      class="col-span-2 grid grid-cols-2 gap-4 mt-2 p-4 bg-blue-50 rounded-lg">
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Nom du site UNESCO</label>
+        <input type="text" formControlName="nomSiteUnesco"
+          class="w-full px-4 py-2 border border-blue-200 rounded-lg bg-white">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Date d'inscription</label>
+        <input type="date" formControlName="dateInscriptionUnesco"
+          class="w-full px-4 py-2 border border-blue-200 rounded-lg bg-white">
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-semibold text-gray-700 mb-1">Date de classement</label>
+      <input type="date" formControlName="dateClassement"
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+    </div>
+
+    <div>
+      <label class="block text-xs font-bold text-gray-700 mb-1.5">Référence classement</label>
+      <input type="text" formControlName="referenceClassement" placeholder="Ex: UNESCO Ref 26"
+        class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800">
+    </div>
+    <div>
+      <label class="block text-xs font-bold text-gray-700 mb-1.5">Inscrit UNESCO</label>
+      <select formControlName="inscritUnesco"
+        class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-800">
+        <option value="false">Non</option>
+        <option value="true">Oui (Inscrit)</option>
+      </select>
+    </div>
+    <div class="md:col-span-2">
+      <label class="block text-xs font-bold text-gray-700 mb-1.5">Protection juridique</label>
+      <textarea formControlName="protectionJuridique" rows="3" placeholder="Dispositifs juridiques..."
+        class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800"></textarea>
+    </div>
+  </div>
+
+  <!-- État de conservation -->
+  <div class="pt-6 border-t border-gray-100" formGroupName="conservation">
+    <h3 class="text-sm font-bold text-gray-700 mb-3">État de conservation</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-amber-50/50 p-4 rounded-xl border border-amber-100">
+      <div>
+        <label class="block text-[11px] font-bold text-gray-500 mb-1">État actuel</label>
+        <select formControlName="etat" class="w-full text-xs p-2.5 rounded-lg border border-gray-300">
+          <option value="">Sélectionner</option>
+          <option value="EXCELLENT">Excellent</option>
+          <option value="BON">Bon</option>
+          <option value="MOYEN">Moyen (Acceptable)</option>
+          <option value="ACCEPTABLE">Acceptable</option>
+          <option value="MAUVAIS">Mauvais (Dégradé)</option>
+          <option value="DEGRADE">Dégradé</option>
+          <option value="CRITIQUE">Critique</option>
+          <option value="RUINE">En ruine</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-gray-500 mb-1">Date d'évaluation</label>
+        <input type="date" formControlName="dateEvaluation" class="w-full text-xs p-2.5 rounded-lg border border-gray-300">
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-[11px] font-bold text-gray-500 mb-1">Description de l'état</label>
+        <textarea formControlName="descriptionEtat" rows="2" class="w-full text-xs p-2.5 rounded-lg border border-gray-300"></textarea>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-gray-500 mb-1">Dégradations constatées</label>
+        <app-tag-input formControlName="degradations" badgeColor="rose" placeholder="Ajouter une dégradation (ex: Fissures, Érosion)..."></app-tag-input>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-gray-500 mb-1">Causes des dégradations</label>
+        <app-tag-input formControlName="causesDegradation" badgeColor="rose" placeholder="Ajouter une cause (ex: Intempéries, Humidité)..."></app-tag-input>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-gray-500 mb-1">Travaux nécessaires</label>
+        <app-tag-input formControlName="travauxNecessaires" badgeColor="amber" placeholder="Ajouter un travail (ex: Réfection toiture, Étanchéité)..."></app-tag-input>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-gray-500 mb-1">Recommandations</label>
+        <app-tag-input formControlName="recommandations" badgeColor="teal" placeholder="Ajouter une recommandation (ex: Surveillance trimestrielle)..."></app-tag-input>
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-gray-500 mb-1">Derniers travaux</label>
+        <input type="text" formControlName="dernierTravaux" class="w-full text-xs p-2.5 rounded-lg border border-gray-300">
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-gray-500 mb-1">Date derniers travaux</label>
+        <input type="date" formControlName="dateDerniersTravaux" class="w-full text-xs p-2.5 rounded-lg border border-gray-300">
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-gray-500 mb-1">Organisme de conservation</label>
+        <input type="text" formControlName="organismeConservation" class="w-full text-xs p-2.5 rounded-lg border border-gray-300">
+      </div>
+      <div>
+        <label class="block text-[11px] font-bold text-gray-500 mb-1">Budget estimé (FCFA)</label>
+        <input type="number" formControlName="budgetEstime" class="w-full text-xs p-2.5 rounded-lg border border-gray-300">
+      </div>
+      
+      <div class="md:col-span-2 mt-2 pt-2 border-t border-amber-200" formGroupName="contactConservateur">
+        <h4 class="text-[11px] font-bold text-gray-700 mb-2 uppercase">Contact Conservateur</h4>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-[10px] font-bold text-gray-500 mb-1">Nom complet</label>
+            <input type="text" formControlName="nom" class="w-full text-xs p-2 rounded-lg border border-gray-300">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-gray-500 mb-1">Fonction</label>
+            <input type="text" formControlName="fonction" class="w-full text-xs p-2 rounded-lg border border-gray-300">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-gray-500 mb-1">Téléphone</label>
+            <input type="text" formControlName="telephone" class="w-full text-xs p-2 rounded-lg border border-gray-300">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-gray-500 mb-1">Email</label>
+            <input type="email" formControlName="email" class="w-full text-xs p-2 rounded-lg border border-gray-300">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-gray-500 mb-1">Site Web</label>
+            <input type="url" formControlName="siteWeb" class="w-full text-xs p-2 rounded-lg border border-gray-300">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-gray-500 mb-1">Organisme</label>
+            <input type="text" formControlName="organisme" class="w-full text-xs p-2 rounded-lg border border-gray-300">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menaces Dynamiques -->
+  <div class="pt-6 border-t border-gray-100" formArrayName="menaces">
+    <div class="flex items-center justify-between mb-3">
+      <div>
+        <label class="block text-sm font-bold text-gray-700">Menaces identifiées</label>
+        <p class="text-[11px] text-gray-500">Risques physiques, environnementaux ou humains pesant sur le site</p>
+      </div>
+      <button type="button" (click)="addMenace()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 border border-rose-200">
+        <i class="fas fa-plus text-[10px]"></i>
+        <span>Ajouter une menace</span>
+      </button>
+    </div>
+
+    <div *ngFor="let m of menacesArray.controls; let i = index" [formGroupName]="i" [id]="'menace-item-' + i"
+         class="bg-rose-50/30 p-4 rounded-xl mb-3 relative border border-rose-200/80 shadow-xs animate-fade-in">
+      <div class="flex items-center justify-between pb-2 mb-3 border-b border-rose-100/80">
+        <span class="text-xs font-bold text-rose-800 flex items-center gap-1.5">
+          <i class="fas fa-exclamation-circle text-rose-500"></i>
+          <span>Menace #{{ i + 1 }}</span>
+        </span>
+        <button type="button" (click)="removeMenace(i)" class="px-2 py-1 text-xs text-rose-600 hover:text-white hover:bg-rose-600 rounded-md transition-colors flex items-center gap-1" title="Supprimer cette menace">
+          <i class="fas fa-trash-alt text-[10px]"></i>
+          <span class="text-[11px] font-semibold">Supprimer</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-[11px] font-bold text-gray-600 mb-1">Type de menace <span class="text-rose-500">*</span></label>
+          <input type="text" formControlName="type" placeholder="Ex: Érosion, Urbanisation, Vandalisme..." class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-600 mb-1">Niveau de sévérité</label>
+          <select formControlName="niveau" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white">
+            <option value="FAIBLE">Faible</option>
+            <option value="MOYEN">Moyen</option>
+            <option value="ELEVE">Élevé</option>
+            <option value="CRITIQUE">Critique</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-600 mb-1">Description</label>
+          <textarea formControlName="description" rows="2" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white" placeholder="Détails de la menace..."></textarea>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-600 mb-1">Mesures de prévention</label>
+          <textarea formControlName="mesuresPrevention" rows="2" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white" placeholder="Solutions ou mesures..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-2">
+      <button type="button" (click)="addMenace()"
+        class="w-full py-2.5 px-4 rounded-xl border border-dashed border-rose-300 text-rose-600 bg-rose-50/40 hover:bg-rose-50 hover:border-rose-400 text-xs font-bold transition-all flex items-center justify-center gap-2">
+        <i class="fas fa-plus-circle text-sm"></i>
+        <span>Ajouter une menace</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Horaires Dynamiques -->
+  <div class="pt-6 border-t border-gray-100" formArrayName="horaires">
+    <div class="flex items-center justify-between mb-3">
+      <div>
+        <label class="block text-sm font-bold text-gray-700">Horaires d'ouverture</label>
+        <p class="text-[11px] text-gray-500">Jours et créneaux d'accès pour les visiteurs</p>
+      </div>
+      <button type="button" (click)="addHoraire()"
+        class="px-3 py-1.5 bg-[#0b5d5e]/10 hover:bg-[#0b5d5e]/15 text-[#0b5d5e] rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 border border-[#0b5d5e]/20">
+        <i class="fas fa-plus text-[10px]"></i>
+        <span>Ajouter un horaire</span>
+      </button>
+    </div>
+
+    <div *ngFor="let h of horairesArray.controls; let i = index" [formGroupName]="i" [id]="'horaire-item-' + i"
+      class="bg-gray-50 p-4 rounded-xl mb-3 relative border border-gray-200/90 shadow-xs animate-fade-in">
+      <div class="flex items-center justify-between pb-2 mb-3 border-b border-gray-200">
+        <span class="text-xs font-bold text-gray-800 flex items-center gap-1.5">
+          <i class="fas fa-clock text-[#0b5d5e]"></i>
+          <span>Créneau #{{ i + 1 }} : {{ h.get('jour')?.value || 'Jour' }}</span>
+        </span>
+        <button type="button" (click)="removeHoraire(i)"
+          class="px-2 py-1 text-xs text-rose-600 hover:text-white hover:bg-rose-600 rounded-md transition-colors flex items-center gap-1" title="Supprimer cet horaire">
+          <i class="fas fa-trash-alt text-[10px]"></i>
+          <span class="text-[11px] font-semibold">Supprimer</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div>
+          <label class="block text-[11px] font-bold text-gray-500 mb-1">Jour</label>
+          <select formControlName="jour" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white">
+            <option value="LUNDI">Lundi</option>
+            <option value="MARDI">Mardi</option>
+            <option value="MERCREDI">Mercredi</option>
+            <option value="JEUDI">Jeudi</option>
+            <option value="VENDREDI">Vendredi</option>
+            <option value="SAMEDI">Samedi</option>
+            <option value="DIMANCHE">Dimanche</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-500 mb-1">Ouverture</label>
+          <input type="time" formControlName="heureOuverture"
+            class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-500 mb-1">Fermeture</label>
+          <input type="time" formControlName="heureFermeture"
+            class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-500 mb-1">État</label>
+          <select formControlName="ouvert" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white">
+            <option [ngValue]="true">Ouvert</option>
+            <option [ngValue]="false">Fermé</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3">
+        <div>
+          <label class="block text-[11px] font-bold text-gray-500 mb-1">Début pause</label>
+          <input type="time" formControlName="pauseDebut"
+            class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-500 mb-1">Fin pause</label>
+          <input type="time" formControlName="pauseFin"
+            class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-500 mb-1">Réservation</label>
+          <select formControlName="surReservation" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white">
+            <option [ngValue]="false">Non</option>
+            <option [ngValue]="true">Oui</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-500 mb-1">Commentaire</label>
+          <input type="text" formControlName="commentaire" placeholder="Ex: Fermé jours fériés"
+            class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white">
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-2">
+      <button type="button" (click)="addHoraire()"
+        class="w-full py-2.5 px-4 rounded-xl border border-dashed border-[#0b5d5e]/30 text-[#0b5d5e] bg-[#0b5d5e]/5 hover:bg-[#0b5d5e]/10 hover:border-[#0b5d5e]/50 text-xs font-bold transition-all flex items-center justify-center gap-2">
+        <i class="fas fa-plus-circle text-sm"></i>
+        <span>Ajouter un horaire d'ouverture</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Expositions Dynamiques (Uniquement pour les Musées) -->
+  <div *ngIf="form.get('type')?.value === 'MUSEE'" class="pt-6 border-t border-gray-100" formArrayName="expositions">
+    <div class="flex items-center justify-between mb-3">
+      <div>
+        <label class="block text-sm font-bold text-gray-700">Expositions</label>
+        <p class="text-[11px] text-gray-500">Expositions permanentes et temporaires du musée</p>
+      </div>
+      <button type="button" (click)="addExposition()"
+        class="px-3 py-1.5 bg-[#0b5d5e]/10 hover:bg-[#0b5d5e]/15 text-[#0b5d5e] rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 border border-[#0b5d5e]/20">
+        <i class="fas fa-plus text-[10px]"></i>
+        <span>Ajouter une exposition</span>
+      </button>
+    </div>
+
+    <div *ngFor="let expo of expositionsArray.controls; let i = index" [formGroupName]="i" [id]="'exposition-item-' + i"
+      class="bg-gray-50 p-4 rounded-xl mb-3 relative border border-gray-200 shadow-xs animate-fade-in">
+      <div class="flex items-center justify-between pb-2 mb-3 border-b border-gray-200">
+        <span class="text-xs font-bold text-gray-800 flex items-center gap-1.5">
+          <i class="fas fa-palette text-[#0b5d5e]"></i>
+          <span>Exposition #{{ i + 1 }} : {{ expo.get('titre')?.value || 'Titre' }}</span>
+        </span>
+        <button type="button" (click)="removeExposition(i)"
+          class="px-2 py-1 text-xs text-rose-600 hover:text-white hover:bg-rose-600 rounded-md transition-colors flex items-center gap-1" title="Supprimer cette exposition">
+          <i class="fas fa-trash-alt text-[10px]"></i>
+          <span class="text-[11px] font-semibold">Supprimer</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-[11px] font-bold text-gray-500 mb-1">Titre de l'exposition</label>
+          <input type="text" formControlName="titre" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-500 mb-1">Type</label>
+          <select formControlName="expositionPermanente" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white">
+            <option [ngValue]="true">Permanente</option>
+            <option [ngValue]="false">Temporaire</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-500 mb-1">Date début</label>
+          <input type="date" formControlName="dateDebut" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-500 mb-1">Date fin</label>
+          <input type="date" formControlName="dateFin" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-500 mb-1">Commissaire</label>
+          <input type="text" formControlName="commissaire" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-gray-500 mb-1">Lieu</label>
+          <input type="text" formControlName="lieu" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white">
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-[11px] font-bold text-gray-500 mb-1">Description</label>
+          <textarea formControlName="description" rows="2" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-2">
+      <button type="button" (click)="addExposition()"
+        class="w-full py-2.5 px-4 rounded-xl border border-dashed border-[#0b5d5e]/30 text-[#0b5d5e] bg-[#0b5d5e]/5 hover:bg-[#0b5d5e]/10 hover:border-[#0b5d5e]/50 text-xs font-bold transition-all flex items-center justify-center gap-2">
+        <i class="fas fa-plus-circle text-sm"></i>
+        <span>Ajouter une exposition</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Actions finales : Précédent, Annuler & Enregistrer -->
+  <div class="pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
+    <button type="button" (click)="onPrev()"
+      class="px-4 py-2 text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors flex items-center gap-1.5">
+      <i class="fas fa-arrow-left text-[10px]"></i>
+      <span>Précédent</span>
+    </button>
+    <div class="flex flex-wrap items-center gap-3 mt-2 sm:mt-0">
+      <button type="button" routerLink="/admin/patrimoines"
+        class="px-5 py-2.5 text-xs font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-xl transition-all shadow-sm flex items-center gap-2">
+        <i class="fas fa-times text-gray-500"></i>
+        <span>Annuler</span>
+      </button>
+      <button type="button" (click)="onSubmit()"
+        class="px-6 py-2.5 text-xs font-bold text-white bg-[#0b5d5e] hover:bg-[#084b4c] rounded-xl shadow-md transition-all flex items-center gap-2">
+        <span *ngIf="!isEditMode" class="inline-flex items-center gap-2">
+          <i class="fas fa-save"></i>
+          <span>Enregistrer</span>
+        </span>
+        <span *ngIf="isEditMode" class="inline-flex items-center gap-2">
+          <i class="fas fa-sync-alt"></i>
+          <span>Mettre à jour</span>
+        </span>
+      </button>
+    </div>
+  </div>
+</section>

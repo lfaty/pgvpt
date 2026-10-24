@@ -1,0 +1,95 @@
+<!-- HERO IMMERSIF — style magazine de voyage -->
+<header class="td-hero relative w-full overflow-hidden bg-[#0B1A24]" *ngIf="patrimoine">
+  <!-- Image de fond avec effet Ken Burns -->
+  <img [src]="mainImage" [alt]="patrimoine.nom" class="td-hero-img absolute inset-0 w-full h-full object-cover">
+  <div class="absolute inset-0 bg-gradient-to-t from-[#0B1A24] via-[#0B1A24]/45 to-black/30"></div>
+  <div class="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/50 to-transparent"></div>
+
+  <div class="relative z-10 mx-auto max-w-[1200px] px-6 h-full flex flex-col justify-between pt-28 pb-24 md:pb-28">
+
+    <!-- Barre supérieure : fil d'Ariane + actions -->
+    <div class="flex items-center justify-between gap-4">
+      <nav aria-label="Fil d'Ariane" class="flex items-center gap-2 text-xs md:text-sm text-white/80 min-w-0">
+        <a routerLink="/" class="hover:text-white transition-colors shrink-0"><i class="fa-solid fa-house text-[11px]"></i></a>
+        <i class="fa-solid fa-chevron-right text-[9px] text-white/50"></i>
+        <a routerLink="/patrimoines" class="hover:text-white transition-colors shrink-0">Patrimoines</a>
+        <i class="fa-solid fa-chevron-right text-[9px] text-white/50"></i>
+        <span class="text-white font-semibold truncate">{{ patrimoine.nom }}</span>
+      </nav>
+
+      <div class="flex items-center gap-2 shrink-0">
+        <button id="btn-partager" type="button" (click)="partager()" title="Partager"
+                class="td-glass-btn w-10 h-10 md:w-auto md:px-4 rounded-full flex items-center justify-center gap-2 text-white text-sm font-semibold">
+          <i class="fa-solid fa-arrow-up-from-bracket"></i>
+          <span class="hidden md:inline">Partager</span>
+        </button>
+        <button id="btn-favori" type="button" (click)="toggleFavori()" [title]="isFavori ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+                class="td-glass-btn w-10 h-10 md:w-auto md:px-4 rounded-full flex items-center justify-center gap-2 text-sm font-semibold"
+                [ngClass]="isFavori ? 'text-[#FF6B6B]' : 'text-white'">
+          <i [class]="isFavori ? 'fa-solid fa-heart td-pop' : 'fa-regular fa-heart'"></i>
+          <span class="hidden md:inline text-white">{{ isFavori ? 'Enregistré' : 'Enregistrer' }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Bloc titre -->
+    <div class="td-hero-content max-w-3xl">
+      <div class="flex flex-wrap items-center gap-2 mb-5">
+        <span *ngIf="categorieLabel" class="px-3 py-1.5 rounded-full bg-[#D16933] text-white text-[11px] font-bold uppercase tracking-[0.15em] shadow-lg shadow-[#D16933]/30">
+          {{ categorieLabel }}
+        </span>
+        <span *ngIf="typeLabel" class="px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-white text-[11px] font-bold uppercase tracking-[0.15em]">
+          {{ typeLabel }}
+        </span>
+        <span *ngIf="patrimoine.inscritUnesco" class="px-3 py-1.5 rounded-full bg-[#C9A227] text-[#1F1A0A] text-[11px] font-bold uppercase tracking-[0.15em] flex items-center gap-1.5">
+          <i class="fa-solid fa-award"></i> Patrimoine mondial UNESCO
+        </span>
+      </div>
+
+      <h1 class="font-serif text-4xl sm:text-5xl md:text-7xl font-bold text-white leading-[1.05] tracking-tight drop-shadow-[0_4px_24px_rgba(0,0,0,0.45)]">
+        {{ patrimoine.nom }}
+      </h1>
+
+      <p *ngIf="altNames.length" class="mt-3 text-white/75 text-sm md:text-base italic">
+        <ng-container *ngFor="let n of altNames; let last = last">
+          {{ n.label }} : <span class="text-white/95 not-italic font-medium">{{ n.value }}</span><span *ngIf="!last" class="mx-2 text-white/40">|</span>
+        </ng-container>
+      </p>
+
+      <p *ngIf="locationLabel" class="mt-5 flex items-center gap-2 text-white/90 text-base md:text-lg">
+        <span class="w-8 h-8 rounded-full bg-white/15 backdrop-blur flex items-center justify-center">
+          <i class="fa-solid fa-location-dot text-[#F4A261] text-sm"></i>
+        </span>
+        <span class="font-medium">{{ locationLabel }}<span class="text-white/60"> · Sénégal</span></span>
+      </p>
+
+      <!-- Appels à l'action -->
+      <div class="mt-8 flex flex-wrap gap-3">
+        <button id="btn-preparer-visite" type="button" (click)="navigate.emit('presentation')"
+                class="td-cta px-6 py-3.5 rounded-full bg-white text-[#0B1A24] font-bold text-sm flex items-center gap-2 shadow-xl">
+          <i class="fa-solid fa-compass text-[#D16933]"></i> Découvrir le site
+        </button>
+        <a *ngIf="itineraireUrl" id="btn-itineraire-hero" [href]="itineraireUrl" target="_blank" rel="noopener"
+           class="td-cta px-6 py-3.5 rounded-full bg-[#D16933] text-white font-bold text-sm flex items-center gap-2 shadow-xl shadow-[#D16933]/30">
+          <i class="fa-solid fa-route"></i> Itinéraire
+        </a>
+        <button *ngIf="mediaCount > 0" id="btn-galerie-hero" type="button" (click)="navigate.emit('galerie')"
+                class="td-cta td-glass-btn px-6 py-3.5 rounded-full text-white font-bold text-sm flex items-center gap-2">
+          <i class="fa-regular fa-images"></i> {{ mediaCount }} photo<span *ngIf="mediaCount > 1">s</span> & médias
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Indicateur de défilement -->
+  <button type="button" (click)="navigate.emit('presentation')" aria-label="Faire défiler"
+          class="hidden md:flex absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex-col items-center gap-2 text-white/70 hover:text-white text-[10px] uppercase tracking-[0.3em]">
+    <span>Explorer</span>
+    <span class="td-scroll-mouse"><span></span></span>
+  </button>
+
+  <!-- Toast -->
+  <div *ngIf="toast" class="td-toast fixed bottom-6 left-1/2 -translate-x-1/2 z-[2000] px-5 py-3 rounded-full bg-[#0B1A24] text-white text-sm font-semibold shadow-2xl flex items-center gap-2">
+    <i class="fa-solid fa-circle-check text-emerald-400"></i> {{ toast }}
+  </div>
+</header>

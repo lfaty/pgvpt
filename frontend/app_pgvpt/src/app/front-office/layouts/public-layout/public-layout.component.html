@@ -1,5 +1,5 @@
 <app-header></app-header>
-<main class="flex-grow">
+<main [ngClass]="isCarteRoute ? 'h-[calc(100vh-5rem)] overflow-hidden flex flex-col' : 'flex-grow'">
   <router-outlet></router-outlet>
 </main>
-<app-footer></app-footer>
+<app-footer *ngIf="!isCarteRoute"></app-footer>

@@ -258,7 +258,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EtapeCircuit'
-  /etapes/{id}:
+  /circuits/etapes/{id}:
     get:
       tags:
       - Etapes
@@ -328,7 +328,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/EtapeCircuit'
-  /activites:
+  /circuits/activites:
     get:
       tags:
       - Activites
@@ -372,7 +372,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Activite'
-  /activites/{id}:
+  /circuits/activites/{id}:
     get:
       tags:
       - Activites
@@ -417,7 +417,7 @@ paths:
       responses:
         '204':
           description: Activité supprimée
-  /activites/{id}/activer:
+  /circuits/activites/{id}/activer:
     patch:
       tags:
       - Activites
@@ -435,7 +435,7 @@ paths:
                 $ref: '#/components/schemas/Activite'
         '404':
           $ref: '#/components/responses/NotFound'
-  /activites/{id}/desactiver:
+  /circuits/activites/{id}/desactiver:
     patch:
       tags:
       - Activites

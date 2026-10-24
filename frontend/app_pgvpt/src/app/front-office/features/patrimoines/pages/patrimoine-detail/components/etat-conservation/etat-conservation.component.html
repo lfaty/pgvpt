@@ -1,0 +1,350 @@
+<!-- SECTION : CONSERVATION -->
+<section id="conservation" class="scroll-mt-24" *ngIf="patrimoine && patrimoine.conservation">
+  <div class="mx-auto max-w-[1200px] px-6 py-16 md:py-20">
+
+    <!-- En-tête de section -->
+    <div class="flex items-end gap-4 mb-12 td-reveal">
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-700 text-white flex items-center justify-center text-xl shadow-lg shadow-emerald-600/20 shrink-0">
+        <i class="fa-solid fa-shield-heart"></i>
+      </div>
+      <div>
+        <p class="td-kicker mb-0">Conservation</p>
+        <h2 class="font-serif text-2xl md:text-3xl font-bold text-[#0B1A24] leading-tight">État & préservation du site</h2>
+      </div>
+    </div>
+
+    <!-- Cartes de synthèse (état + organisme) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10 td-reveal">
+      <!-- État -->
+      <div class="relative overflow-hidden rounded-2xl border border-[#F0EDE6] bg-white p-6">
+        <div class="absolute top-0 left-0 right-0 h-1 rounded-t-2xl"
+             [ngClass]="{
+               'bg-emerald-500': patrimoine.conservation.etat === 'BON',
+               'bg-amber-500': patrimoine.conservation.etat === 'MOYEN' || patrimoine.conservation.etat === 'PASSABLE',
+               'bg-rose-500': patrimoine.conservation.etat === 'MAUVAIS' || patrimoine.conservation.etat === 'CRITIQUE'
+             }"></div>
+        <div class="flex items-start gap-4">
+          <span class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 text-lg"
+                [ngClass]="{
+                  'bg-emerald-50 text-emerald-600': patrimoine.conservation.etat === 'BON',
+                  'bg-amber-50 text-amber-600': patrimoine.conservation.etat === 'MOYEN' || patrimoine.conservation.etat === 'PASSABLE',
+                  'bg-rose-50 text-rose-600': patrimoine.conservation.etat === 'MAUVAIS' || patrimoine.conservation.etat === 'CRITIQUE'
+                }">
+            <i class="fa-solid" [ngClass]="{
+              'fa-check-circle': patrimoine.conservation.etat === 'BON',
+              'fa-exclamation-circle': patrimoine.conservation.etat === 'MOYEN' || patrimoine.conservation.etat === 'PASSABLE',
+              'fa-triangle-exclamation': patrimoine.conservation.etat === 'MAUVAIS' || patrimoine.conservation.etat === 'CRITIQUE'
+            }"></i>
+          </span>
+          <div>
+            <p class="td-info-label">État de conservation</p>
+            <div class="flex items-center gap-2.5 mt-1.5">
+              <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider"
+                    [ngClass]="{
+                      'bg-emerald-100 text-emerald-700': patrimoine.conservation.etat === 'BON',
+                      'bg-amber-100 text-amber-700': patrimoine.conservation.etat === 'MOYEN' || patrimoine.conservation.etat === 'PASSABLE',
+                      'bg-rose-100 text-rose-700': patrimoine.conservation.etat === 'MAUVAIS' || patrimoine.conservation.etat === 'CRITIQUE'
+                    }">
+                {{ patrimoine.conservation.etat }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Organisme -->
+      <div class="relative overflow-hidden rounded-2xl border border-[#F0EDE6] bg-white p-6">
+        <div class="absolute top-0 left-0 right-0 h-1 bg-[#087F5B] rounded-t-2xl"></div>
+        <div class="flex items-start gap-4">
+          <span class="w-12 h-12 rounded-xl bg-[#087F5B]/10 text-[#087F5B] flex items-center justify-center text-lg shrink-0">
+            <i class="fa-solid fa-building-columns"></i>
+          </span>
+          <div>
+            <p class="td-info-label">Organisme de conservation</p>
+            <p class="text-base font-bold text-[#0B1A24] mt-1">{{ patrimoine.conservation.organismeConservation || patrimoine.organismeGestionnaire || 'Non précisé' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Description de l'état -->
+    <div *ngIf="patrimoine.conservation.descriptionEtat" class="mb-10 td-reveal">
+      <div class="rounded-2xl bg-[#F6F4EE] border border-[#E9E3D3] p-6 md:p-8">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-lg bg-white text-[#D16933] flex items-center justify-center text-sm border border-[#E9E3D3]">
+            <i class="fa-solid fa-file-lines"></i>
+          </span>
+          <h3 class="font-serif text-lg font-bold text-[#0B1A24]">Description de l'état</h3>
+        </div>
+        <p class="text-sm text-gray-700 leading-[1.85]">{{ patrimoine.conservation.descriptionEtat }}</p>
+      </div>
+    </div>
+
+    <!-- Grille : Dégradations + Travaux -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10 td-reveal">
+      <!-- Dégradations & Causes -->
+      <div class="rounded-2xl bg-white border border-[#F0EDE6] p-6 md:p-7"
+           *ngIf="(patrimoine.conservation.degradations && patrimoine.conservation.degradations.length > 0) || (patrimoine.conservation.causesDegradation && patrimoine.conservation.causesDegradation.length > 0)">
+        <h4 class="flex items-center gap-2.5 font-serif text-lg font-bold text-[#0B1A24] mb-6">
+          <span class="w-8 h-8 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center text-sm"><i class="fa-solid fa-magnifying-glass-chart"></i></span>
+          Dégradations & Causes
+        </h4>
+        <div class="space-y-5">
+          <div *ngIf="patrimoine.conservation.degradations && patrimoine.conservation.degradations.length > 0">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 flex items-center gap-2">
+              <i class="fa-solid fa-circle-exclamation text-orange-400"></i> Dégradations observées
+            </p>
+            <ul class="space-y-2">
+              <li *ngFor="let d of patrimoine.conservation.degradations" class="flex items-start gap-2.5 text-sm text-gray-600">
+                <span class="w-1.5 h-1.5 rounded-full bg-orange-400 mt-2 shrink-0"></span>
+                <span>{{ d }}</span>
+              </li>
+            </ul>
+          </div>
+          <div *ngIf="patrimoine.conservation.causesDegradation && patrimoine.conservation.causesDegradation.length > 0">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 flex items-center gap-2">
+              <i class="fa-solid fa-fire-flame-curved text-rose-400"></i> Causes principales
+            </p>
+            <ul class="space-y-2">
+              <li *ngFor="let c of patrimoine.conservation.causesDegradation" class="flex items-start gap-2.5 text-sm text-gray-600">
+                <span class="w-1.5 h-1.5 rounded-full bg-rose-400 mt-2 shrink-0"></span>
+                <span>{{ c }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Travaux & Financement -->
+      <div class="rounded-2xl bg-white border border-[#F0EDE6] p-6 md:p-7 flex flex-col justify-between">
+        <div class="space-y-6">
+          <h4 class="flex items-center gap-2.5 font-serif text-lg font-bold text-[#0B1A24]">
+            <span class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm">
+              <i class="fa-solid fa-trowel-bricks"></i>
+            </span>
+            Travaux & Financement
+          </h4>
+
+          <!-- Derniers travaux -->
+          <div *ngIf="patrimoine.conservation.dernierTravaux || patrimoine.conservation.dateDerniersTravaux">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-hammer text-gray-400"></i> Derniers travaux
+              <span class="text-[10px] font-normal text-gray-400 normal-case" *ngIf="patrimoine.conservation.dateDerniersTravaux">({{ patrimoine.conservation.dateDerniersTravaux | date:'dd/MM/yyyy' }})</span>
+            </p>
+            <p class="text-sm text-gray-700 leading-relaxed">{{ patrimoine.conservation.dernierTravaux || 'Non précisé' }}</p>
+          </div>
+
+          <!-- Travaux nécessaires -->
+          <div *ngIf="patrimoine.conservation.travauxNecessaires && patrimoine.conservation.travauxNecessaires.length > 0">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 flex items-center gap-2">
+              <i class="fa-solid fa-clipboard-list text-amber-500"></i> Travaux nécessaires
+            </p>
+            <ul class="space-y-2">
+              <li *ngFor="let t of patrimoine.conservation.travauxNecessaires" class="flex items-start gap-2.5 text-sm text-gray-600">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400 mt-2 shrink-0"></span>
+                <span>{{ t }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <div *ngIf="!patrimoine.conservation.dernierTravaux && !patrimoine.conservation.dateDerniersTravaux && (!patrimoine.conservation.travauxNecessaires || patrimoine.conservation.travauxNecessaires.length === 0) && (patrimoine.conservation.budgetEstime === null || patrimoine.conservation.budgetEstime === undefined)" class="text-sm text-gray-400 italic">
+            Aucune information sur les travaux disponible pour ce site.
+          </div>
+        </div>
+
+        <!-- Budget estimé (Carte valorisée) -->
+        <div *ngIf="patrimoine.conservation.budgetEstime !== null && patrimoine.conservation.budgetEstime !== undefined"
+             class="relative overflow-hidden rounded-xl bg-gradient-to-br from-[#FFFBF5] via-[#FFF8EE] to-[#FFF3E0] border border-[#F5E1C8] p-4 sm:p-5 mt-6">
+          <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-[#D16933]/10 blur-xl pointer-events-none"></div>
+
+          <div class="relative flex items-center justify-between gap-4 flex-wrap sm:flex-nowrap">
+            <div class="flex items-center gap-3">
+              <span class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D16933] to-[#E8956A] text-white flex items-center justify-center text-base shadow-sm shadow-[#D16933]/25 shrink-0">
+                <i class="fa-solid fa-coins"></i>
+              </span>
+              <div>
+                <p class="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#A24D20]">Budget estimé</p>
+                <p class="text-xs text-gray-500">Enveloppe prévisionnelle</p>
+              </div>
+            </div>
+
+            <div class="sm:text-right">
+              <p class="text-xl sm:text-2xl font-serif font-extrabold text-[#0B1A24] tracking-tight">
+                {{ formatBudget(patrimoine.conservation.budgetEstime) }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recommandations & Contact -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 td-reveal"
+         *ngIf="(patrimoine.conservation.recommandations && patrimoine.conservation.recommandations.length > 0) || patrimoine.conservation.contactConservateur">
+
+      <!-- Recommandations -->
+      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50/50 border border-blue-100 p-6 md:p-7"
+           *ngIf="patrimoine.conservation.recommandations && patrimoine.conservation.recommandations.length > 0">
+        <div class="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-blue-200/30 blur-2xl"></div>
+        <h4 class="relative flex items-center gap-2.5 font-serif text-lg font-bold text-blue-900 mb-5">
+          <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm"><i class="fa-solid fa-lightbulb"></i></span>
+          Recommandations
+        </h4>
+        <ul class="relative space-y-3">
+          <li *ngFor="let r of patrimoine.conservation.recommandations" class="flex items-start gap-3 text-sm text-blue-800 leading-relaxed">
+            <span class="w-6 h-6 rounded-md bg-blue-100 text-blue-500 flex items-center justify-center shrink-0 text-[10px] mt-0.5">
+              <i class="fa-solid fa-check"></i>
+            </span>
+            <span>{{ r }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Contact Conservateur -->
+      <div class="rounded-2xl bg-white border border-[#F0EDE6] p-6 md:p-7"
+           *ngIf="patrimoine.conservation.contactConservateur">
+        <h4 class="flex items-center gap-2.5 font-serif text-lg font-bold text-[#0B1A24] mb-5">
+          <span class="w-8 h-8 rounded-lg bg-gray-100 text-gray-500 flex items-center justify-center text-sm"><i class="fa-solid fa-user-shield"></i></span>
+          Contact conservateur
+        </h4>
+        <div class="space-y-3.5">
+          <div class="flex items-center gap-3">
+            <span class="w-10 h-10 rounded-full bg-[#0B1A24] text-white flex items-center justify-center text-sm font-bold shrink-0">
+              {{ patrimoine.conservation.contactConservateur.nom?.charAt(0) || 'C' }}
+            </span>
+            <div class="min-w-0">
+              <p class="text-sm font-bold text-[#0B1A24] truncate">{{ patrimoine.conservation.contactConservateur.nom }}</p>
+              <p class="text-xs text-gray-500 truncate" *ngIf="patrimoine.conservation.contactConservateur.fonction">{{ patrimoine.conservation.contactConservateur.fonction }}</p>
+            </div>
+          </div>
+          <div *ngIf="patrimoine.conservation.contactConservateur.organisme" class="flex items-center gap-3 text-sm text-gray-600">
+            <i class="fa-solid fa-building text-gray-400 w-5 text-center"></i>
+            <span class="truncate">{{ patrimoine.conservation.contactConservateur.organisme }}</span>
+          </div>
+          <div *ngIf="patrimoine.conservation.contactConservateur.telephone" class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs shrink-0">
+              <i class="fa-solid fa-phone"></i>
+            </span>
+            <a [href]="'tel:' + patrimoine.conservation.contactConservateur.telephone" class="text-sm text-[#0B1A24] font-semibold hover:text-[#D16933] transition-colors">
+              {{ patrimoine.conservation.contactConservateur.telephone }}
+            </a>
+          </div>
+          <div *ngIf="patrimoine.conservation.contactConservateur.email" class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs shrink-0">
+              <i class="fa-solid fa-envelope"></i>
+            </span>
+            <a [href]="'mailto:' + patrimoine.conservation.contactConservateur.email" class="text-sm text-[#0B1A24] font-semibold hover:text-[#D16933] transition-colors truncate">
+              {{ patrimoine.conservation.contactConservateur.email }}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Menaces -->
+    <div class="td-reveal" *ngIf="patrimoine.menaces && patrimoine.menaces.length > 0">
+      <h3 class="flex items-center gap-3 font-serif text-xl font-bold text-[#0B1A24] mb-8">
+        <span class="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 text-white flex items-center justify-center text-base shadow-md shadow-rose-500/20">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </span>
+        Menaces identifiées
+        <span class="ml-auto px-3 py-1 rounded-full bg-rose-50 text-rose-600 text-xs font-bold">
+          {{ patrimoine.menaces.length }} menace{{ patrimoine.menaces.length > 1 ? 's' : '' }}
+        </span>
+      </h3>
+
+      <div class="space-y-5">
+        <div class="rounded-2xl bg-white border border-[#F0EDE6] overflow-hidden hover:shadow-lg transition-all duration-300"
+             *ngFor="let m of patrimoine.menaces; let i = index">
+
+          <!-- Barre colorée selon le niveau -->
+          <div class="h-1.5"
+               [ngClass]="{
+                 'bg-gradient-to-r from-rose-500 to-rose-400': m.niveau === 'ELEVE' || m.niveau === 'CRITIQUE',
+                 'bg-gradient-to-r from-amber-500 to-amber-400': m.niveau === 'MOYEN',
+                 'bg-gradient-to-r from-emerald-500 to-emerald-400': m.niveau === 'FAIBLE'
+               }"></div>
+
+          <!-- En-tête cliquable -->
+          <div class="p-5 md:p-6 cursor-pointer" (click)="onToggleThreat(i)">
+            <div class="flex justify-between items-start gap-3">
+              <div class="flex items-start gap-3 min-w-0">
+                <span class="w-9 h-9 rounded-xl flex items-center justify-center text-sm shrink-0 mt-0.5"
+                      [ngClass]="{
+                        'bg-rose-50 text-rose-500': m.niveau === 'ELEVE' || m.niveau === 'CRITIQUE',
+                        'bg-amber-50 text-amber-500': m.niveau === 'MOYEN',
+                        'bg-emerald-50 text-emerald-500': m.niveau === 'FAIBLE'
+                      }">
+                  <i class="fa-solid fa-bolt"></i>
+                </span>
+                <div class="min-w-0">
+                  <h5 class="font-serif font-bold text-[#0B1A24] text-base leading-snug">{{ m.type }}</h5>
+                  <p class="text-xs text-gray-400 mt-0.5" *ngIf="m.description">{{ m.description | slice:0:100 }}{{ m.description.length > 100 ? '…' : '' }}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider"
+                      [ngClass]="{
+                        'bg-rose-100 text-rose-700': m.niveau === 'ELEVE' || m.niveau === 'CRITIQUE',
+                        'bg-amber-100 text-amber-700': m.niveau === 'MOYEN',
+                        'bg-emerald-100 text-emerald-700': m.niveau === 'FAIBLE'
+                      }">
+                  {{ m.niveau }}
+                </span>
+                <i class="fa-solid text-gray-300 text-xs transition-transform duration-300"
+                   [ngClass]="{'fa-chevron-down': expandedThreatIndex !== i, 'fa-chevron-up': expandedThreatIndex === i}"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panneau déplié -->
+          <div *ngIf="expandedThreatIndex === i" class="border-t border-[#F0EDE6]">
+            <!-- Description complète -->
+            <div class="px-5 md:px-6 pt-5 pb-4" *ngIf="m.description">
+              <p class="text-sm text-gray-600 leading-[1.85]">{{ m.description }}</p>
+            </div>
+
+            <!-- Mesures de prévention (parsées) -->
+            <div *ngIf="m.mesuresPrevention" class="px-5 md:px-6 pb-6">
+              <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-emerald-50 via-[#F0FAF4] to-teal-50/40 border border-emerald-200/60 p-4 sm:p-5">
+                <!-- Glow décoratif -->
+                <div class="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-emerald-200/30 blur-2xl pointer-events-none"></div>
+
+                <div class="relative">
+                  <!-- En-tête plan d'action -->
+                  <div class="flex items-center gap-2.5 mb-4">
+                    <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 text-white flex items-center justify-center text-xs shadow-sm shadow-emerald-500/20">
+                      <i class="fa-solid fa-shield-heart"></i>
+                    </span>
+                    <div>
+                      <p class="text-[10px] font-extrabold uppercase tracking-[0.16em] text-emerald-700">Plan d'action</p>
+                      <p class="text-[11px] text-emerald-600/70">Mesures de prévention & mitigation</p>
+                    </div>
+                  </div>
+
+                  <!-- Liste des mesures parsées -->
+                  <div class="space-y-2.5" *ngIf="parseMesures(m.mesuresPrevention).length > 1">
+                    <div *ngFor="let item of parseMesures(m.mesuresPrevention); let j = index"
+                         class="flex items-start gap-3 p-3 rounded-lg bg-white/70 border border-emerald-100/80 hover:bg-white hover:shadow-sm transition-all duration-200">
+                      <span class="w-6 h-6 rounded-md bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px] shrink-0 mt-0.5 font-bold">
+                        {{ j + 1 }}
+                      </span>
+                      <p class="text-[13px] text-gray-700 leading-relaxed">{{ item }}</p>
+                    </div>
+                  </div>
+
+                  <!-- Si texte non parsable (une seule mesure) -->
+                  <div *ngIf="parseMesures(m.mesuresPrevention).length <= 1"
+                       class="flex items-start gap-3 p-3 rounded-lg bg-white/70 border border-emerald-100/80">
+                    <i class="fa-solid fa-check-circle text-emerald-500 mt-0.5 shrink-0"></i>
+                    <p class="text-[13px] text-gray-700 leading-relaxed">{{ m.mesuresPrevention }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>

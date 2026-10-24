@@ -1,32 +1,88 @@
 <div class="space-y-6 animate-fade-in-up pb-12">
   <!-- En-tête -->
-  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
     <div>
-      <h2 class="text-2xl font-bold text-gray-900">
-        <i class="fas fa-map-marker-alt text-blue-600 mr-2"></i>
-        Géolocalisation du Patrimoine
-      </h2>
-      <p class="text-gray-500 mt-1">
-        Définissez les coordonnées spatiales et les points d'accès du patrimoine.
+      <div class="flex flex-wrap items-center gap-2.5 mb-1.5">
+        <h2 class="text-2xl font-bold text-gray-900 flex items-center">
+          <i class="fas fa-map-marker-alt text-blue-600 mr-2.5"></i>
+          Géolocalisation du Patrimoine
+        </h2>
+
+        <!-- Badge Nom du Patrimoine -->
+        <span *ngIf="nomPatrimoine" 
+              class="text-xs font-bold px-3 py-1 rounded-xl bg-blue-50 text-blue-700 border border-blue-200/80 shadow-2xs flex items-center gap-1.5">
+          <i class="fas fa-landmark text-blue-600 text-[11px]"></i>
+          <span>{{ nomPatrimoine }}</span>
+        </span>
+      </div>
+      <p class="text-xs text-gray-500">
+        Définissez les coordonnées spatiales GPS et les points d'accès du site
+        <strong *ngIf="nomPatrimoine" class="text-blue-700 font-bold">« {{ nomPatrimoine }} »</strong>.
       </p>
     </div>
-    <div class="flex items-center gap-2">
-      <button type="button" routerLink="/admin/patrimoines" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-        <i class="fas fa-arrow-left mr-2"></i> Retour
+
+    <div class="flex flex-wrap items-center gap-3">
+      <!-- Sélecteur rapide de patrimoine -->
+      <div *ngIf="patrimoinesList.length > 0"
+           class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-200">
+        <label class="text-xs font-bold text-gray-700 whitespace-nowrap">
+          <i class="fas fa-landmark text-blue-600 mr-1"></i> Site :
+        </label>
+        <select [value]="patrimoineId" (change)="onSelectPatrimoineChange($event)"
+                class="px-2 py-1 bg-white border border-gray-300 rounded-lg text-xs font-semibold text-gray-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none">
+          <option *ngFor="let p of patrimoinesList" [value]="p.id">{{ p.nom }}</option>
+        </select>
+      </div>
+
+      <button type="button" routerLink="/admin/patrimoines" 
+              class="px-4 py-2 border border-gray-300 text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-50 transition-colors inline-flex items-center gap-1.5 shadow-2xs">
+        <i class="fas fa-arrow-left"></i> Retour
       </button>
-      <button type="button" (click)="generateJson()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
-        <i class="fas fa-save mr-2"></i> Enregistrer
+      <button type="button" (click)="saveLocalisation()" [disabled]="isSaving" 
+              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition-colors shadow-sm flex items-center gap-1.5 disabled:opacity-50">
+        <i class="fas" [ngClass]="isSaving ? 'fa-circle-notch fa-spin' : 'fa-save'"></i>
+        <span>{{ isSaving ? 'Enregistrement...' : 'Enregistrer' }}</span>
       </button>
     </div>
   </div>
 
   <!-- Notification (Succès/Erreur) -->
-  <div *ngIf="notificationMessage" class="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 flex items-center animate-fade-in-up">
-    <i class="fas fa-info-circle text-xl mr-3 text-blue-500"></i>
-    <span class="font-medium">{{ notificationMessage }}</span>
+  <div *ngIf="notificationMessage" class="bg-blue-50 border border-blue-200 text-blue-800 rounded-xl p-4 flex items-center animate-fade-in-up">
+    <i class="fas fa-info-circle text-lg mr-2.5 text-blue-600"></i>
+    <span class="text-xs font-semibold">{{ notificationMessage }}</span>
   </div>
 
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+    <!-- Bandeau d'identification du Patrimoine en cours -->
+    <div *ngIf="nomPatrimoine || patrimoine" class="px-6 py-4 bg-gradient-to-r from-blue-50/90 to-indigo-50/70 border-b border-blue-100 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3.5">
+        <div class="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-sm text-lg">
+          <i class="fas fa-landmark"></i>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-blue-600 uppercase tracking-wider block">Patrimoine en cours de géolocalisation</span>
+          <h3 class="text-base font-extrabold text-gray-900 leading-tight">{{ nomPatrimoine || patrimoine?.nom }}</h3>
+          <p *ngIf="patrimoine?.description" class="text-xs text-gray-500 line-clamp-1 mt-0.5 max-w-xl">
+            {{ patrimoine.description }}
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span *ngIf="patrimoine?.code" class="px-2.5 py-1 rounded-lg bg-white border border-blue-200 text-blue-800 text-xs font-mono font-bold shadow-2xs">
+          {{ patrimoine.code }}
+        </span>
+        <span *ngIf="patrimoine?.typePatrimoine" class="px-2.5 py-1 rounded-lg bg-white border border-gray-200 text-gray-700 text-xs font-medium shadow-2xs">
+          {{ patrimoine.typePatrimoine }}
+        </span>
+        <a *ngIf="patrimoineId" [routerLink]="['/admin/patrimoines/modifier', patrimoineId]" 
+           class="px-2.5 py-1 rounded-lg bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 hover:text-blue-600 text-xs font-medium transition-colors"
+           title="Voir la fiche du patrimoine">
+          <i class="fas fa-external-link-alt text-[10px]"></i>
+        </a>
+      </div>
+    </div>
+
     <!-- En-tête de section -->
     <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
       <h3 class="text-lg font-semibold text-gray-800 flex items-center">
@@ -42,14 +98,29 @@
         
         <!-- Formulaire principal -->
         <form [formGroup]="locForm" class="space-y-6">
+          <!-- Indicateur champs requis -->
+          <div class="flex items-center gap-2 px-3.5 py-2.5 bg-blue-50/80 border border-blue-200/80 text-blue-900 rounded-xl text-xs font-medium">
+            <i class="fas fa-asterisk text-rose-500 text-[10px]"></i>
+            <span>Les champs marqués d'une étoile rouge (<span class="text-rose-500 font-bold">*</span>) sont strictement obligatoires.</span>
+          </div>
+
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Zone Géographique <span class="text-red-500">*</span></label>
-              <input type="text" formControlName="zoneGeographiqueId" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all" placeholder="ex: Zone Ouest">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Zone Touristique <span class="text-red-500">*</span></label>
+              <select formControlName="zoneTouristiqueId" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all">
+                <option value="" disabled>-- Sélectionner une zone touristique --</option>
+                <option *ngFor="let zt of zonesTouristiques" [value]="zt.id">
+                  {{ zt.nom }} — {{ getZoneRegionLabel(zt) ? 'Région de ' + getZoneRegionLabel(zt) : zt.code }}
+                </option>
+              </select>
+              <div *ngIf="selectedZoneInfo" class="mt-1.5 flex items-center gap-1.5 text-xs text-blue-700 font-medium bg-blue-50/80 px-2.5 py-1 rounded-lg border border-blue-100">
+                <i class="fas fa-map-location-dot text-blue-600"></i>
+                <span>Zone rattachée : <strong>{{ selectedZoneInfo.nom }}</strong> (Région : <strong>{{ selectedZoneInfo.region }}</strong>)</span>
+              </div>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Zone Touristique <span class="text-red-500">*</span></label>
-              <input type="text" formControlName="zoneTouristiqueId" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all" placeholder="ex: Zone Touristique Gorée">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Adresse</label>
+              <input type="text" formControlName="adresse" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all" placeholder="ex: Rue Saint-Germain, Île de Gorée">
             </div>
           </div>
 
@@ -78,10 +149,13 @@
              <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Méthode d'acquisition</label>
               <select formControlName="methodeAcquisition" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all">
-                <option value="GPS">Relevé GPS sur site</option>
+                <option value="GPS">Relevé GPS sur site (GPS)</option>
+                <option value="RELEVE_TERRAIN">Relevé de terrain</option>
                 <option value="SATELLITE">Imagerie Satellite</option>
-                <option value="CARTE">Carte topographique</option>
                 <option value="DRONE">Relevé par Drone</option>
+                <option value="GEOCODAGE">Géocodage d'adresse</option>
+                <option value="IMPORT_SIG">Import SIG</option>
+                <option value="AUTRE">Autre</option>
               </select>
             </div>
             <div>
@@ -130,9 +204,10 @@
               <span class="px-2 py-0.5 text-xs rounded-full bg-teal-100 text-teal-800 font-medium border border-teal-200">{{ p.type }}</span>
               <span *ngIf="p.accessiblePMR" class="text-blue-600 tooltip-trigger" title="Accessible PMR"><i class="fab fa-accessible-icon"></i></span>
               <span *ngIf="p.parkingDisponible" class="text-gray-600 tooltip-trigger" title="Parking"><i class="fas fa-parking"></i></span>
+              <span *ngIf="p.transportPublic" class="text-teal-600 tooltip-trigger" title="Transport public"><i class="fas fa-bus"></i></span>
             </div>
             <div class="text-sm text-gray-500 flex gap-4">
-              <span><i class="fas fa-map-marker-alt mr-1"></i> {{ p.coordonnees?.latitude }}, {{ p.coordonnees?.longitude }}</span>
+              <span><i class="fas fa-map-marker-alt mr-1"></i> {{ p.latitude ?? p.coordonnees?.latitude }}, {{ p.longitude ?? p.coordonnees?.longitude }}</span>
               <span *ngIf="p.description" class="text-gray-400 italic">"{{ p.description }}"</span>
             </div>
           </div>
@@ -150,10 +225,16 @@
 
       <!-- Formulaire d'ajout de point -->
       <form [formGroup]="accessForm" class="bg-teal-50/30 border border-teal-100 rounded-xl p-5">
-        <h4 class="font-medium text-teal-800 mb-4 flex items-center">
+        <h4 class="font-medium text-teal-800 mb-2 flex items-center">
           <i class="fas" [ngClass]="editingPointId ? 'fa-edit' : 'fa-plus-circle'"></i>
           <span class="ml-2">{{ editingPointId ? 'Modifier le point d\'accès' : 'Ajouter un nouveau point d\'accès' }}</span>
         </h4>
+
+        <!-- Indicateur champs requis pour point d'accès -->
+        <div class="flex items-center gap-2 px-3 py-1.5 bg-teal-100/60 border border-teal-200 text-teal-900 rounded-lg text-xs font-medium mb-4">
+          <i class="fas fa-asterisk text-rose-500 text-[10px]"></i>
+          <span>Les champs marqués d'une étoile (<span class="text-rose-500 font-bold">*</span>) sont obligatoires.</span>
+        </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
@@ -165,10 +246,15 @@
             <select formControlName="type" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all">
               <option value="ENTREE_PRINCIPALE">Entrée Principale</option>
               <option value="ENTREE_SECONDAIRE">Entrée Secondaire</option>
-              <option value="SORTIE_SECOURS">Sortie de secours</option>
-              <option value="BILLETERIE">Billetterie</option>
-              <option value="ACCES_PMR">Accès PMR spécifique</option>
               <option value="PARKING">Parking</option>
+              <option value="EMBARCADERE">Embarcadère</option>
+              <option value="QUAI">Quai</option>
+              <option value="GARE">Gare</option>
+              <option value="ARRET_BUS">Arrêt de bus</option>
+              <option value="PORT">Port</option>
+              <option value="AEROPORT">Aéroport</option>
+              <option value="CENTRE_VISITEUR">Centre d'accueil visiteurs</option>
+              <option value="AUTRE">Autre</option>
             </select>
           </div>
         </div>
@@ -189,7 +275,7 @@
           <input type="text" formControlName="description" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all" placeholder="Ex: Accès via la rue principale, sonner à l'interphone...">
         </div>
 
-        <div class="flex items-center gap-6 mb-4">
+        <div class="flex flex-wrap items-center gap-6 mb-4">
           <label class="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" formControlName="accessiblePMR" class="w-5 h-5 text-teal-600 rounded border-gray-300 focus:ring-teal-500">
             <span class="text-sm font-medium text-gray-700">Accessible PMR <i class="fab fa-accessible-icon text-blue-600 ml-1"></i></span>
@@ -197,6 +283,10 @@
           <label class="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" formControlName="parkingDisponible" class="w-5 h-5 text-teal-600 rounded border-gray-300 focus:ring-teal-500">
             <span class="text-sm font-medium text-gray-700">Parking disponible <i class="fas fa-parking text-gray-500 ml-1"></i></span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" formControlName="transportPublic" class="w-5 h-5 text-teal-600 rounded border-gray-300 focus:ring-teal-500">
+            <span class="text-sm font-medium text-gray-700">Desservi par transport public <i class="fas fa-bus text-teal-600 ml-1"></i></span>
           </label>
         </div>
 
@@ -209,27 +299,6 @@
         </div>
       </form>
 
-    </div>
-  </div>
-
-  <!-- DEBUG : AFFICHAGE DU PAYLOAD JSON -->
-  <div *ngIf="showJsonPayload" class="mt-8 bg-gray-900 rounded-xl overflow-hidden shadow-lg border border-gray-800 relative animate-fade-in-up">
-    <div class="flex items-center justify-between px-4 py-3 bg-gray-800/50 border-b border-gray-700">
-      <div class="flex items-center gap-2">
-        <i class="fas fa-code text-blue-400"></i>
-        <span class="text-sm font-medium text-gray-200">{{ jsonTypeTitle }}</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <span class="text-xs font-mono px-2 py-1 rounded bg-gray-800 text-gray-400 border border-gray-700">POST /api/v1/geolocalisations</span>
-        <button type="button" (click)="copyJson()"
-                class="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 transition-colors tooltip-trigger"
-                title="Copier le JSON">
-          <i class="fas" [ngClass]="copiedSuccess ? 'fa-check text-green-400' : 'fa-copy'"></i>
-        </button>
-      </div>
-    </div>
-    <div class="p-4 overflow-x-auto">
-      <pre class="text-sm text-green-400 font-mono leading-relaxed"><code>{{ jsonPayload }}</code></pre>
     </div>
   </div>
 

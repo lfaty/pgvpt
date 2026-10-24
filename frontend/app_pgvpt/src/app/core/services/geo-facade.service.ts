@@ -1,37 +1,59 @@
 import { Injectable } from '@angular/core';
-import { MockService } from './mock.service';
-import { Observable, map, delay, of, forkJoin } from 'rxjs';
-import { PatrimoineMarker, GeoSummary } from '../models/geo.ui';
-import { FeaturePatrimoine } from '../api/geolocalisation/model/feature-patrimoine';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, map, of, forkJoin, catchError } from 'rxjs';
+import { MarqueurPatrimoine, PatrimoineMarker, CriteresRechercheSpatiale, SyntheseGeographique, GeoSummary } from '../models/geo.ui';
+import { FeaturePatrimoine } from '../openapi/geolocalisation/model/feature-patrimoine';
 
 /**
- * Facade service pour ms-geolocalisation.
- *
- * PHASE ACTUELLE : retourne des données mockées.
- * PHASE FUTURE  : remplacer les appels MockService par les appels API réels.
+ * Facade service pour ms-geolocalisation connecté aux endpoints réels.
  */
 @Injectable({
   providedIn: 'root'
 })
 export class GeoFacadeService {
 
-  private cachedFeatures: PatrimoineMarker[] | null = null;
+  private cachedFeatures: MarqueurPatrimoine[] | null = null;
 
-  constructor(private mockService: MockService) {}
+  constructor(private http: HttpClient) {}
 
   /**
-   * Obtenir les features patrimoines pour affichage cartographique.
-   * Correspond à GET /cartographie/patrimoines dans le backend.
+   * Charger les marqueurs géographiques des sites patrimoniaux.
+   * Appelle GET /api/v1/cartographie/patrimoines avec filtres optionnels (?region=...&type=...&categorie=...).
    */
-  getFeaturePatrimoines(): Observable<PatrimoineMarker[]> {
+  getMarqueursPatrimoine(criteres?: CriteresRechercheSpatiale): Observable<MarqueurPatrimoine[]> {
+    let params = new HttpParams();
+    if (criteres?.region && criteres.region !== 'TOUTES') {
+      params = params.set('region', criteres.region);
+    }
+    if (criteres?.type && criteres.type !== 'TOUS') {
+      params = params.set('type', criteres.type);
+    }
+    if (criteres?.categorie && criteres.categorie !== 'TOUS') {
+      params = params.set('categorie', criteres.categorie);
+    }
+
+    return this.http.get<FeaturePatrimoine[]>('/api/v1/geolocalisations/cartographie/patrimoines', { params }).pipe(
+      map(features => {
+        const list = Array.isArray(features) ? features : [];
+        return list.map(f => ({ ...f, selected: false } as MarqueurPatrimoine));
+      }),
+      catchError(err => {
+        console.warn('Erreur chargement marqueurs cartographie', err);
+        return of([]);
+      })
+    );
+  }
+
+  /**
+   * Obtenir les features patrimoines pour affichage cartographique (avec cache mémoire).
+   */
+  getFeaturePatrimoines(): Observable<MarqueurPatrimoine[]> {
     if (this.cachedFeatures) {
       return of(this.cachedFeatures);
     }
 
-    return this.mockService.getMockData<FeaturePatrimoine[]>('geo/feature-patrimoines.json').pipe(
-      delay(300),
-      map(features => {
-        const markers = features.map(f => ({ ...f, selected: false } as PatrimoineMarker));
+    return this.getMarqueursPatrimoine().pipe(
+      map(markers => {
         this.cachedFeatures = markers;
         return markers;
       })
@@ -57,8 +79,7 @@ export class GeoFacadeService {
   }
 
   /**
-   * Rechercher les patrimoines dans un rayon (simulation locale).
-   * En production, appellera GET /geolocalisations/recherche/rayon
+   * Rechercher les patrimoines dans un rayon.
    */
   searchInRadius(lat: number, lng: number, radiusKm: number): Observable<PatrimoineMarker[]> {
     return this.getFeaturePatrimoines().pipe(
@@ -76,7 +97,7 @@ export class GeoFacadeService {
   getGeoSummary(): Observable<GeoSummary> {
     return forkJoin({
       features: this.getFeaturePatrimoines(),
-      zones: this.mockService.getMockData<any[]>('geo/zones-touristiques.json')
+      zones: this.getZonesTouristiques()
     }).pipe(
       map(({ features, zones }) => ({
         totalPatrimoines: features.length,
@@ -92,21 +113,30 @@ export class GeoFacadeService {
    * Obtenir les zones touristiques.
    */
   getZonesTouristiques(): Observable<any[]> {
-    return this.mockService.getMockData<any[]>('geo/zones-touristiques.json');
+    return this.http.get<any>('/api/v1/geolocalisations/zones-touristiques').pipe(
+      map(res => Array.isArray(res) ? res : (res?.content || [])),
+      catchError(() => of([]))
+    );
   }
 
   /**
    * Obtenir les zones géographiques.
    */
   getZonesGeographiques(): Observable<any[]> {
-    return this.mockService.getMockData<any[]>('geo/zones-geographiques.json');
+    return this.http.get<any>('/api/v1/geolocalisations/zones-geographiques').pipe(
+      map(res => Array.isArray(res) ? res : (res?.content || [])),
+      catchError(() => of([]))
+    );
   }
 
   /**
    * Obtenir les régions.
    */
   getRegions(): Observable<any[]> {
-    return this.mockService.getMockData<any[]>('geo/regions.json');
+    return this.http.get<any>('/api/v1/geolocalisations/regions').pipe(
+      map(res => Array.isArray(res) ? res : (res?.content || [])),
+      catchError(() => of([]))
+    );
   }
 
   /**

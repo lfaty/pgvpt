@@ -1,0 +1,105 @@
+<div class="space-y-8" *ngIf="contenu">
+  
+  <!-- VISUEL D'ACCROCHE OU MÉDIAS ASSOCIÉS -->
+  <div *ngIf="associatedMedias && associatedMedias.length > 0" class="space-y-6">
+    <div *ngFor="let m of associatedMedias; let idx = index"
+         class="rounded-3xl overflow-hidden shadow-sm hover:shadow-md border border-gray-100 bg-white group transition-all">
+      
+      <div class="relative max-h-[500px] overflow-hidden bg-gray-900 cursor-pointer"
+           (click)="m.type === 'PHOTO' ? openLightbox(m) : null">
+        <img *ngIf="m.type === 'PHOTO' && m.url" [src]="m.url" [alt]="m.nom"
+             class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-700">
+        <video *ngIf="m.type === 'VIDEO' && m.url" [src]="m.url" controls class="w-full max-h-[500px] object-cover"></video>
+        
+        <!-- Badge Zoom plein écran sur photo -->
+        <div *ngIf="m.type === 'PHOTO'"
+             class="absolute top-4 right-4 bg-black/60 backdrop-blur-xs text-white w-9 h-9 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <i class="fas fa-expand text-xs"></i>
+        </div>
+      </div>
+
+      <!-- Légende & Crédits photographiques -->
+      <div *ngIf="m.nom || m.description || m.auteur" class="p-4 sm:p-5 bg-white border-t border-gray-100 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <span class="font-bold text-gray-900">{{ m.nom || 'Photographie d\'archive' }}</span>
+          <p *ngIf="m.description" class="text-gray-500 text-[11px] mt-0.5">{{ m.description }}</p>
+        </div>
+        <span *ngIf="m.auteur || m.credit" class="text-gray-400 italic shrink-0 text-[11px]">
+          <i class="fas fa-camera mr-1 text-gray-300"></i>{{ m.auteur || m.credit }}
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- VISUEL DU SITE EN TÊTE SI AUCUN MÉDIA N'EST SPÉCIFIQUEMENT RATTACHÉ -->
+  <div *ngIf="(!associatedMedias || associatedMedias.length === 0) && patrimoine?.photoPrincipale?.urlPhotoPrincipale"
+       class="rounded-3xl overflow-hidden shadow-sm border border-gray-100 bg-white">
+    <div class="relative max-h-[460px] overflow-hidden bg-gray-100">
+      <img [src]="patrimoine.photoPrincipale.urlPhotoPrincipale" [alt]="patrimoine.nom"
+           class="w-full h-full object-cover">
+    </div>
+    <div class="p-4 bg-white border-t border-gray-100 text-xs text-gray-500 flex items-center justify-between">
+      <span class="font-medium text-gray-800">Vue du site : {{ patrimoine.nom }}</span>
+      <span class="text-gray-400 italic">Photothèque officielle PGVPT</span>
+    </div>
+  </div>
+
+  <!-- CORPS DU RÉCIT (FORMAT GRAND MAGAZINE / LECTURE CONFORT) -->
+  <div class="bg-white rounded-[32px] p-8 sm:p-14 border border-gray-100 shadow-sm">
+    
+    <div class="editorial-body text-gray-800 font-serif leading-relaxed text-justify space-y-6"
+         [ngClass]="{'text-large': fontSizeMode === 'large'}">
+      
+      <ng-container *ngFor="let paragraph of contenu.corps.split('\n\n'); let i = index">
+        <!-- Paragraphe standard -->
+        <p class="leading-loose text-base sm:text-lg text-gray-800">
+          {{ paragraph }}
+        </p>
+
+        <!-- Séparateur ornemental culturel à mi-lecture si texte riche -->
+        <div *ngIf="contenu.corps.split('\n\n').length > 3 && i === 1" class="editorial-divider">
+          <i class="fas fa-compass text-xs text-[#0b5d5e]/70"></i>
+        </div>
+      </ng-container>
+
+    </div>
+
+    <!-- Mots-clés & Thématiques -->
+    <div *ngIf="contenu.motsCles && contenu.motsCles.length > 0" class="mt-14 pt-8 border-t border-gray-100">
+      <div class="flex items-center gap-2 mb-3.5">
+        <i class="fas fa-tags text-xs text-[#0b5d5e]"></i>
+        <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Thématiques & Mots-clés</h4>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <span *ngFor="let k of contenu.motsCles"
+              class="px-3.5 py-1.5 bg-gray-50 hover:bg-[#0b5d5e]/10 text-gray-700 hover:text-[#0b5d5e] text-xs font-semibold rounded-full border border-gray-200 transition-colors">
+          #{{ k }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Signature de bas d'article -->
+    <div class="mt-10 pt-6 border-t border-dashed border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-gray-400 gap-2">
+      <span>Documentation validée par la Commission du Patrimoine National</span>
+      <span>Réf: CONT-{{ contenu.id | slice:0:8 }}</span>
+    </div>
+
+  </div>
+
+  <!-- NAVIGATION RETOUR RAPIDE -->
+  <div class="pt-2 flex items-center justify-between">
+    <a *ngIf="patrimoine" [routerLink]="['/patrimoines', patrimoine.id]"
+       class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-white border border-gray-200 text-gray-700 hover:text-[#0b5d5e] hover:border-[#0b5d5e] text-xs font-bold shadow-2xs hover:shadow-xs transition-all">
+      <i class="fas fa-arrow-left"></i>
+      <span>Retour à {{ patrimoine.nom }}</span>
+    </a>
+
+    <a routerLink="/patrimoines"
+       class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-white border border-gray-200 text-gray-500 hover:text-gray-800 text-xs font-bold shadow-2xs transition-all">
+      <span>Tous les patrimoines</span>
+      <i class="fas fa-compass"></i>
+    </a>
+  </div>
+
+</div>

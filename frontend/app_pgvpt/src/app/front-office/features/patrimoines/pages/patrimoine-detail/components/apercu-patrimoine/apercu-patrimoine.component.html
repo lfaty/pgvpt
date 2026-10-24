@@ -1,0 +1,75 @@
+<!-- SECTION : APERÇU -->
+<section id="presentation" class="scroll-mt-24 td-reveal" *ngIf="patrimoine">
+
+  <!-- Introduction éditoriale -->
+  <p class="td-kicker">Aperçu</p>
+  <h2 class="font-serif text-3xl md:text-[2.75rem] leading-[1.1] font-bold text-[#0B1A24] mb-5">{{ titre }}</h2>
+  <p *ngIf="patrimoine.descriptionCourte" class="text-lg md:text-xl text-gray-600 leading-relaxed font-light border-l-4 border-[#D16933] pl-5">
+    {{ patrimoine.descriptionCourte }}
+  </p>
+
+  <!-- En un coup d'œil -->
+  <div *ngIf="facts.length" class="mt-10 grid grid-cols-2 md:grid-cols-3 gap-3">
+    <div *ngFor="let f of facts" class="td-fact group">
+      <span class="w-10 h-10 rounded-xl bg-[#FBF3EC] text-[#D16933] flex items-center justify-center shrink-0 group-hover:bg-[#D16933] group-hover:text-white transition-colors">
+        <i [class]="f.icon"></i>
+      </span>
+      <div class="min-w-0">
+        <p class="text-[10px] font-bold uppercase tracking-[0.14em] text-gray-400">{{ f.label }}</p>
+        <p class="text-sm font-bold text-[#0B1A24] leading-snug truncate" [title]="f.value">{{ f.value }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Description -->
+  <div *ngIf="patrimoine.description" class="mt-12">
+    <h3 class="td-h3">Le site en quelques mots</h3>
+    <div class="relative">
+      <p class="text-[15px] md:text-base text-gray-700 leading-[1.85] td-dropcap whitespace-pre-line">
+        {{ (descriptionLongue && !descriptionOuverte) ? (patrimoine.description | slice:0:DESCRIPTION_LIMIT) + '…' : patrimoine.description }}
+      </p>
+      <div *ngIf="descriptionLongue && !descriptionOuverte" class="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-[#FAFAF7] to-transparent pointer-events-none"></div>
+    </div>
+    <button *ngIf="descriptionLongue" id="btn-lire-suite" type="button" (click)="descriptionOuverte = !descriptionOuverte"
+            class="mt-3 inline-flex items-center gap-2 text-sm font-bold text-[#D16933] hover:gap-3 transition-all">
+      {{ descriptionOuverte ? 'Réduire' : 'Lire la suite' }}
+      <i class="fa-solid text-xs" [ngClass]="descriptionOuverte ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+    </button>
+  </div>
+
+  <!-- Pourquoi visiter -->
+  <div *ngIf="highlights.length" class="mt-14">
+    <h3 class="td-h3">Ce qui rend ce lieu unique</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <article *ngFor="let h of highlights; let first = first" class="td-highlight"
+               [ngClass]="{ 'md:col-span-2': first && highlights.length % 2 === 1 }"
+               [style.--accent]="h.accent">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="td-highlight-icon"><i [class]="h.icon"></i></span>
+          <h4 class="font-serif text-lg font-bold text-[#0B1A24]">{{ h.titre }}</h4>
+        </div>
+        <p class="text-sm text-gray-600 leading-relaxed">{{ h.texte }}</p>
+      </article>
+    </div>
+  </div>
+
+  <!-- Traditions & langues -->
+  <div *ngIf="toList(patrimoine.traditionsAssociees).length || toList(patrimoine.langues).length"
+       class="mt-14 rounded-3xl bg-[#0B1A24] text-white p-7 md:p-9 relative overflow-hidden">
+    <div class="absolute -right-16 -bottom-16 w-56 h-56 rounded-full bg-[#D16933]/20 blur-3xl"></div>
+    <div class="relative">
+      <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-[#F4A261] mb-2">Patrimoine vivant</p>
+      <h3 class="font-serif text-2xl font-bold mb-5">Traditions & communautés</h3>
+      <div *ngFor="let t of toList(patrimoine.traditionsAssociees)" class="flex gap-3 mb-4 last:mb-0">
+        <i class="fa-solid fa-feather-pointed text-[#F4A261] mt-1"></i>
+        <p class="text-sm text-white/80 leading-relaxed">{{ t }}</p>
+      </div>
+      <div *ngIf="toList(patrimoine.langues).length" class="mt-6 pt-5 border-t border-white/10">
+        <p class="text-xs font-semibold text-white/60 mb-3"><i class="fa-solid fa-comments mr-1.5"></i>Langues parlées sur place</p>
+        <div class="flex flex-wrap gap-2">
+          <span *ngFor="let l of toList(patrimoine.langues)" class="px-3 py-1 rounded-full bg-white/10 border border-white/15 text-xs font-semibold">{{ l }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

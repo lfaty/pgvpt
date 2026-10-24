@@ -17,8 +17,8 @@ Voici le résumé des étapes de création et d'intégration du projet Frontend 
 
 ### 3. Architecture et Pattern Adaptateur
 - Mise en place d'une interface `PatrimoineUI` servant de *ViewModel*.
-- Création d'un `MockService` générique (`getMockData<T>`) pour simuler les données backend de manière typée et sécurisée en attendant le branchement final des vrais endpoints.
-- Le frontend est ainsi découplé des éventuels changements de structure de la base de données.
+- Raccordement direct aux microservices Spring Boot via l'API Gateway (`/api/v1/*`).
+- Les facades et services API orchestrent les requêtes HTTP typées sans aucune donnée mockée.
 
 ### 4. Création des Pages et Composants (Refonte UI Premium)
 L'interface utilisateur a été conçue pour refléter "l'esprit Teranga" (authentique, immersif, premium) en utilisant du CSS sémantique :

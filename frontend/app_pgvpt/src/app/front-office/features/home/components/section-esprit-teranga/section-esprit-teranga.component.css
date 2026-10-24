@@ -1,0 +1,212 @@
+/* =============================================
+   8. STORYTELLING
+   ============================================= */
+.storytelling {
+  background: #0B2638;
+  color: #ffffff;
+}
+
+.storytelling-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 1024px) {
+  .storytelling-layout {
+    flex-direction: row;
+  }
+}
+
+.storytelling-image {
+  position: relative;
+  width: 100%;
+  height: 400px;
+}
+
+@media (min-width: 1024px) {
+  .storytelling-image {
+    width: 50%;
+    height: auto;
+  }
+}
+
+.storytelling-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.storytelling-image-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(30, 58, 138, 0.4);
+}
+
+.storytelling-content {
+  position: relative;
+  width: 100%;
+  padding: 64px 32px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+  .storytelling-content {
+    width: 50%;
+    padding: 100px 80px;
+  }
+}
+
+.storytelling-bg-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.storytelling-text {
+  position: relative;
+  z-index: 10;
+}
+
+.storytelling-label {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #D97706;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.storytelling-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  font-weight: 700;
+  margin: 0 0 24px;
+  line-height: 1.1;
+}
+
+.storytelling-desc {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.8;
+  margin: 0 0 32px;
+}
+
+.storytelling-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #D97706;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.storytelling-link:hover {
+  color: #ffffff;
+}
+
+.storytelling-link svg,
+.storytelling-link i {
+  width: 20px;
+  height: 20px;
+}
+
+/* =============================================
+   9. CTA FINAL
+   ============================================= */
+.cta-section {
+  position: relative;
+  padding: 100px 24px;
+  background: #1E3A8A;
+  text-align: center;
+  overflow: hidden;
+}
+
+.cta-bg-shape {
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+}
+
+.cta-bg-shape::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='white' d='M0,0 L100,100 L100,0 Z'/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.cta-content {
+  position: relative;
+  z-index: 10;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.cta-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 24px;
+}
+
+.cta-subtitle {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 auto 40px;
+  line-height: 1.6;
+}
+
+.cta-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .cta-buttons {
+    flex-direction: row;
+  }
+}
+
+.cta-btn {
+  padding: 16px 32px;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.cta-btn--primary {
+  background: #D97706;
+  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(217, 119, 6, 0.4);
+}
+
+.cta-btn--primary:hover {
+  background: #B45309;
+  transform: translateY(-2px);
+}
+
+.cta-btn--outline {
+  background: transparent;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+}
+
+.cta-btn--outline:hover {
+  background: #ffffff;
+  color: #1E3A8A;
+}

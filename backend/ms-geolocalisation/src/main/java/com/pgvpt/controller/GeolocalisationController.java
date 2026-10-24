@@ -3,7 +3,6 @@ package com.pgvpt.controller;
 import com.pgvpt.api.GeolocalisationsApi;
 import com.pgvpt.dto.*;
 import com.pgvpt.service.GeolocalisationService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,10 +13,13 @@ import org.springframework.http.HttpStatus;
 import java.util.UUID;
 
 @RestController
-@RequiredArgsConstructor
 public class GeolocalisationController implements GeolocalisationsApi {
 
     private final GeolocalisationService service;
+
+    public GeolocalisationController(GeolocalisationService service) {
+        this.service = service;
+    }
 
     @Override
     public ResponseEntity<Geolocalisation> createGeolocalisation(GeolocalisationCreate geolocalisationCreate) {

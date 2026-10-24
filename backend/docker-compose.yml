@@ -87,6 +87,27 @@ services:
     networks:
       - pgvpt-network
 
+  db-circuit:
+    image: postgres:15-alpine
+    container_name: db-circuit
+    restart: unless-stopped
+    ports:
+      - "5436:5432"
+    environment:
+      POSTGRES_DB: ${CIRCUIT_DB}
+      POSTGRES_USER: ${CIRCUIT_USER}
+      POSTGRES_PASSWORD: ${CIRCUIT_PASSWORD}
+    volumes:
+      - circuit-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${CIRCUIT_USER} -d ${CIRCUIT_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - pgvpt-network
+
   # 2. CONFIG SERVER
   pgvpt-config:
     image: pgvpt-config:1.0.0
@@ -137,6 +158,12 @@ services:
     environment:
       CONFIG_SERVER_URL: http://pgvpt-config:9999
       SPRING_PROFILES_ACTIVE: docker
+      SPRING_CLOUD_GATEWAY_HTTPCLIENT_POOL_TYPE: ELASTIC
+      SPRING_CLOUD_GATEWAY_HTTPCLIENT_POOL_MAX_IDLE_TIME: 45000
+      SPRING_CLOUD_LOADBALANCER_CACHE_ENABLED: "true"
+      SPRING_CLOUD_LOADBALANCER_CACHE_TTL: 60s
+      EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS: 5
+      JAVA_TOOL_OPTIONS: "-Djava.net.preferIPv4Stack=true -Dsun.net.inetaddr.ttl=30"
     depends_on:
       pgvpt-config:
         condition: service_healthy
@@ -181,6 +208,7 @@ services:
       - "3002:3002"
     environment:
       # CORRECTION
+      SPRING_APPLICATION_NAME: ms-geolocalisation
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       CONFIG_SERVER_URL: http://pgvpt-config:9999
       SPRING_PROFILES_ACTIVE: docker
@@ -189,6 +217,11 @@ services:
       DB_NAME: ${GEO_DB}
       DB_USER: ${GEO_USER}
       DB_PASSWORD: ${GEO_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db-geolocalisation:5432/${GEO_DB}
+      SPRING_DATASOURCE_USERNAME: ${GEO_USER}
+      SPRING_DATASOURCE_PASSWORD: ${GEO_PASSWORD}
+      SPRING_CONFIG_IMPORT: "optional:configserver:http://pgvpt-config:9999"
+      SPRING_CLOUD_CONFIG_IMPORT_CHECK_ENABLED: "false"
     depends_on:
       db-geolocalisation:
         condition: service_healthy
@@ -253,6 +286,44 @@ services:
     networks:
       - pgvpt-network
 
+        # 9. MICROSERVICE CIRCUIT
+  ms-circuit:
+    image: ms-circuit:1.0.0
+    build:
+      context: ./ms-circuit
+    container_name: ms-circuit
+    restart: unless-stopped
+    ports:
+      - "3003:3003"
+    environment:
+      SERVER_PORT: 3003
+      SERVER_SERVLET_CONTEXT_PATH: /api/v1
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db-circuit:5432/${CIRCUIT_DB}
+      SPRING_DATASOURCE_USERNAME: ${CIRCUIT_USER}
+      SPRING_DATASOURCE_PASSWORD: ${CIRCUIT_PASSWORD}
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      CONFIG_SERVER_URL: http://pgvpt-config:9999
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: db-circuit
+      DB_PORT: 5432
+      DB_NAME: ${CIRCUIT_DB}
+      DB_USER: ${CIRCUIT_USER}
+      DB_PASSWORD: ${CIRCUIT_PASSWORD}
+      GEO_SERVICE_URL: http://ms-geolocalisation:3002
+      EUREKA_ENABLED: "true"
+      EUREKA_URL: http://pgvpt-discovery:8761/eureka/
+    depends_on:
+      db-circuit:
+        condition: service_healthy
+      pgvpt-config:
+        condition: service_healthy
+      pgvpt-discovery:
+        condition: service_healthy
+    networks:
+      - pgvpt-network
+
+
 # 9. RESEAU ET VOLUMES PERSISTANTS
 networks:
   pgvpt-network:
@@ -263,3 +334,4 @@ volumes:
   geolocalisation-data:
   contenu-data:
   media-data:
+  circuit-data:

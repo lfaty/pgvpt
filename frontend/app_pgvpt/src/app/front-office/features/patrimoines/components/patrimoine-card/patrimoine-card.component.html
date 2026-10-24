@@ -6,7 +6,7 @@
          (error)="img.src='assets/images/activite_saloum.jpg'"
          [alt]="patrimoine.nom" class="card-img">
     
-    <!-- Hover overlay -->
+    <!-- Gradient overlay -->
     <div class="card-image-overlay"></div>
 
     <!-- Category Badge -->
@@ -15,7 +15,12 @@
             [class.badge-historique]="patrimoine.type === 'MONUMENT'"
             [class.badge-naturel]="patrimoine.type === 'SITE_NATUREL'"
             [class.badge-culturel]="patrimoine.type === 'MUSEE'">
-        {{ patrimoine.categorie }}
+        <i class="fa-solid"
+           [class.fa-mountain-sun]="patrimoine.type === 'SITE_NATUREL'"
+           [class.fa-monument]="patrimoine.type === 'MONUMENT'"
+           [class.fa-building-columns]="patrimoine.type === 'MUSEE'"
+           style="font-size:0.55rem;"></i>
+        {{ formatCategorie(patrimoine.categorie) }}
       </span>
     </div>
     
@@ -26,16 +31,18 @@
         <span class="rating-text">{{ patrimoine.note }}</span>
       </div>
     </div>
+
+    <!-- Bottom gradient info -->
+    <div class="card-image-info">
+      <div class="card-location-overlay">
+        <i class="fa-solid fa-location-dot"></i>
+        <span>{{ patrimoine.region || 'Sénégal' }}{{ patrimoine.departement ? ' · ' + patrimoine.departement : '' }}</span>
+      </div>
+    </div>
   </div>
 
   <!-- Content -->
   <div class="card-body">
-    
-    <!-- Location -->
-    <div class="card-location">
-      <i class="fa-solid fa-location-dot location-icon"></i>
-      <span>{{ patrimoine.region || 'Sénégal' }}{{ patrimoine.departement ? ', ' + patrimoine.departement : '' }}</span>
-    </div>
 
     <!-- Title & Description -->
     <h3 class="card-title">{{ patrimoine.nom }}</h3>
@@ -43,7 +50,7 @@
 
     <!-- Action -->
     <div class="card-footer">
-      <span class="card-link-text">Découvrir le site</span>
+      <span class="card-link-text">Découvrir</span>
       <div class="card-link-arrow">
         <i class="fa-solid fa-arrow-right"></i>
       </div>

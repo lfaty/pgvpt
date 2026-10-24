@@ -2,17 +2,17 @@ package com.pgvpt.model;
 
 import com.pgvpt.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.lang.Nullable;
 
 import java.util.UUID;
 
 @Entity
 @Table(name = "etapes_circuit")
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
 public class EtapeCircuitEntity extends BaseEntity {
 

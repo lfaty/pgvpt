@@ -21,24 +21,28 @@ public interface ReferentielAdministratifService {
     void deleteRegion(UUID id);
 
     PageDepartement getAllDepartements(Pageable pageable);
+    PageDepartement getDepartementsByRegion(UUID regionId, Pageable pageable);
     Departement createDepartement(DepartementCreate dto);
     Departement getDepartementById(UUID id);
     Departement updateDepartement(UUID id, DepartementUpdate dto);
     void deleteDepartement(UUID id);
 
     PageCommune getAllCommunes(Pageable pageable);
+    PageCommune getCommunesByDepartement(UUID departementId, Pageable pageable);
     Commune createCommune(CommuneCreate dto);
     Commune getCommuneById(UUID id);
     Commune updateCommune(UUID id, CommuneUpdate dto);
     void deleteCommune(UUID id);
 
     PageVillage getVillages(Pageable pageable);
+    PageVillage getVillagesByCommune(UUID communeId, Pageable pageable);
     Village createVillage(VillageCreate dto);
     Village getVillageById(UUID id);
     Village updateVillage(UUID id, VillageUpdate dto);
     void deleteVillage(UUID id);
 
     PageQuartier getQuartiers(Pageable pageable);
+    PageQuartier getQuartiersByCommune(UUID communeId, Pageable pageable);
     Quartier createQuartier(QuartierCreate dto);
     Quartier getQuartierById(UUID id);
     Quartier updateQuartier(UUID id, QuartierUpdate dto);

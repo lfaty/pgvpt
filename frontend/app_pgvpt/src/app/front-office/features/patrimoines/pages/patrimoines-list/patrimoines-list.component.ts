@@ -22,6 +22,7 @@ export class PatrimoinesListComponent implements OnInit, OnDestroy {
   selectedCategory: string = 'TOUTES';
   selectedRegion: string = 'TOUTES';
   selectedType: string = 'TOUS';
+  backendError: boolean = false;
 
   private sub?: Subscription;
 
@@ -40,7 +41,23 @@ export class PatrimoinesListComponent implements OnInit, OnDestroy {
     { value: 'PATRIMOINE_RELIGIEUX', label: 'Religieux' }
   ];
   
-  regions = ['TOUTES', 'Dakar', 'Saint-Louis', 'Tambacounda', 'Fatick', 'Diourbel', 'Ziguinchor', 'Thiès', 'Louga'];
+  regions: string[] = [
+    'TOUTES',
+    'Dakar',
+    'Diourbel',
+    'Fatick',
+    'Kaffrine',
+    'Kaolack',
+    'Kédougou',
+    'Kolda',
+    'Louga',
+    'Matam',
+    'Saint-Louis',
+    'Sédhiou',
+    'Tambacounda',
+    'Thiès',
+    'Ziguinchor'
+  ];
 
   constructor(
     private patrimoineService: PatrimoineFacadeService,
@@ -53,27 +70,36 @@ export class PatrimoinesListComponent implements OnInit, OnDestroy {
     this.sub = combineLatest([
       this.patrimoineService.getPatrimoines(),
       this.route.queryParamMap
-    ]).subscribe(([data, params]) => {
-      this.patrimoines = data;
+    ]).subscribe({
+      next: ([data, params]) => {
+        this.backendError = false;
+        this.patrimoines = data;
 
-      // Catégorie (?categorie=... ou ancien ?category=...)
-      let cat = (params.get('categorie') ?? params.get('category') ?? '').toUpperCase();
-      if (cat === 'CULTUREL') cat = 'PATRIMOINE_CULTUREL';
-      if (cat === 'NATUREL') cat = 'PATRIMOINE_NATUREL';
-      if (cat === 'HISTORIQUE') cat = 'PATRIMOINE_COLONIAL';
-      this.selectedCategory = this.categories.some(c => c.value === cat) ? cat : 'TOUTES';
+        // Catégorie (?categorie=... ou ancien ?category=...)
+        let cat = (params.get('categorie') ?? params.get('category') ?? '').toUpperCase();
+        if (cat === 'CULTUREL') cat = 'PATRIMOINE_CULTUREL';
+        if (cat === 'NATUREL') cat = 'PATRIMOINE_NATUREL';
+        if (cat === 'HISTORIQUE') cat = 'PATRIMOINE_COLONIAL';
+        this.selectedCategory = this.categories.some(c => c.value === cat) ? cat : 'TOUTES';
 
-      // Type (?type=MONUMENT | MUSEE | SITE_NATUREL)
-      const type = (params.get('type') ?? '').toUpperCase();
-      this.selectedType = this.types.some(t => t.value === type) ? type : 'TOUS';
+        // Type (?type=MONUMENT | MUSEE | SITE_NATUREL)
+        const type = (params.get('type') ?? '').toUpperCase();
+        this.selectedType = this.types.some(t => t.value === type) ? type : 'TOUS';
 
-      // Search term (?q=...)
-      const q = params.get('q');
-      if (q) {
-        this.searchTerm = q;
+        // Search term (?q=...)
+        const q = params.get('q');
+        if (q) {
+          this.searchTerm = q;
+        }
+
+        this.applyFilters();
+      },
+      error: (err) => {
+        console.warn('Erreur chargement catalogue patrimoines', err);
+        this.backendError = true;
+        this.patrimoines = [];
+        this.filteredPatrimoines = [];
       }
-
-      this.applyFilters();
     });
   }
 
@@ -108,7 +134,7 @@ export class PatrimoinesListComponent implements OnInit, OnDestroy {
         (p.description && p.description.toLowerCase().includes(this.searchTerm.toLowerCase()));
       
       const matchCategory = this.selectedCategory === 'TOUTES' || p.categorie === this.selectedCategory;
-      const matchRegion = this.selectedRegion === 'TOUTES' || (p.region && p.region.includes(this.selectedRegion));
+      const matchRegion = this.selectedRegion === 'TOUTES' || (!!p.region && p.region.toLowerCase().includes(this.selectedRegion.toLowerCase()));
       
       const matchType = this.selectedType === 'TOUS' || p.type === this.selectedType;
       

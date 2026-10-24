@@ -1,0 +1,240 @@
+/* =============================================
+   CAROUSEL CONTAINER & NAVIGATION CONTROLS
+   ============================================= */
+.group-carousel {
+  padding: 30px 24px;
+}
+
+.group-carousel--amber  { background-color: #FAFAF9; }
+.group-carousel--green  { background-color: #F8FAF8; }
+.group-carousel--red    { background-color: #FAF8F8; }
+.group-carousel--blue   { background-color: #F8F9FA; }
+.group-carousel--purple { background-color: #FAF8FA; }
+
+.carousel-container-premium {
+  position: relative;
+  width: 100%;
+}
+
+.carousel-controls-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
+  padding-bottom: 6px;
+}
+
+.carousel-nav-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #E2E8F0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #1E293B;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+}
+
+.carousel-nav-btn:hover {
+  background: #0B5D5E;
+  color: #ffffff;
+  border-color: #0B5D5E;
+  transform: translateY(-3px) scale(1.08);
+  box-shadow: 0 10px 24px rgba(11, 93, 94, 0.35);
+}
+
+.carousel-nav-btn:active {
+  transform: scale(0.95);
+}
+
+/* =============================================
+   CAROUSEL GRID FIX
+   ============================================= */
+.patrimoines-grid-carousel {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  padding: 10px 4px 12px 4px;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+}
+.patrimoines-grid-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.patrimoines-grid-carousel .patrimoine-mini-card {
+  flex: 0 0 calc(85% - 8px);
+  min-width: 260px;
+  max-width: 330px;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 640px) {
+  .patrimoines-grid-carousel .patrimoine-mini-card {
+    flex: 0 0 calc(50% - 12px);
+    max-width: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .patrimoines-grid-carousel .patrimoine-mini-card {
+    flex: 0 0 calc(33.333% - 16px);
+  }
+}
+
+@media (min-width: 1280px) {
+  .patrimoines-grid-carousel .patrimoine-mini-card {
+    flex: 0 0 calc(25% - 18px);
+  }
+}
+
+.group-carousel .section-header { 
+  margin-bottom: 24px; 
+}
+
+/* =============================================
+   PATRIMOINES MINI-CARDS
+   ============================================= */
+.patrimoine-mini-card {
+  background: #ffffff;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.patrimoine-mini-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.1);
+}
+
+.mini-card-image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+  background-color: #1a202c;
+}
+
+.mini-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.patrimoine-mini-card:hover .mini-card-image img {
+  transform: scale(1.08);
+}
+
+.mini-card-type-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: auto;
+  max-width: calc(100% - 24px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 2;
+}
+
+.badge--red,
+.mini-card-type-badge--red    { color: #DC2626; }
+.badge--green,
+.mini-card-type-badge--green  { color: #059669; }
+.badge--amber,
+.mini-card-type-badge--amber  { color: #D97706; }
+.badge--blue,
+.mini-card-type-badge--blue   { color: #2563EB; }
+.badge--purple,
+.mini-card-type-badge--purple { color: #7C3AED; }
+
+.mini-card-body {
+  padding: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.mini-card-top-row {
+  margin-bottom: 0.4rem;
+}
+
+.mini-card-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #0b5d5e;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mini-loc-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  color: #D16933;
+}
+
+.mini-card-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #111827;
+  margin: 0 0 0.5rem 0;
+}
+
+.mini-card-desc {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: #4b5563;
+  margin: 0 0 1.2rem 0;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.mini-card-cta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #D16933;
+  padding-top: 0.8rem;
+  border-top: 1px solid #f1f5f9;
+  transition: gap 0.2s ease, color 0.2s ease;
+}
+
+.mini-card-cta-arrow {
+  width: 0.95rem;
+  height: 0.95rem;
+  transition: transform 0.2s ease;
+}
+
+.patrimoine-mini-card:hover .mini-card-cta-arrow {
+  transform: translateX(4px);
+}

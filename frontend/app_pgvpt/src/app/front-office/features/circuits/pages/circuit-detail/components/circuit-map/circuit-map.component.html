@@ -1,0 +1,19 @@
+<section class="section-card map-card">
+  <div class="section-card-header">
+    <div>
+      <h2 class="section-title">
+        <i class="fa-solid fa-map-location-dot text-primary mr-2"></i>
+        Tracé de l'itinéraire
+      </h2>
+      <p class="section-subtitle">Visualisez les différentes étapes et le cheminement géographique du circuit.</p>
+    </div>
+    <button (click)="recentrerTout()" class="btn-recenter" title="Recentrer l'itinéraire" type="button">
+      <i class="fa-solid fa-compress mr-1.5"></i>
+      Vue d'ensemble
+    </button>
+  </div>
+  
+  <div class="map-wrapper">
+    <div id="circuit-map" class="map-view"></div>
+  </div>
+</section>

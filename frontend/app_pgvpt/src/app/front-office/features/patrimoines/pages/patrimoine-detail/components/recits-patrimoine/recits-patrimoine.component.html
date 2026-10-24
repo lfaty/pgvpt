@@ -1,0 +1,127 @@
+<!-- SECTION : RÉCITS & GUIDES ÉDITORIAUX -->
+<section id="recits" class="scroll-mt-24 mt-16 td-reveal" *ngIf="contenus && contenus.length > 0">
+
+  <!-- En-tête de section -->
+  <div class="flex items-end gap-4 mb-8">
+    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#0b5d5e] to-[#087F5B] text-white flex items-center justify-center text-lg shadow-lg shadow-[#087F5B]/20 shrink-0">
+      <i class="fa-solid fa-book-open"></i>
+    </div>
+    <div>
+      <p class="td-kicker mb-0">Bibliothèque éditoriale</p>
+      <h2 class="font-serif text-2xl md:text-3xl font-bold text-[#0B1A24] leading-tight">Récits & guides de visite</h2>
+    </div>
+  </div>
+  <p class="text-sm text-gray-500 leading-relaxed mb-8 max-w-xl">
+    Plongez dans l'histoire vivante du patrimoine à travers articles, guides pratiques et chroniques culturelles.
+  </p>
+
+  <!-- Barre de Filtres & Recherche -->
+  <div class="flex flex-col lg:flex-row gap-4 justify-between items-stretch lg:items-center mb-8 pb-5 border-b border-[#E9E3D3]/60">
+
+    <!-- Filtres par Type -->
+    <div class="flex overflow-x-auto gap-2 pb-2 lg:pb-0 flex-1 min-w-0 td-hide-scrollbar items-center">
+      <button type="button" (click)="setContenuTypeFilter('TOUS')"
+              class="shrink-0 whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer border"
+              [ngClass]="selectedContenuType === 'TOUS' ? 'bg-[#0B1A24] text-white border-[#0B1A24] shadow-md' : 'bg-white text-gray-600 border-[#E9E3D3] hover:border-[#0B1A24]/20 hover:text-[#0B1A24]'">
+        Tous les récits
+      </button>
+      <button *ngFor="let t of uniqueContenuTypes"
+              type="button" (click)="setContenuTypeFilter(t.type)"
+              class="shrink-0 whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer border flex items-center gap-1.5"
+              [ngClass]="selectedContenuType === t.type ? 'bg-[#0B1A24] text-white border-[#0B1A24] shadow-md' : 'bg-white text-gray-600 border-[#E9E3D3] hover:border-[#0B1A24]/20 hover:text-[#0B1A24]'">
+        <i class="fa-solid" [ngClass]="getContenuTypeIcon(t.type)"></i>
+        <span>{{ t.label }}</span>
+      </button>
+    </div>
+
+    <!-- Recherche textuelle -->
+    <div class="search-recits-wrapper relative w-full sm:w-72 shrink-0">
+      <i class="fa-solid fa-magnifying-glass search-recits-icon"></i>
+      <input type="text" [(ngModel)]="contenuSearchQuery" (input)="onSearchChange()"
+             placeholder="Rechercher un récit…"
+             class="search-recits-input">
+      <button *ngIf="contenuSearchQuery" (click)="contenuSearchQuery = ''; onSearchChange()"
+              type="button" class="search-recits-clear-btn" title="Effacer">
+        <i class="fa-solid fa-xmark text-xs"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Grille des Contenus -->
+  <div *ngIf="filteredContenus.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <a *ngFor="let c of filteredContenus"
+       [routerLink]="['/patrimoines', patrimoine?.id, 'contenus', c.id]"
+       class="group rounded-2xl bg-white border border-[#F0EDE6] overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col no-underline">
+
+      <!-- Image d'accroche -->
+      <div class="relative h-44 bg-[#F6F4EE] overflow-hidden">
+        <img [src]="getMediaUrlForContenu(c) || mainImage" [alt]="c.titre"
+             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"></div>
+
+        <!-- Badge Type Flottant -->
+        <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-sm text-[#0B1A24] px-2.5 py-1 rounded-lg text-[10px] font-bold shadow-sm flex items-center gap-1.5">
+          <i class="fas" [ngClass]="getContenuTypeIcon(c.type)"></i>
+          <span>{{ getContenuTypeLabel(c.type) }}</span>
+        </div>
+
+        <!-- Langue & Temps -->
+        <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-[10px] font-medium">
+          <span class="flex items-center gap-1.5 drop-shadow-sm">
+            <i class="far fa-clock"></i> {{ getReadingTime(c.corps) }} min
+          </span>
+          <span class="bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded text-[9px] uppercase font-bold tracking-widest">
+            {{ c.langue || 'FR' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Corps -->
+      <div class="p-5 flex-1 flex flex-col">
+        <h3 class="font-serif text-lg font-bold text-[#0B1A24] group-hover:text-[#D16933] transition-colors leading-snug mb-2.5 line-clamp-2">
+          {{ c.titre }}
+        </h3>
+        <p class="text-xs text-gray-500 line-clamp-2 leading-relaxed mb-4 flex-1">
+          {{ c.resume || c.corps }}
+        </p>
+
+        <!-- Tags -->
+        <div *ngIf="c.motsCles && c.motsCles.length > 0" class="flex flex-wrap gap-1.5 mb-3">
+          <span *ngFor="let tag of c.motsCles.slice(0, 3)"
+                class="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#F6F4EE] text-gray-500 border border-[#E9E3D3]">
+            #{{ tag }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Pied de Carte -->
+      <div class="px-5 py-3.5 border-t border-[#F0EDE6] flex items-center justify-between text-xs">
+        <span class="text-gray-400 flex items-center gap-1.5">
+          <i class="far fa-calendar-alt"></i>
+          {{ (c.createdAt | date:'d MMM y') || 'Récent' }}
+        </span>
+        <span class="text-[#D16933] font-bold inline-flex items-center gap-1.5 group-hover:gap-2.5 transition-all">
+          Lire <i class="fas fa-arrow-right text-[9px]"></i>
+        </span>
+      </div>
+    </a>
+  </div>
+
+  <!-- État vide -->
+  <div *ngIf="filteredContenus.length === 0"
+       class="py-14 px-6 bg-white rounded-2xl border border-dashed border-[#E9E3D3] text-center max-w-md mx-auto">
+    <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center mx-auto mb-4 text-xl">
+      <i class="fas fa-book-open"></i>
+    </div>
+    <h4 class="font-serif text-lg font-bold text-[#0B1A24] mb-2">Aucun contenu trouvé</h4>
+    <p class="text-xs text-gray-500 leading-relaxed mb-5">
+      {{ contenuSearchQuery || selectedContenuType !== 'TOUS' ? 'Aucun résultat ne correspond à votre filtre.' : 'Aucun récit ni guide n\'a encore été publié.' }}
+    </p>
+    <button *ngIf="contenuSearchQuery || selectedContenuType !== 'TOUS'"
+            type="button" (click)="resetFilters()"
+            class="px-4 py-2 bg-[#F6F4EE] hover:bg-[#E9E3D3] text-gray-700 text-xs font-bold rounded-xl transition-all cursor-pointer">
+      Réinitialiser les filtres
+    </button>
+  </div>
+
+</section>

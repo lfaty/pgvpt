@@ -1,0 +1,59 @@
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 font-sans">
+
+  <!-- Tous les sites -->
+  <button type="button" (click)="onSelectStatut('TOUS')"
+    class="text-left bg-white p-4 rounded-2xl border transition-all duration-150 shadow-sm cursor-pointer"
+    [ngClass]="selectedStatut === 'TOUS' ? 'border-[#0b5d5e] ring-2 ring-[#0b5d5e]/20 shadow-md' : 'border-gray-100 hover:border-gray-300'">
+    <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
+      <span class="font-semibold uppercase tracking-wider text-[10px]">Tous les sites</span>
+      <div class="w-7 h-7 rounded-lg bg-gray-100 text-gray-600 flex items-center justify-center text-xs">
+        <i class="fas fa-landmark"></i>
+      </div>
+    </div>
+    <div class="text-2xl font-black text-gray-900">{{ totalCount }}</div>
+    <div class="text-[11px] text-gray-400 mt-1">Inventaire total</div>
+  </button>
+
+  <!-- Publiés -->
+  <button type="button" (click)="onSelectStatut('PUBLIE')"
+    class="text-left bg-white p-4 rounded-2xl border transition-all duration-150 shadow-sm cursor-pointer"
+    [ngClass]="selectedStatut === 'PUBLIE' ? 'border-emerald-500 ring-2 ring-emerald-500/20 shadow-md' : 'border-gray-100 hover:border-emerald-200'">
+    <div class="flex items-center justify-between text-xs text-emerald-700 mb-1">
+      <span class="font-semibold uppercase tracking-wider text-[10px]">Publiés en ligne</span>
+      <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs">
+        <i class="fas fa-check-circle"></i>
+      </div>
+    </div>
+    <div class="text-2xl font-black text-emerald-700">{{ publiesCount }}</div>
+    <div class="text-[11px] text-emerald-600/70 mt-1">Visibles au public</div>
+  </button>
+
+  <!-- En validation -->
+  <button type="button" (click)="onSelectStatut('EN_VALIDATION')"
+    class="text-left bg-white p-4 rounded-2xl border transition-all duration-150 shadow-sm cursor-pointer"
+    [ngClass]="selectedStatut === 'EN_VALIDATION' ? 'border-amber-500 ring-2 ring-amber-500/20 shadow-md' : 'border-gray-100 hover:border-amber-200'">
+    <div class="flex items-center justify-between text-xs text-amber-700 mb-1">
+      <span class="font-semibold uppercase tracking-wider text-[10px]">En validation</span>
+      <div class="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xs">
+        <i class="fas fa-clock"></i>
+      </div>
+    </div>
+    <div class="text-2xl font-black text-amber-700">{{ enValidationCount }}</div>
+    <div class="text-[11px] text-amber-600/70 mt-1">En attente de revue</div>
+  </button>
+
+  <!-- Brouillons -->
+  <button type="button" (click)="onSelectStatut('BROUILLON')"
+    class="text-left bg-white p-4 rounded-2xl border transition-all duration-150 shadow-sm cursor-pointer"
+    [ngClass]="selectedStatut === 'BROUILLON' ? 'border-gray-500 ring-2 ring-gray-500/20 shadow-md' : 'border-gray-100 hover:border-gray-300'">
+    <div class="flex items-center justify-between text-xs text-gray-600 mb-1">
+      <span class="font-semibold uppercase tracking-wider text-[10px]">Brouillons</span>
+      <div class="w-7 h-7 rounded-lg bg-gray-100 text-gray-500 flex items-center justify-center text-xs">
+        <i class="fas fa-pen"></i>
+      </div>
+    </div>
+    <div class="text-2xl font-black text-gray-700">{{ brouillonsCount }}</div>
+    <div class="text-[11px] text-gray-400 mt-1">Fiches à compléter</div>
+  </button>
+
+</div>

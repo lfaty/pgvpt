@@ -55,6 +55,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    public ResponseEntity<ApiError> handleDataIntegrityViolation(org.springframework.dao.DataIntegrityViolationException ex, HttpServletRequest request) {
+        log.warn("Violation d'intégrité référentielle sur l'URI {}: {}", request.getRequestURI(), ex.getMessage());
+        String message = "Suppression impossible : cet élément est lié à d'autres données du système (géolocalisations de patrimoines, zones touristiques ou sous-entités administratives). Veuillez d'abord détacher ou supprimer ces éléments dépendants.";
+        ApiError error = createBaseApiError(HttpStatus.CONFLICT, message, request.getRequestURI());
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
     private ApiError createBaseApiError(HttpStatus status, String message, String path) {
         ApiError error = new ApiError();
         error.setTimestamp(OffsetDateTime.now());

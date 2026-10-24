@@ -1,36 +1,45 @@
 <div class="space-y-6 pb-12 font-sans">
 
   <!-- ═══════════════════════════════════════════════════════════ -->
-  <!-- NOTIFICATION TOAST FLOTTANT                                 -->
-  <!-- ═══════════════════════════════════════════════════════════ -->
-  <div *ngIf="notificationMessage"
-    class="fixed bottom-6 right-6 z-50 bg-gray-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-gray-700 animate-bounce">
-    <div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs">
-      <i class="fas fa-check"></i>
-    </div>
-    <span class="text-xs font-medium">{{ notificationMessage }}</span>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════════════ -->
   <!-- 1. EN-TÊTE : Titre & Action Principale                      -->
   <!-- ═══════════════════════════════════════════════════════════ -->
-  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
     <div>
-      <div class="flex items-center gap-2 mb-1">
-        <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Catalogue du Patrimoine</h1>
-        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#0b5d5e]/10 text-[#0b5d5e]">
-          Sénégal
-        </span>
+      <div class="flex items-center gap-2 text-xs text-gray-500 mb-1">
+        <a routerLink="/admin/dashboard" class="hover:text-[#0b5d5e] transition-colors">Accueil</a>
+        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        <span>Patrimoine</span>
+        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        <span class="text-gray-800 font-semibold">Catalogue</span>
       </div>
-      <p class="text-sm text-gray-500">
-        Inventaire officiel, gestion et valorisation des sites naturels, historiques et culturels.
-      </p>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center text-lg shadow-sm border border-teal-100">
+          <i class="fas fa-landmark"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
+            Catalogue du Patrimoine
+            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#0b5d5e]/10 text-[#0b5d5e] border border-[#0b5d5e]/20">
+              Sénégal ({{ totalCount }})
+            </span>
+          </h1>
+          <p class="text-xs text-gray-500 mt-0.5">
+            Inventaire officiel, gestion et valorisation des sites naturels, historiques et culturels
+          </p>
+        </div>
+      </div>
     </div>
 
-    <!-- Bouton Création -->
-    <div class="flex items-center gap-3">
+    <!-- Actions En-tête -->
+    <div class="flex items-center gap-2.5">
+      <button (click)="loadPatrimoines()" [disabled]="isLoading" type="button"
+              class="px-3 py-2 text-xs font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center gap-1.5 shadow-sm disabled:opacity-50 cursor-pointer">
+        <i class="fas fa-sync-alt" [ngClass]="{'fa-spin': isLoading}"></i>
+        <span>Actualiser</span>
+      </button>
+
       <a routerLink="/admin/patrimoines/nouveau"
-        class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#0b5d5e] hover:bg-[#084b4c] text-white text-xs font-semibold rounded-xl shadow-sm hover:shadow transition-all duration-150">
+         class="inline-flex items-center gap-2 px-4 py-2 bg-[#0b5d5e] hover:bg-[#084b4c] text-white text-xs font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-150">
         <i class="fas fa-plus text-xs"></i>
         <span>Nouveau Patrimoine</span>
       </a>
@@ -40,333 +49,176 @@
   <!-- ═══════════════════════════════════════════════════════════ -->
   <!-- 2. MINI-CARTES D'ÉTAT : KPIs & Filtres en 1 clic            -->
   <!-- ═══════════════════════════════════════════════════════════ -->
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+  <app-cartes-indicateurs-patrimoines
+    [totalCount]="totalCount"
+    [publiesCount]="publiesCount"
+    [enValidationCount]="enValidationCount"
+    [brouillonsCount]="brouillonsCount"
+    [selectedStatut]="selectedStatut"
+    (statutChange)="filterByStatutCard($event)">
+  </app-cartes-indicateurs-patrimoines>
 
-    <!-- Tous les sites -->
-    <button (click)="filterByStatutCard('TOUS')"
-      class="text-left bg-white p-4 rounded-xl border transition-all duration-150"
-      [ngClass]="selectedStatut === 'TOUS' ? 'border-[#0b5d5e] ring-2 ring-[#0b5d5e]/20 shadow-sm' : 'border-gray-100 hover:border-gray-200'">
-      <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
-        <span class="font-medium">Tous les sites</span>
-        <i class="fas fa-landmark text-[#0b5d5e]"></i>
-      </div>
-      <div class="text-2xl font-extrabold text-gray-900">{{ totalCount }}</div>
-      <div class="text-[11px] text-gray-400 mt-1">Inventaire total</div>
-    </button>
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 3. BARRE DE RECHERCHE & CONTRÔLE DES FILTRES                -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <app-barre-filtres-patrimoines
+    [(searchQuery)]="searchQuery"
+    [(selectedRegion)]="selectedRegion"
+    [(selectedType)]="selectedType"
+    [(selectedStatut)]="selectedStatut"
+    [(selectedCategorie)]="selectedCategorie"
+    [(selectedEtatConservation)]="selectedEtatConservation"
+    [(accessiblePublic)]="accessiblePublic"
+    [(inscritUnesco)]="inscritUnesco"
+    [(classePatrimoine)]="classePatrimoine"
+    [(viewMode)]="viewMode"
+    [(showAdvancedFilters)]="showAdvancedFilters"
+    [activeFiltersCount]="activeFiltersCount()"
+    [hasActiveFilters]="hasActiveFilters()"
+    (filterChange)="onFilterChange()"
+    (resetFiltersEvent)="resetFilters()">
+  </app-barre-filtres-patrimoines>
 
-    <!-- Publiés -->
-    <button (click)="filterByStatutCard('PUBLIE')"
-      class="text-left bg-white p-4 rounded-xl border transition-all duration-150"
-      [ngClass]="selectedStatut === 'PUBLIE' ? 'border-emerald-500 ring-2 ring-emerald-500/20 shadow-sm' : 'border-gray-100 hover:border-gray-200'">
-      <div class="flex items-center justify-between text-xs text-emerald-700 mb-1">
-        <span class="font-medium">Publiés en ligne</span>
-        <i class="fas fa-check-circle text-emerald-600"></i>
-      </div>
-      <div class="text-2xl font-extrabold text-emerald-700">{{ getCountByStatut('PUBLIE') }}</div>
-      <div class="text-[11px] text-gray-400 mt-1">Visibles au public</div>
-    </button>
-
-    <!-- En validation -->
-    <button (click)="filterByStatutCard('EN_VALIDATION')"
-      class="text-left bg-white p-4 rounded-xl border transition-all duration-150"
-      [ngClass]="selectedStatut === 'EN_VALIDATION' ? 'border-amber-500 ring-2 ring-amber-500/20 shadow-sm' : 'border-gray-100 hover:border-gray-200'">
-      <div class="flex items-center justify-between text-xs text-amber-700 mb-1">
-        <span class="font-medium">En validation</span>
-        <i class="fas fa-clock text-amber-500"></i>
-      </div>
-      <div class="text-2xl font-extrabold text-amber-700">{{ getCountByStatut('EN_VALIDATION') }}</div>
-      <div class="text-[11px] text-gray-400 mt-1">À vérifier</div>
-    </button>
-
-    <!-- Brouillons -->
-    <button (click)="filterByStatutCard('BROUILLON')"
-      class="text-left bg-white p-4 rounded-xl border transition-all duration-150"
-      [ngClass]="selectedStatut === 'BROUILLON' ? 'border-gray-500 ring-2 ring-gray-500/20 shadow-sm' : 'border-gray-100 hover:border-gray-200'">
-      <div class="flex items-center justify-between text-xs text-gray-600 mb-1">
-        <span class="font-medium">Brouillons</span>
-        <i class="fas fa-pen text-gray-400"></i>
-      </div>
-      <div class="text-2xl font-extrabold text-gray-700">{{ getCountByStatut('BROUILLON') }}</div>
-      <div class="text-[11px] text-gray-400 mt-1">Fiches à compléter</div>
-    </button>
-
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 4. ÉTAT CHARGEMENT (LOADING)                                -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div *ngIf="isLoading" class="bg-white p-16 rounded-2xl border border-gray-100 shadow-sm text-center animate-fade-in">
+    <i class="fas fa-circle-notch fa-spin text-3xl text-[#0b5d5e] mb-3"></i>
+    <h3 class="text-sm font-bold text-gray-800">Chargement du catalogue...</h3>
+    <p class="text-xs text-gray-400 mt-1">Récupération des données patrimoniales depuis le microservice</p>
   </div>
 
   <!-- ═══════════════════════════════════════════════════════════ -->
-  <!-- 3. BARRE DE RECHERCHE & FILTRES COMBINÉS                    -->
+  <!-- 5. ÉTAT VIDE (EMPTY STATE)                                  -->
   <!-- ═══════════════════════════════════════════════════════════ -->
-  <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm space-y-3">
-    <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-
-      <!-- Recherche textuelle -->
-      <div class="relative flex-1">
-        <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
-        <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onFilterChange()"
-          placeholder="Rechercher par nom, ville, région ou référence..."
-          class="w-full pl-9 pr-4 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#0b5d5e] focus:border-[#0b5d5e] transition-all">
-      </div>
-
-      <!-- Bouton Réinitialiser & Bascules Vue -->
-      <div class="flex items-center justify-end gap-2 shrink-0">
-        <button *ngIf="hasActiveFilters()" (click)="resetFilters()"
-          class="px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition-colors flex items-center gap-1.5">
-          <i class="fas fa-times text-xs"></i>
-          <span>Effacer filtres</span>
-        </button>
-
-        <!-- Toggle Affichage : Liste / Grille -->
-        <div class="flex items-center bg-gray-100 p-1 rounded-xl">
-          <button (click)="toggleView('list')"
-            class="p-1.5 rounded-lg text-xs transition-all"
-            [ngClass]="viewMode === 'list' ? 'bg-white text-[#0b5d5e] shadow-sm font-bold' : 'text-gray-400 hover:text-gray-700'"
-            title="Vue Tableau">
-            <i class="fas fa-list-ul w-4 text-center"></i>
-          </button>
-          <button (click)="toggleView('grid')"
-            class="p-1.5 rounded-lg text-xs transition-all"
-            [ngClass]="viewMode === 'grid' ? 'bg-white text-[#0b5d5e] shadow-sm font-bold' : 'text-gray-400 hover:text-gray-700'"
-            title="Vue Cartes">
-            <i class="fas fa-th-large w-4 text-center"></i>
-          </button>
-        </div>
-      </div>
-
+  <div *ngIf="!isLoading && filteredPatrimoines.length === 0"
+    class="bg-white p-14 rounded-2xl border border-gray-100 shadow-sm text-center animate-fade-in">
+    <div class="w-16 h-16 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-4 text-2xl shadow-sm">
+      <i class="fas" [ngClass]="totalCount === 0 ? 'fa-landmark' : 'fa-search'"></i>
     </div>
+    
+    <h3 class="text-base font-bold text-gray-900 mb-1">
+      {{ totalCount === 0 ? 'Votre catalogue est vide' : 'Aucun patrimoine ne correspond à vos filtres' }}
+    </h3>
+    
+    <p class="text-xs text-gray-500 max-w-md mx-auto mb-6">
+      {{ totalCount === 0 
+         ? 'Aucun patrimoine n\'est encore enregistré en base de données. Créez votre première fiche pour commencer.' 
+         : 'Modifiez vos critères de recherche ou réinitialisez les filtres pour afficher l\'ensemble des fiches.' }}
+    </p>
 
-    <!-- Sélecteurs de filtres combinés -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t border-gray-50">
-      
-      <!-- Région -->
-      <div class="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-xl border border-gray-100">
-        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Région :</span>
-        <select [(ngModel)]="selectedRegion" (ngModelChange)="onFilterChange()"
-          class="w-full text-xs font-semibold bg-transparent border-0 text-gray-700 focus:outline-none cursor-pointer">
-          <option value="TOUTES">Toutes les régions</option>
-          <option value="Dakar">Dakar</option>
-          <option value="Saint-Louis">Saint-Louis</option>
-          <option value="Fatick">Fatick (Saloum)</option>
-          <option value="Tambacounda">Tambacounda</option>
-          <option value="Kaolack">Kaolack</option>
-          <option value="Kédougou">Kédougou</option>
-        </select>
-      </div>
+    <div class="flex items-center justify-center gap-3">
+      <a *ngIf="totalCount === 0" routerLink="/admin/patrimoines/nouveau"
+         class="px-5 py-2.5 bg-[#0b5d5e] text-white text-xs font-semibold rounded-xl hover:bg-[#084b4c] shadow-md transition-all inline-flex items-center gap-2">
+        <i class="fas fa-plus"></i>
+        <span>Créer un patrimoine</span>
+      </a>
 
-      <!-- Type -->
-      <div class="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-xl border border-gray-100">
-        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Type :</span>
-        <select [(ngModel)]="selectedType" (ngModelChange)="onFilterChange()"
-          class="w-full text-xs font-semibold bg-transparent border-0 text-gray-700 focus:outline-none cursor-pointer">
-          <option value="TOUS">Tous les types</option>
-          <option value="MONUMENT">Monument Historique</option>
-          <option value="SITE_NATUREL">Site Naturel</option>
-          <option value="MUSEE">Musée National</option>
-          <option value="SITE_ARCHEOLOGIQUE">Site Archéologique</option>
-        </select>
-      </div>
-
-      <!-- Catégorie -->
-      <div class="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-xl border border-gray-100">
-        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Catégorie :</span>
-        <select [(ngModel)]="selectedCategorie" (ngModelChange)="onFilterChange()"
-          class="w-full text-xs font-semibold bg-transparent border-0 text-gray-700 focus:outline-none cursor-pointer">
-          <option value="TOUTES">Toutes les catégories</option>
-          <option value="PATRIMOINE_NATUREL">Patrimoine Naturel</option>
-          <option value="PATRIMOINE_HISTORIQUE">Patrimoine Historique</option>
-          <option value="PATRIMOINE_CULTUREL">Patrimoine Culturel</option>
-          <option value="PATRIMOINE_ARCHITECTURAL">Patrimoine Architectural</option>
-          <option value="PATRIMOINE_RELIGIEUX">Patrimoine Religieux</option>
-          <option value="PATRIMOINE_COLONIAL">Patrimoine Colonial</option>
-          <option value="PATRIMOINE_ARCHEOLOGIQUE">Patrimoine Archéologique</option>
-          <option value="PATRIMOINE_MUSEAL">Patrimoine Muséal</option>
-          <option value="PATRIMOINE_MEMORIEL">Patrimoine Mémoriel</option>
-          <option value="PATRIMOINE_MARITIME">Patrimoine Maritime</option>
-          <option value="PATRIMOINE_RURAL">Patrimoine Rural</option>
-          <option value="AUTRE">Autre</option>
-        </select>
-      </div>
-
-      <!-- État Conservation -->
-      <div class="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-xl border border-gray-100">
-        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">État :</span>
-        <select [(ngModel)]="selectedEtatConservation" (ngModelChange)="onFilterChange()"
-          class="w-full text-xs font-semibold bg-transparent border-0 text-gray-700 focus:outline-none cursor-pointer">
-          <option value="TOUS">Tous les états</option>
-          <option value="EXCELLENT">Excellent</option>
-          <option value="BON">Bon</option>
-          <option value="MOYEN">Moyen</option>
-          <option value="MAUVAIS">Mauvais</option>
-          <option value="CRITIQUE">Critique</option>
-          <option value="RUINE">En ruine</option>
-        </select>
-      </div>
-
-      <!-- Statut -->
-      <div class="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-xl border border-gray-100">
-        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Statut :</span>
-        <select [(ngModel)]="selectedStatut" (ngModelChange)="onFilterChange()"
-          class="w-full text-xs font-semibold bg-transparent border-0 text-gray-700 focus:outline-none cursor-pointer">
-          <option value="TOUS">Tous les statuts</option>
-          <option value="PUBLIE">Publié</option>
-          <option value="EN_VALIDATION">En validation</option>
-          <option value="BROUILLON">Brouillon</option>
-        </select>
-      </div>
-
-      <!-- Accès Public -->
-      <div class="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-xl border border-gray-100">
-        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Accès :</span>
-        <select [(ngModel)]="accessiblePublic" (ngModelChange)="onFilterChange()"
-          class="w-full text-xs font-semibold bg-transparent border-0 text-gray-700 focus:outline-none cursor-pointer">
-          <option value="TOUS">Tous</option>
-          <option value="true">Ouvert au public</option>
-          <option value="false">Fermé au public</option>
-        </select>
-      </div>
-
-      <!-- Inscrit UNESCO -->
-      <div class="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-xl border border-gray-100">
-        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">UNESCO :</span>
-        <select [(ngModel)]="inscritUnesco" (ngModelChange)="onFilterChange()"
-          class="w-full text-xs font-semibold bg-transparent border-0 text-gray-700 focus:outline-none cursor-pointer">
-          <option value="TOUS">Tous</option>
-          <option value="true">Inscrit</option>
-          <option value="false">Non Inscrit</option>
-        </select>
-      </div>
-
-      <!-- Classé Patrimoine -->
-      <div class="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-xl border border-gray-100">
-        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Classé :</span>
-        <select [(ngModel)]="classePatrimoine" (ngModelChange)="onFilterChange()"
-          class="w-full text-xs font-semibold bg-transparent border-0 text-gray-700 focus:outline-none cursor-pointer">
-          <option value="TOUS">Tous</option>
-          <option value="true">Classé</option>
-          <option value="false">Non Classé</option>
-        </select>
-      </div>
-
+      <button *ngIf="totalCount > 0" (click)="resetFilters()" type="button"
+        class="px-4 py-2 bg-gray-100 text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-200 transition-colors cursor-pointer">
+        Réinitialiser les filtres
+      </button>
     </div>
   </div>
 
   <!-- ═══════════════════════════════════════════════════════════ -->
-  <!-- 4. RÉSULTATS : VUE TABLEAU (LIST VIEW)                      -->
+  <!-- 6. RÉSULTATS : VUE TABLEAU (LIST VIEW)                      -->
   <!-- ═══════════════════════════════════════════════════════════ -->
-  <div *ngIf="viewMode === 'list'" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+  <div *ngIf="!isLoading && viewMode === 'list' && filteredPatrimoines.length > 0"
+       class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden animate-fade-in">
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse">
         <thead>
-          <tr class="bg-gray-50/75 text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100">
-            <th class="py-3 px-5">Patrimoine</th>
-            <th class="py-3 px-5">Localisation</th>
-            <th class="py-3 px-5">Catégorie</th>
-            <th class="py-3 px-5">Activités liées</th>
-            <th class="py-3 px-5">Statut</th>
-            <th class="py-3 px-5 text-right">Actions</th>
+          <tr class="bg-gray-50/80 border-b border-gray-100 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+            <th class="py-3.5 px-4">Patrimoine</th>
+            <th class="py-3.5 px-4">Type &amp; Catégorie</th>
+            <th class="py-3.5 px-4">Localisation</th>
+            <th class="py-3.5 px-4 text-center">Statut</th>
+            <th class="py-3.5 px-4 text-right">Actions</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100 text-xs">
           <tr *ngFor="let item of paginatedPatrimoines" class="hover:bg-gray-50/60 transition-colors group">
-
-            <!-- Vignette & Nom -->
-            <td class="py-3.5 px-5">
+            
+            <!-- Colonne Nom & Image -->
+            <td class="py-3 px-4">
               <div class="flex items-center gap-3">
-                <div class="relative w-12 h-12 rounded-xl overflow-hidden bg-gray-100 shrink-0 shadow-sm border border-gray-100">
-                  <img [src]="item.imageUrl" [alt]="item.nom" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                </div>
-                <div>
-                  <div class="flex items-center gap-1.5">
-                    <span class="font-bold text-gray-900 group-hover:text-[#0b5d5e] transition-colors">{{ item.nom }}</span>
-                    <span *ngIf="item.isUnesco" class="px-1.5 py-0.2 rounded text-[9px] font-black bg-blue-50 text-blue-700 border border-blue-200">
-                      UNESCO
-                    </span>
+                <img [src]="item.imageUrl" [alt]="item.nom" class="w-12 h-12 rounded-xl object-cover shrink-0 shadow-sm border border-gray-100">
+                <div class="min-w-0">
+                  <div class="font-bold text-gray-900 group-hover:text-[#0b5d5e] transition-colors truncate max-w-xs">
+                    {{ item.nom }}
+                  </div>
+                  <div class="flex items-center gap-2 mt-0.5 text-[11px] text-gray-400">
+                    <span class="font-mono text-[10px] bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">{{ item.code }}</span>
+                    <span *ngIf="item.isUnesco" class="font-bold text-blue-600">UNESCO</span>
                   </div>
                 </div>
               </div>
             </td>
 
-            <!-- Localisation -->
-            <td class="py-3.5 px-5">
-              <div class="font-semibold text-gray-800"><i class="fa-solid fa-location-dot text-rose-500 mr-1 text-xs"></i>{{ item.region }}</div>
-              <div class="text-[11px] text-gray-400">{{ item.commune }}</div>
+            <!-- Colonne Type & Catégorie -->
+            <td class="py-3 px-4">
+              <div class="font-semibold text-gray-800">{{ item.typeLabel }}</div>
+              <div class="text-[11px] text-gray-400 truncate max-w-[160px]">{{ item.categorie }}</div>
             </td>
 
-            <!-- Catégorie -->
-            <td class="py-3.5 px-5">
-              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-50 border border-gray-200 text-gray-700 font-medium text-[11px]">
-                {{ item.typeLabel }}
-              </span>
+            <!-- Colonne Localisation -->
+            <td class="py-3 px-4">
+              <div class="font-semibold text-gray-800 flex items-center gap-1">
+                <i class="fa-solid fa-location-dot text-rose-500 text-[10px]"></i>
+                {{ item.region }}
+              </div>
+              <div class="text-[11px] text-gray-400" *ngIf="item.commune">{{ item.commune }}</div>
             </td>
 
-            <!-- Activités liées -->
-            <td class="py-3.5 px-5">
-              <a routerLink="/admin/activites" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-semibold text-[11px] hover:bg-emerald-100 transition-colors">
-                <i class="fas fa-hiking text-[10px]"></i>
-                <span>{{ item.activitesCount }} activité(s)</span>
-              </a>
+            <!-- Colonne Statut -->
+            <td class="py-3 px-4 text-center">
+              <button type="button" (click)="toggleStatut(item)"
+                class="px-2.5 py-1 rounded-full text-[10px] font-bold border transition-all cursor-pointer"
+                [ngClass]="getStatutBadgeClass(item.statut)"
+                [title]="'Cliquer pour basculer : ' + (item.statut === 'PUBLIE' ? 'Dépublier (Brouillon)' : 'Publier en ligne')">
+                <span class="inline-block w-1.5 h-1.5 rounded-full mr-1" [ngClass]="item.statut === 'PUBLIE' ? 'bg-emerald-500' : (item.statut === 'EN_VALIDATION' ? 'bg-amber-500' : 'bg-gray-400')"></span>
+                {{ item.statut }}
+              </button>
             </td>
 
-            <!-- Statut -->
-            <td class="py-3.5 px-5">
-              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold border inline-flex items-center gap-1.5"
-                [ngClass]="getStatutBadgeClass(item.statut)">
-                <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
-                {{ item.statut === 'PUBLIE' ? 'Publié' : (item.statut === 'EN_VALIDATION' ? 'En validation' : 'Brouillon') }}
-              </span>
-            </td>
-
-            <!-- Actions Rapides -->
-            <td class="py-3.5 px-5 text-right">
-              <div class="flex items-center justify-end gap-1.5">
-
-                <!-- Aperçu Rapide -->
-                <button (click)="openDetail(item)"
-                  class="p-2 rounded-lg text-gray-400 hover:text-[#0b5d5e] hover:bg-[#0b5d5e]/10 transition-colors"
+            <!-- Colonne Actions -->
+            <td class="py-3 px-4 text-right">
+              <div class="flex items-center justify-end gap-1">
+                <!-- Aperçu rapide -->
+                <button (click)="openDetail(item)" type="button"
+                  class="p-2 rounded-xl text-gray-400 hover:text-[#0b5d5e] hover:bg-teal-50 transition-colors cursor-pointer"
                   title="Aperçu rapide">
                   <i class="far fa-eye text-xs"></i>
                 </button>
-
-                <!-- Bascule publication -->
-                <button (click)="toggleStatut(item)"
-                  class="p-2 rounded-lg text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
-                  [title]="item.statut === 'PUBLIE' ? 'Passer en brouillon' : 'Publier immédiatement'">
-                  <i class="fas fa-power-off text-xs"></i>
-                </button>
-
-                <!-- Modifier (Formulaire) -->
-                <a [routerLink]="['/admin/patrimoines/modifier', item.id]"
-                  class="p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-                  title="Modifier la fiche complète">
-                  <i class="far fa-edit text-xs"></i>
-                </a>
-
-                <!-- Géolocalisation & Points d'accès -->
+                
+                <!-- Gestion Localisation -->
                 <a [routerLink]="['/admin/patrimoines', item.id, 'localisation']"
-                  class="p-2 rounded-lg text-gray-400 hover:text-[#0b5d5e] hover:bg-[#0b5d5e]/10 transition-colors"
-                  title="Gérer la géolocalisation et les points d'accès">
+                  class="p-2 rounded-xl text-gray-400 hover:text-teal-600 hover:bg-teal-50 transition-colors"
+                  title="Gérer la géolocalisation">
                   <i class="fas fa-map-marker-alt text-xs"></i>
                 </a>
 
-                <!-- Médias (Galerie) -->
+                <!-- Gestion Médias -->
                 <a [routerLink]="['/admin/patrimoines', item.id, 'medias']"
-                  class="p-2 rounded-lg text-gray-400 hover:text-purple-600 hover:bg-purple-50 transition-colors"
-                  title="Gérer la galerie multimédia">
-                  <i class="fas fa-camera-retro text-xs"></i>
+                  class="p-2 rounded-xl text-gray-400 hover:text-purple-600 hover:bg-purple-50 transition-colors"
+                  title="Gérer les photos & médias">
+                  <i class="fas fa-camera text-xs"></i>
                 </a>
 
-                <!-- Contenus éditoriaux -->
-                <a [routerLink]="['/admin/patrimoines', item.id, 'contenu']"
-                  class="p-2 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
-                  title="Rédiger les contenus et articles">
-                  <i class="fas fa-file-alt text-xs"></i>
+                <!-- Modifier -->
+                <a [routerLink]="['/admin/patrimoines/modifier', item.id]"
+                  class="p-2 rounded-xl text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                  title="Modifier la fiche">
+                  <i class="far fa-edit text-xs"></i>
                 </a>
 
                 <!-- Supprimer -->
-                <button (click)="confirmDelete(item)"
-                  class="p-2 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                <button (click)="confirmDelete(item)" type="button"
+                  class="p-2 rounded-xl text-gray-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
                   title="Supprimer">
                   <i class="far fa-trash-alt text-xs"></i>
                 </button>
-
               </div>
             </td>
 
@@ -374,285 +226,154 @@
         </tbody>
       </table>
     </div>
+  </div>
 
-    <!-- Barre de bas de tableau : PAGINATION -->
-    <div *ngIf="filteredPatrimoines.length > 0"
-      class="p-4 bg-gray-50/75 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 7. RÉSULTATS : VUE GRILLE (GRID VIEW)                        -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div *ngIf="!isLoading && viewMode === 'grid' && filteredPatrimoines.length > 0"
+       class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-fade-in">
+    <div *ngFor="let item of paginatedPatrimoines" 
+         class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col group hover:shadow-md hover:border-gray-200 transition-all">
       
-      <!-- Infos d'affichage & Sélection par page -->
-      <div class="flex items-center gap-3">
-        <span>
-          Affichage de <strong class="text-gray-900">{{ startIndex }}</strong> à <strong class="text-gray-900">{{ endIndex }}</strong> sur <strong class="text-gray-900">{{ filteredPatrimoines.length }}</strong> sites
-        </span>
-        <div class="flex items-center gap-1.5 pl-3 border-l border-gray-200">
-          <span class="text-gray-400 text-[11px]">Par page :</span>
-          <select [ngModel]="pageSize" (ngModelChange)="changePageSize($event)"
-            class="bg-white border border-gray-200 rounded-lg px-2 py-1 text-xs font-semibold text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#0b5d5e] cursor-pointer">
-            <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Boutons de pagination -->
-      <div class="flex items-center gap-1.5">
-        <!-- Précédent -->
-        <button (click)="prevPage()" [disabled]="currentPage === 1"
-          class="px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-1">
-          <i class="fas fa-chevron-left text-[10px]"></i>
-          <span>Précédent</span>
-        </button>
-
-        <!-- Pages numériques -->
-        <div class="flex items-center gap-1">
-          <button *ngFor="let p of pagesArray" (click)="goToPage(p)"
-            class="w-7 h-7 rounded-lg text-xs font-bold transition-all flex items-center justify-center"
-            [ngClass]="currentPage === p ? 'bg-[#0b5d5e] text-white shadow-sm' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'">
-            {{ p }}
+      <!-- Photo de couverture -->
+      <div class="relative h-44 w-full overflow-hidden bg-gray-100">
+        <img [src]="item.imageUrl" [alt]="item.nom" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+        
+        <!-- Badges flottants -->
+        <div class="absolute top-3 left-3 right-3 flex items-center justify-between">
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-white/95 text-gray-800 shadow-sm">
+            {{ item.typeLabel }}
+          </span>
+          <button type="button" (click)="toggleStatut(item)"
+            class="px-2 py-0.5 rounded-full text-[10px] font-bold border shadow-sm cursor-pointer"
+            [ngClass]="getStatutBadgeClass(item.statut)">
+            {{ item.statut }}
           </button>
         </div>
 
-        <!-- Suivant -->
-        <button (click)="nextPage()" [disabled]="currentPage === totalPages"
-          class="px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-1">
-          <span>Suivant</span>
-          <i class="fas fa-chevron-right text-[10px]"></i>
-        </button>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════════════ -->
-  <!-- 5. RÉSULTATS : VUE CARTES (GRID VIEW)                       -->
-  <!-- ═══════════════════════════════════════════════════════════ -->
-  <div *ngIf="viewMode === 'grid'" class="space-y-6">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-      <div *ngFor="let item of paginatedPatrimoines"
-        class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden flex flex-col group">
-
-        <!-- Photo & Badges flottants -->
-        <div class="relative h-44 w-full bg-gray-100 overflow-hidden">
-          <img [src]="item.imageUrl" [alt]="item.nom" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20"></div>
-
-          <!-- Badges Top -->
-          <div class="absolute top-3 left-3 right-3 flex items-center justify-between">
-            <span class="px-2 py-0.5 text-[10px] uppercase font-bold rounded-md bg-white/90 backdrop-blur text-gray-800 shadow-sm">
-              {{ item.typeLabel }}
-            </span>
-            <span class="px-2 py-0.5 text-[10px] font-bold rounded-md border shadow-sm" [ngClass]="getStatutBadgeClass(item.statut)">
-              {{ item.statut === 'PUBLIE' ? 'Publié' : (item.statut === 'EN_VALIDATION' ? 'Validation' : 'Brouillon') }}
-            </span>
-          </div>
-
-          <!-- Tag UNESCO et Nom en bas d'image -->
-          <div class="absolute bottom-3 left-3 right-3">
-            <span *ngIf="item.isUnesco" class="inline-block px-1.5 py-0.5 rounded text-[9px] font-black bg-blue-600 text-white mb-1 shadow-sm">
-              UNESCO
-            </span>
-            <h3 class="text-sm font-bold text-white truncate" [title]="item.nom">{{ item.nom }}</h3>
-          </div>
-        </div>
-
-        <!-- Corps de Carte -->
-        <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
-          <div>
-            <div class="flex items-center justify-between text-xs text-gray-500 mb-1.5">
-              <span><i class="fa-solid fa-location-dot text-rose-500 mr-1 text-xs"></i>{{ item.region }}</span>
-              <span class="text-xs font-semibold text-[#0b5d5e]">{{ item.categorie }}</span>
-            </div>
-            <p class="text-xs text-gray-600 line-clamp-2 leading-relaxed">
-              {{ item.descriptionCourte }}
-            </p>
-          </div>
-
-          <div class="pt-3 border-t border-gray-100 flex items-center justify-between">
-            <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-              <i class="fas fa-hiking text-[10px]"></i> {{ item.activitesCount }} act.
-            </span>
-            <div class="flex items-center gap-1">
-              <button (click)="openDetail(item)"
-                class="px-2.5 py-1.5 bg-gray-50 hover:bg-[#0b5d5e] hover:text-white text-gray-700 text-xs font-semibold rounded-lg transition-colors">
-                Aperçu
-              </button>
-              <a [routerLink]="['/admin/patrimoines/modifier', item.id]"
-                class="px-2.5 py-1.5 bg-[#0b5d5e]/10 hover:bg-[#0b5d5e] text-[#0b5d5e] hover:text-white text-xs font-semibold rounded-lg transition-colors">
-                Gérer
-              </a>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- Barre de pagination pour la vue grille -->
-    <div *ngIf="filteredPatrimoines.length > 0"
-      class="p-4 bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
-      
-      <!-- Infos d'affichage & Sélection par page -->
-      <div class="flex items-center gap-3">
-        <span>
-          Affichage de <strong class="text-gray-900">{{ startIndex }}</strong> à <strong class="text-gray-900">{{ endIndex }}</strong> sur <strong class="text-gray-900">{{ filteredPatrimoines.length }}</strong> sites
-        </span>
-        <div class="flex items-center gap-1.5 pl-3 border-l border-gray-200">
-          <span class="text-gray-400 text-[11px]">Par page :</span>
-          <select [ngModel]="pageSize" (ngModelChange)="changePageSize($event)"
-            class="bg-white border border-gray-200 rounded-lg px-2 py-1 text-xs font-semibold text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#0b5d5e] cursor-pointer">
-            <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
-          </select>
+        <div class="absolute bottom-3 left-3 right-3">
+          <span *ngIf="item.isUnesco" class="inline-block px-1.5 py-0.2 rounded text-[9px] font-black bg-blue-600 text-white mb-1 shadow-sm">
+            UNESCO
+          </span>
+          <h3 class="text-sm font-bold text-white leading-snug line-clamp-1 drop-shadow">
+            {{ item.nom }}
+          </h3>
         </div>
       </div>
 
-      <!-- Boutons de pagination -->
-      <div class="flex items-center gap-1.5">
-        <!-- Précédent -->
-        <button (click)="prevPage()" [disabled]="currentPage === 1"
-          class="px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-1">
-          <i class="fas fa-chevron-left text-[10px]"></i>
-          <span>Précédent</span>
-        </button>
-
-        <!-- Pages numériques -->
-        <div class="flex items-center gap-1">
-          <button *ngFor="let p of pagesArray" (click)="goToPage(p)"
-            class="w-7 h-7 rounded-lg text-xs font-bold transition-all flex items-center justify-center"
-            [ngClass]="currentPage === p ? 'bg-[#0b5d5e] text-white shadow-sm' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'">
-            {{ p }}
-          </button>
-        </div>
-
-        <!-- Suivant -->
-        <button (click)="nextPage()" [disabled]="currentPage === totalPages"
-          class="px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-1">
-          <span>Suivant</span>
-          <i class="fas fa-chevron-right text-[10px]"></i>
-        </button>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════════════ -->
-  <!-- 6. ÉTAT VIDE (EMPTY STATE)                                  -->
-  <!-- ═══════════════════════════════════════════════════════════ -->
-  <div *ngIf="filteredPatrimoines.length === 0"
-    class="bg-white p-12 rounded-2xl border border-gray-100 shadow-sm text-center">
-    <div class="w-16 h-16 rounded-full bg-gray-50 text-gray-300 flex items-center justify-center mx-auto mb-4 text-2xl">
-      <i class="fas fa-search"></i>
-    </div>
-    <h3 class="text-base font-bold text-gray-800 mb-1">Aucun patrimoine trouvé</h3>
-    <p class="text-xs text-gray-500 max-w-sm mx-auto mb-5">
-      Aucun résultat ne correspond à vos filtres de recherche. Essayez de réinitialiser vos filtres.
-    </p>
-    <button (click)="resetFilters()"
-      class="px-4 py-2 bg-[#0b5d5e] text-white text-xs font-semibold rounded-xl hover:bg-[#084b4c] transition-colors">
-      Réinitialiser les filtres
-    </button>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════════════ -->
-  <!-- 7. TIROIR / MODAL D'APERÇU RAPIDE (QUICK VIEW)              -->
-  <!-- ═══════════════════════════════════════════════════════════ -->
-  <div *ngIf="selectedPatrimoineDetail" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-    <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-gray-100 relative animate-fade-in">
-
-      <!-- Bouton Fermer -->
-      <button (click)="closeDetail()"
-        class="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-colors">
-        <i class="fas fa-times text-xs"></i>
-      </button>
-
-      <!-- Photo & Titre -->
-      <div class="relative h-56 w-full">
-        <img [src]="selectedPatrimoineDetail.imageUrl" [alt]="selectedPatrimoineDetail.nom" class="w-full h-full object-cover">
-        <div class="absolute inset-0 bg-gradient-to-t from-gray-950/80 via-transparent to-black/20"></div>
-        <div class="absolute bottom-4 left-5 right-5">
-          <div class="flex items-center gap-2 mb-1">
-            <span *ngIf="selectedPatrimoineDetail.isUnesco" class="px-1.5 py-0.5 rounded text-[9px] font-black bg-blue-600 text-white shadow-sm">
-              UNESCO
-            </span>
-            <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-white/90 text-gray-800">
-              {{ selectedPatrimoineDetail.typeLabel }}
-            </span>
+      <!-- Corps de la carte -->
+      <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+        <div class="space-y-1.5">
+          <div class="flex items-center gap-1.5 text-xs text-gray-500">
+            <i class="fa-solid fa-location-dot text-rose-500 text-xs shrink-0"></i>
+            <span class="font-medium text-gray-800">{{ item.region }}</span>
+            <span *ngIf="item.commune" class="text-gray-400">• {{ item.commune }}</span>
           </div>
-          <h2 class="text-xl font-bold text-white">{{ selectedPatrimoineDetail.nom }}</h2>
-          <p class="text-xs text-gray-300"><i class="fa-solid fa-location-dot text-rose-400 mr-1 text-xs"></i>{{ selectedPatrimoineDetail.commune }}, {{ selectedPatrimoineDetail.region }}</p>
-        </div>
-      </div>
 
-      <!-- Détails -->
-      <div class="p-6 space-y-4">
-        <div>
-          <h4 class="text-xs font-bold uppercase text-gray-400 mb-1">Description</h4>
-          <p class="text-xs text-gray-700 leading-relaxed">{{ selectedPatrimoineDetail.descriptionCourte }}</p>
+          <p *ngIf="item.descriptionCourte" class="text-xs text-gray-500 line-clamp-2 leading-relaxed">
+            {{ item.descriptionCourte }}
+          </p>
         </div>
 
-        <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-100 text-xs">
-          <div class="bg-gray-50 p-2.5 rounded-xl">
-            <span class="text-gray-400 block text-[10px]">Région</span>
-            <span class="font-bold text-gray-800"><i class="fa-solid fa-location-dot text-rose-500 mr-1 text-xs"></i>{{ selectedPatrimoineDetail.region }}</span>
-          </div>
-          <div class="bg-gray-50 p-2.5 rounded-xl">
-            <span class="text-gray-400 block text-[10px]">Activités touristiques</span>
-            <span class="font-bold text-emerald-700">{{ selectedPatrimoineDetail.activitesCount }} activités disponibles</span>
-          </div>
-        </div>
-
-        <!-- Statut actuel -->
-        <div class="flex items-center justify-between p-3 rounded-xl bg-gray-50">
-          <span class="text-xs text-gray-600 font-medium">Statut de la fiche :</span>
-          <span class="px-2.5 py-1 rounded-full text-xs font-bold border" [ngClass]="getStatutBadgeClass(selectedPatrimoineDetail.statut)">
-            {{ selectedPatrimoineDetail.statut === 'PUBLIE' ? 'En ligne (Publié)' : (selectedPatrimoineDetail.statut === 'EN_VALIDATION' ? 'En attente de validation' : 'Brouillon') }}
+        <!-- Badges infos pratiques -->
+        <div class="pt-2 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-500">
+          <span class="inline-flex items-center gap-1 font-mono text-[10px] text-gray-400">
+            {{ item.code }}
+          </span>
+          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold">
+            <i class="fas fa-hiking text-[10px]"></i> {{ item.activitesCount }} act.
           </span>
         </div>
 
-        <!-- Boutons d'action -->
-        <div class="flex items-center justify-end gap-2.5 pt-2 flex-wrap">
-          <button (click)="toggleStatut(selectedPatrimoineDetail)"
-            class="px-3.5 py-2 text-xs font-semibold rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">
-            {{ selectedPatrimoineDetail.statut === 'PUBLIE' ? 'Passer en brouillon' : 'Publier en ligne' }}
+        <!-- Actions rapides de la carte -->
+        <div class="pt-2 border-t border-gray-50 flex items-center justify-between">
+          <button (click)="openDetail(item)" type="button"
+            class="text-xs font-semibold text-[#0b5d5e] hover:underline flex items-center gap-1 cursor-pointer">
+            <i class="far fa-eye"></i> Aperçu
           </button>
-          <a [routerLink]="['/admin/patrimoines', selectedPatrimoineDetail.id, 'contenu']"
-            (click)="closeDetail()"
-            class="px-3.5 py-2 text-xs font-semibold rounded-xl border border-amber-200 text-amber-700 hover:bg-amber-50 transition-colors flex items-center gap-1.5">
-            <i class="fas fa-file-alt text-amber-500"></i>
-            Rédiger un contenu
-          </a>
-          <a [routerLink]="['/admin/patrimoines/modifier', selectedPatrimoineDetail.id]"
-            (click)="closeDetail()"
-            class="px-4 py-2 bg-[#0b5d5e] hover:bg-[#084b4c] text-white text-xs font-semibold rounded-xl transition-colors">
-            Modifier la fiche complète
-          </a>
+
+          <div class="flex items-center gap-1">
+            <a [routerLink]="['/admin/patrimoines/modifier', item.id]"
+              class="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+              title="Modifier">
+              <i class="far fa-edit text-xs"></i>
+            </a>
+            <button (click)="confirmDelete(item)" type="button"
+              class="p-1.5 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+              title="Supprimer">
+              <i class="far fa-trash-alt text-xs"></i>
+            </button>
+          </div>
         </div>
+
       </div>
 
     </div>
   </div>
 
   <!-- ═══════════════════════════════════════════════════════════ -->
-  <!-- 8. MODAL CONFIRMATION SUPPRESSION                           -->
+  <!-- 8. PAGINATION                                               -->
   <!-- ═══════════════════════════════════════════════════════════ -->
-  <div *ngIf="deleteConfirmItem" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-gray-100 text-center">
-      <div class="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4 text-xl">
-        <i class="fas fa-exclamation-triangle"></i>
+  <div *ngIf="!isLoading && filteredPatrimoines.length > 0"
+       class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white px-5 py-3.5 rounded-2xl border border-gray-100 shadow-sm text-xs">
+    
+    <div class="text-gray-500">
+      Affichage de <span class="font-bold text-gray-800">{{ startIndex }}</span> à <span class="font-bold text-gray-800">{{ endIndex }}</span> sur <span class="font-bold text-gray-800">{{ filteredPatrimoines.length }}</span> patrimoine(s)
+    </div>
+
+    <div class="flex items-center gap-3">
+      <!-- Sélecteur d'éléments par page -->
+      <div class="flex items-center gap-2 text-gray-500">
+        <span>Par page :</span>
+        <select [ngModel]="pageSize" (ngModelChange)="changePageSize($event)"
+          class="bg-gray-50 border border-gray-200 text-gray-800 text-xs font-semibold rounded-lg px-2 py-1 focus:outline-none cursor-pointer">
+          <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+        </select>
       </div>
-      <h3 class="text-base font-bold text-gray-900 mb-1">Confirmer la suppression</h3>
-      <p class="text-xs text-gray-500 mb-6">
-        Êtes-vous sûr de vouloir supprimer définitivement <strong class="text-gray-800">"{{ deleteConfirmItem.nom }}"</strong> ? Cette action est irréversible.
-      </p>
-      <div class="flex items-center justify-center gap-3">
-        <button (click)="cancelDelete()"
-          class="px-4 py-2 rounded-xl text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors">
-          Annuler
+
+      <!-- Navigation entre pages -->
+      <div class="flex items-center gap-1">
+        <button (click)="prevPage()" [disabled]="currentPage === 1" type="button"
+          class="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-40 disabled:hover:bg-transparent transition-colors cursor-pointer"
+          title="Page précédente">
+          <i class="fas fa-chevron-left text-xs"></i>
         </button>
-        <button (click)="executeDelete()"
-          class="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 transition-colors">
-          Oui, supprimer
+
+        <span class="px-2 font-semibold text-gray-700">
+          Page {{ currentPage }} / {{ totalPages }}
+        </span>
+
+        <button (click)="nextPage()" [disabled]="currentPage === totalPages" type="button"
+          class="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-40 disabled:hover:bg-transparent transition-colors cursor-pointer"
+          title="Page suivante">
+          <i class="fas fa-chevron-right text-xs"></i>
         </button>
       </div>
     </div>
+
   </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 9. TIROIR / MODAL D'APERÇU RAPIDE (DÉLÉGUÉ EN FR)           -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <app-modale-apercu-patrimoine
+    [item]="selectedPatrimoineDetail"
+    (close)="closeDetail()">
+  </app-modale-apercu-patrimoine>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- 10. MODAL CONFIRMATION SUPPRESSION (SHARED)                 -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <app-confirm-modal
+    [isOpen]="!!deleteConfirmItem"
+    title="Confirmer la suppression"
+    message="Êtes-vous sûr de vouloir supprimer définitivement ce patrimoine ? Cette action est irréversible."
+    [itemName]="deleteConfirmItem?.nom"
+    confirmText="Oui, supprimer"
+    (confirm)="executeDelete()"
+    (cancel)="cancelDelete()">
+  </app-confirm-modal>
 
 </div>

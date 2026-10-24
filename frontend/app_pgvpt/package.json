@@ -7,10 +7,11 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "generate-api:geolocalisation": "npx @openapitools/openapi-generator-cli generate -i ../../contrat_api_update/ms-geolocalisation-api-v2.yml -g typescript-angular -o src/app/core/api/geolocalisation --additional-properties=ngVersion=17,fileNaming=kebab-case",
-    "generate-api:media": "npx @openapitools/openapi-generator-cli generate -i ../../contrat_api_update/ms-media-api-v2.yml -g typescript-angular -o src/app/core/api/media --additional-properties=ngVersion=17,fileNaming=kebab-case",
-    "generate-api:patrimoine": "npx @openapitools/openapi-generator-cli generate -i ../../contrat_api_update/ms-patrimoine-api-v2.yml -g typescript-angular -o src/app/core/api/patrimoine --additional-properties=ngVersion=17,fileNaming=kebab-case",
-    "generate-api": "npm run generate-api:geolocalisation && npm run generate-api:media && npm run generate-api:patrimoine"
+    "generate-api:circuit": "npx @openapitools/openapi-generator-cli generate -i ../../contrat_api_update/ms-circuit-api-v2.yml -g typescript-angular -o src/app/core/openapi/circuit --additional-properties=ngVersion=17,fileNaming=kebab-case",
+    "generate-api:geolocalisation": "npx @openapitools/openapi-generator-cli generate -i ../../contrat_api_update/ms-geolocalisation-api-v2.yml -g typescript-angular -o src/app/core/openapi/geolocalisation --additional-properties=ngVersion=17,fileNaming=kebab-case",
+    "generate-api:media": "npx @openapitools/openapi-generator-cli generate -i ../../contrat_api_update/ms-media-api-v2.yml -g typescript-angular -o src/app/core/openapi/media --additional-properties=ngVersion=17,fileNaming=kebab-case",
+    "generate-api:patrimoine": "npx @openapitools/openapi-generator-cli generate -i ../../contrat_api_update/ms-patrimoine-api-v2.yml -g typescript-angular -o src/app/core/openapi/patrimoine --additional-properties=ngVersion=17,fileNaming=kebab-case",
+    "generate-api": "npm run generate-api:circuit && npm run generate-api:geolocalisation && npm run generate-api:media && npm run generate-api:patrimoine"
   },
   "private": true,
   "dependencies": {

@@ -1,0 +1,454 @@
+<div class="space-y-6 animate-fade-in-up pb-12">
+  <!-- En-tête -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+    <div>
+      <div class="flex items-center gap-3">
+        <span class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg">
+          <i class="fas fa-landmark-flag"></i>
+        </span>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">Référentiel Administratif</h2>
+          <p class="text-xs text-gray-500 mt-0.5">
+            Organisation territoriale et administrative du Sénégal (Pays, Régions, Départements, Communes, Villages).
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button type="button" routerLink="/admin/dashboard"
+              class="px-4 py-2 border border-gray-300 text-gray-700 text-xs font-medium rounded-xl hover:bg-gray-50 transition-colors">
+        <i class="fas fa-arrow-left mr-1.5"></i> Retour
+      </button>
+      <button type="button" (click)="openCreateModal()"
+              class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl transition-colors shadow-sm flex items-center gap-2">
+        <i class="fas fa-plus"></i> Ajouter au référentiel
+      </button>
+    </div>
+  <!-- Onglets des 5 Niveaux Territoriaux -->
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-2 flex flex-wrap gap-2">
+    <button type="button" (click)="setTab('regions')"
+            [ngClass]="activeTab === 'regions' ? 'bg-amber-600 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'"
+            class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">
+      <i class="fas fa-map-pin"></i>
+      <span>1. Régions en base ({{ regions.length }})</span>
+    </button>
+
+    <button type="button" (click)="setTab('departements')"
+            [ngClass]="activeTab === 'departements' ? 'bg-amber-600 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'"
+            class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">
+      <i class="fas fa-building"></i>
+      <span>2. Départements en base ({{ departements.length }})</span>
+    </button>
+
+    <button type="button" (click)="setTab('communes')"
+            [ngClass]="activeTab === 'communes' ? 'bg-amber-600 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'"
+            class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">
+      <i class="fas fa-city"></i>
+      <span>3. Communes en base ({{ communes.length }})</span>
+    </button>
+
+    <button type="button" (click)="setTab('villages')"
+            [ngClass]="activeTab === 'villages' ? 'bg-amber-600 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'"
+            class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">
+      <i class="fas fa-house-chimney-window"></i>
+      <span>4. Villages ({{ villages.length }})</span>
+    </button>
+
+    <button type="button" (click)="setTab('quartiers')"
+            [ngClass]="activeTab === 'quartiers' ? 'bg-amber-600 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'"
+            class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">
+      <i class="fas fa-tree-city"></i>
+      <span>5. Quartiers ({{ quartiers.length }})</span>
+    </button>
+
+    <button type="button" (click)="setTab('pays')"
+            [ngClass]="activeTab === 'pays' ? 'bg-amber-600 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'"
+            class="py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">
+      <i class="fas fa-flag"></i>
+      <span>Pays ({{ pays.length }})</span>
+    </button>
+  </div>
+
+  <!-- Barre de recherche -->
+  <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center gap-3">
+    <i class="fas fa-search text-gray-400 ml-2"></i>
+    <input type="text" [(ngModel)]="searchQuery"
+           placeholder="Rechercher dans {{ activeTab }} enregistrés en base..."
+           class="w-full text-sm outline-none bg-transparent">
+    <button *ngIf="searchQuery" (click)="searchQuery = ''" class="text-gray-400 hover:text-gray-600 text-xs">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <!-- Tableau Référentiel -->
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-gray-50/70 border-b border-gray-100 text-gray-500 text-xs uppercase font-semibold">
+          <tr>
+            <th class="py-3.5 px-4">Code</th>
+            <th class="py-3.5 px-4">Nom / Libellé</th>
+            <th class="py-3.5 px-4">Rattachement</th>
+            <th class="py-3.5 px-4">Description</th>
+            <th class="py-3.5 px-4 text-center">Statut</th>
+            <th class="py-3.5 px-4 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <tr *ngFor="let item of currentItems" class="hover:bg-amber-50/20 transition-colors">
+            <td class="py-3.5 px-4 font-mono font-bold text-amber-900 text-xs">
+              {{ item.code || item.codeIso || '-' }}
+            </td>
+            <td class="py-3.5 px-4 font-medium text-gray-900">
+              {{ item.nom || item.libelle }}
+            </td>
+            <td class="py-3.5 px-4 text-gray-600 text-xs">
+              <span *ngIf="activeTab === 'regions'">🇸🇳 {{ getParentName(item) }}</span>
+              <span *ngIf="activeTab === 'departements'">📍 {{ getParentName(item) }}</span>
+              <span *ngIf="activeTab === 'communes'">🏢 {{ getParentName(item) }}</span>
+              <span *ngIf="activeTab === 'villages'">🏘️ {{ getParentName(item) }}</span>
+              <span *ngIf="activeTab === 'quartiers'">📍 {{ getParentName(item) }}</span>
+              <span *ngIf="activeTab === 'pays'">🌍 {{ getParentName(item) }}</span>
+            </td>
+            <td class="py-3.5 px-4 text-gray-500 text-xs max-w-xs truncate">
+              {{ item.description || '-' }}
+            </td>
+            <td class="py-3.5 px-4 text-center">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                Actif
+              </span>
+            </td>
+            <td class="py-3.5 px-4 text-right">
+              <div class="flex items-center justify-end gap-1.5">
+                <!-- Bouton Voir (Consultation) -->
+                <button type="button" (click)="openViewModal(item)" title="Voir les détails"
+                        class="text-gray-400 hover:text-blue-600 transition-colors p-1.5 rounded-lg hover:bg-blue-50 text-xs">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <!-- Bouton Modifier (Édition) -->
+                <button type="button" (click)="openEditModal(item)" title="Modifier"
+                        class="text-gray-400 hover:text-amber-600 transition-colors p-1.5 rounded-lg hover:bg-amber-50 text-xs">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <!-- Bouton Supprimer -->
+                <button type="button" (click)="deleteItem(item)" title="Supprimer"
+                        class="text-gray-400 hover:text-red-600 transition-colors p-1.5 rounded-lg hover:bg-red-50 text-xs">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="currentItems.length === 0">
+            <td colspan="6" class="py-12 text-center text-gray-400">
+              <i class="fas fa-inbox text-3xl mb-2 text-gray-300"></i>
+              <p class="text-sm">Aucun enregistrement dans notre base pour cet onglet.</p>
+              <button type="button" (click)="openCreateModal()" class="mt-3 text-xs text-amber-600 font-semibold hover:underline">
+                + Ajouter au référentiel
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modale de Consultation (VOIR) -->
+  <div *ngIf="showViewModal && selectedItem" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-gray-100 animate-scale-up">
+      <div class="px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex justify-between items-center">
+        <h3 class="font-bold text-lg flex items-center gap-2">
+          <i class="fas fa-eye"></i> Détails : {{ selectedItem.nom || selectedItem.libelle }}
+        </h3>
+        <button type="button" (click)="closeViewModal()" class="text-white/80 hover:text-white">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-4">
+        <!-- Informations principales -->
+        <div class="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100 text-xs">
+          <div>
+            <span class="text-gray-400 uppercase font-semibold block mb-0.5">Niveau territorial</span>
+            <span class="font-bold text-indigo-700 uppercase bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200 inline-block">
+              {{ activeTab }}
+            </span>
+          </div>
+          <div>
+            <span class="text-gray-400 uppercase font-semibold block mb-0.5">Code officiel</span>
+            <span class="font-mono font-bold text-gray-900 bg-white px-2 py-0.5 rounded border border-gray-200 inline-block">
+              {{ selectedItem.code || selectedItem.codeIso || '-' }}
+            </span>
+          </div>
+          <div>
+            <span class="text-gray-400 uppercase font-semibold block mb-0.5">Nom officiel</span>
+            <span class="font-semibold text-gray-900 text-sm">
+              {{ selectedItem.nom || selectedItem.libelle }}
+            </span>
+          </div>
+          <div>
+            <span class="text-gray-400 uppercase font-semibold block mb-0.5">Rattachement parent</span>
+            <span class="font-semibold text-gray-800">
+              {{ getParentName(selectedItem) }}
+            </span>
+          </div>
+          <div *ngIf="selectedItem.devise">
+            <span class="text-gray-400 uppercase font-semibold block mb-0.5">Devise</span>
+            <span class="font-semibold text-gray-800">{{ selectedItem.devise }}</span>
+          </div>
+          <div>
+            <span class="text-gray-400 uppercase font-semibold block mb-0.5">Statut</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+              <i class="fas fa-circle text-[8px] mr-1.5"></i> Actif
+            </span>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <span class="text-xs font-bold text-gray-700 uppercase block mb-1">Description</span>
+          <p class="text-sm text-gray-600 bg-gray-50 p-3 rounded-xl border border-gray-100 min-h-[60px]">
+            {{ selectedItem.description || 'Aucune description renseignée pour cette entité.' }}
+          </p>
+        </div>
+
+        <!-- Identifiant technique (UUID) -->
+        <div *ngIf="selectedItem.id" class="text-[11px] text-gray-400 font-mono bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
+          ID: {{ selectedItem.id }}
+        </div>
+
+        <!-- Actions de la modale -->
+        <div class="flex justify-between items-center pt-4 border-t border-gray-100">
+          <button type="button" (click)="closeViewModal()"
+                  class="px-4 py-2 border border-gray-300 text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-50 transition-colors">
+            Fermer
+          </button>
+          <button type="button" (click)="editFromView()"
+                  class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl transition-colors shadow-sm flex items-center gap-1.5">
+            <i class="fas fa-edit"></i> Modifier cette entrée
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal d'ajout / modification (FORMULAIRE) -->
+  <div *ngIf="showCreateModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl border border-gray-100 animate-scale-up">
+      <div class="px-6 py-4 bg-amber-600 text-white flex justify-between items-center">
+        <h3 class="font-bold text-lg flex items-center gap-2">
+          <i [class]="isEditMode ? 'fas fa-edit' : 'fas fa-plus-circle'"></i>
+          {{ isEditMode ? 'Modifier' : 'Ajouter au référentiel' }} : {{ activeTab | uppercase }}
+        </h3>
+        <button type="button" (click)="closeCreateModal()" class="text-white/80 hover:text-white">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <form [formGroup]="createForm" (ngSubmit)="submitSave()" class="p-6 space-y-4">
+
+        <!-- Indicateur champs obligatoires -->
+        <div class="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900">
+          <i class="fas fa-asterisk text-rose-500 text-[10px]"></i>
+          <span>Les champs marqués d'une étoile rouge (<span class="text-rose-500 font-bold">*</span>) sont obligatoires.</span>
+        </div>
+
+        <!-- 1. Formulaire pour PAYS -->
+        <div *ngIf="activeTab === 'pays'" class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Nom du Pays <span class="text-red-500">*</span></label>
+            <input type="text" formControlName="nom" placeholder="ex: Sénégal"
+                   class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Code ISO (3 lettres) <span class="text-red-500">*</span></label>
+            <input type="text" formControlName="code" placeholder="ex: SEN"
+                   class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm uppercase font-mono">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Devise</label>
+            <input type="text" formControlName="devise" placeholder="ex: FCFA"
+                   class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Description</label>
+            <textarea formControlName="description" rows="2" placeholder="Description du pays..."
+                      class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm resize-none"></textarea>
+          </div>
+        </div>
+
+        <!-- 2. Formulaire pour REGIONS -->
+        <div *ngIf="activeTab === 'regions'" class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Pays de rattachement <span class="text-red-500">*</span></label>
+            <select formControlName="parentId" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm outline-none">
+              <option value="">-- Sélectionner le pays --</option>
+              <option *ngFor="let p of pays" [value]="p.id">{{ p.nom }} ({{ p.code }})</option>
+            </select>
+            <p *ngIf="pays.length === 0" class="text-xs text-amber-600 mt-1">
+              <i class="fas fa-exclamation-triangle"></i> Aucun pays enregistré. Créez d'abord le pays Sénégal dans l'onglet "Pays".
+            </p>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Nom de la région <span class="text-red-500">*</span></label>
+            <input type="text" formControlName="nom" placeholder="ex: Dakar ou Thiès"
+                   class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Code Région <span class="text-red-500">*</span></label>
+            <input type="text" formControlName="code" placeholder="ex: DK ou TH"
+                   class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm uppercase font-mono">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Description</label>
+            <textarea formControlName="description" rows="2" placeholder="Description de la région..."
+                      class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm resize-none"></textarea>
+          </div>
+        </div>
+
+        <!-- 3. Formulaire pour DEPARTEMENTS -->
+        <div *ngIf="activeTab === 'departements'" class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Région de rattachement <span class="text-red-500">*</span></label>
+            <select formControlName="parentId" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm outline-none">
+              <option value="">-- Sélectionner la région parente --</option>
+              <option *ngFor="let r of regions" [value]="r.id">{{ r.nom }} ({{ r.code }})</option>
+            </select>
+            <p *ngIf="regions.length === 0" class="text-xs text-amber-600 mt-1">
+              <i class="fas fa-exclamation-triangle"></i> Aucune région trouvée. Créez d'abord une région dans l'onglet "Régions".
+            </p>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Nom du département <span class="text-red-500">*</span></label>
+            <input type="text" formControlName="nom" placeholder="ex: Dakar ou Mbour"
+                   class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Code Département <span class="text-red-500">*</span></label>
+            <input type="text" formControlName="code" placeholder="ex: DKR ou MBR"
+                   class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm uppercase font-mono">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Description</label>
+            <textarea formControlName="description" rows="2" placeholder="Description du département..."
+                      class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm resize-none"></textarea>
+          </div>
+        </div>
+
+        <!-- 4. Formulaire pour COMMUNES -->
+        <div *ngIf="activeTab === 'communes'" class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Département de rattachement <span class="text-red-500">*</span></label>
+            <select formControlName="parentId" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm outline-none">
+              <option value="">-- Sélectionner le département parent --</option>
+              <option *ngFor="let d of departements" [value]="d.id">{{ d.nom }} ({{ d.code }})</option>
+            </select>
+            <p *ngIf="departements.length === 0" class="text-xs text-amber-600 mt-1">
+              <i class="fas fa-exclamation-triangle"></i> Aucun département trouvé. Créez d'abord un département dans l'onglet "Départements".
+            </p>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Nom de la commune <span class="text-red-500">*</span></label>
+            <input type="text" formControlName="nom" placeholder="ex: Gorée ou Saly Portudal"
+                   class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Code Commune <span class="text-red-500">*</span></label>
+            <input type="text" formControlName="code" placeholder="ex: GOR ou SAL"
+                   class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm uppercase font-mono">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Description</label>
+            <textarea formControlName="description" rows="2" placeholder="Description de la commune..."
+                      class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm resize-none"></textarea>
+          </div>
+        </div>
+
+        <!-- 5. Formulaire pour VILLAGES -->
+        <div *ngIf="activeTab === 'villages'" class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Commune de rattachement <span class="text-red-500">*</span></label>
+            <select formControlName="parentId" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm outline-none">
+              <option value="">-- Sélectionner la commune parente --</option>
+              <option *ngFor="let c of communes" [value]="c.id">{{ c.nom }} ({{ c.code }})</option>
+            </select>
+            <p *ngIf="communes.length === 0" class="text-xs text-amber-600 mt-1">
+              <i class="fas fa-exclamation-triangle"></i> Aucune commune trouvée. Créez d'abord une commune dans l'onglet "Communes".
+            </p>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Nom du village <span class="text-red-500">*</span></label>
+            <input type="text" formControlName="nom" placeholder="ex: Île de Gorée ou Ngor Village"
+                   class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Code <span class="text-red-500">*</span></label>
+            <input type="text" formControlName="code" placeholder="ex: VIL-GOREE"
+                   class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm uppercase font-mono">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Description</label>
+            <textarea formControlName="description" rows="2" placeholder="Description du village..."
+                      class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm resize-none"></textarea>
+          </div>
+        </div>
+
+        <!-- 6. Formulaire pour QUARTIERS -->
+        <div *ngIf="activeTab === 'quartiers'" class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Village de rattachement <span class="text-red-500">*</span></label>
+            <select formControlName="parentId" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm outline-none">
+              <option value="">-- Sélectionner le village parent --</option>
+              <option *ngFor="let v of villages" [value]="v.id">{{ v.nom }} ({{ v.code }})</option>
+            </select>
+            <p *ngIf="villages.length === 0" class="text-xs text-amber-600 mt-1">
+              <i class="fas fa-exclamation-triangle"></i> Aucun village trouvé. Créez d'abord un village dans l'onglet "Villages".
+            </p>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Nom du quartier <span class="text-red-500">*</span></label>
+            <input type="text" formControlName="nom" placeholder="ex: Centre historique"
+                   class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Code <span class="text-red-500">*</span></label>
+            <input type="text" formControlName="code" placeholder="ex: GOR-CENTRE"
+                   class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm uppercase font-mono">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Description</label>
+            <textarea formControlName="description" rows="2" placeholder="Description du quartier..."
+                      class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm resize-none"></textarea>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+          <button type="button" (click)="closeCreateModal()"
+                  class="px-4 py-2 border border-gray-300 text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-50 transition-colors">
+            Annuler
+          </button>
+          <button type="submit"
+                  [disabled]="createForm.invalid || (activeTab !== 'pays' && !createForm.get('parentId')?.value) || isSubmitting"
+                  class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2">
+            <i *ngIf="!isSubmitting" [class]="isEditMode ? 'fas fa-save' : 'fas fa-check'"></i>
+            <i *ngIf="isSubmitting" class="fas fa-circle-notch fa-spin text-xs"></i>
+            <span>{{ isSubmitting ? 'Enregistrement...' : (isEditMode ? 'Enregistrer les modifications' : 'Enregistrer en base') }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de confirmation de suppression (Shared) -->
+  <app-confirm-modal
+    [isOpen]="!!itemToDelete"
+    title="Supprimer du référentiel ?"
+    message="Attention : tous les éléments qui lui sont rattachés (niveaux inférieurs) seront également supprimés en cascade."
+    [itemName]="itemToDelete?.nom"
+    [isProcessing]="isDeleting"
+    confirmText="Supprimer définitivement"
+    (confirm)="confirmDeleteItem()"
+    (cancel)="cancelDeleteItem()">
+  </app-confirm-modal>
+
+</div>

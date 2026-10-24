@@ -1,0 +1,76 @@
+<aside class="content-right" *ngIf="circuit">
+  
+  <!-- Reservation Card -->
+  <div class="sidebar-card booking-card">
+    <div class="booking-header">
+      <span class="booking-label">Prix par personne</span>
+      <div class="booking-price">
+        {{ formatPrix() }}
+      </div>
+    </div>
+
+    <div class="booking-features">
+      <div class="feature-item">
+        <i class="fa-solid fa-circle-check text-green-600"></i>
+        <span>Itinéraire complet balisé &amp; documenté</span>
+      </div>
+      <div class="feature-item">
+        <i class="fa-solid fa-circle-check text-green-600"></i>
+        <span>Accès aux fiches de tous les patrimoines</span>
+      </div>
+      <div class="feature-item">
+        <i class="fa-solid fa-circle-check text-green-600"></i>
+        <span>Assistance &amp; conciergerie touristique</span>
+      </div>
+      <div class="feature-item" *ngIf="circuit.coutTotal && circuit.coutTotal > 0">
+        <i class="fa-solid fa-circle-check text-green-600"></i>
+        <span>Droits d'entrée inclus dans le tarif</span>
+      </div>
+    </div>
+
+    <a [routerLink]="['/reservation/nouvelle']" 
+       [queryParams]="{ circuitId: circuit.id }"
+       class="btn-book-cta">
+      <i class="fa-solid fa-calendar-check mr-2"></i>
+      Réserver ce circuit
+    </a>
+  </div>
+
+  <!-- Practical Information Card -->
+  <div class="sidebar-card info-card">
+    <h3 class="info-card-title">
+      <i class="fa-solid fa-circle-info text-primary mr-2"></i>
+      Informations pratiques
+    </h3>
+
+    <ul class="info-list">
+      <li class="info-item">
+        <span class="info-key">Type de circuit</span>
+        <strong class="info-val">{{ getTypeLabel() }}</strong>
+      </li>
+      <li class="info-item">
+        <span class="info-key">Difficulté</span>
+        <strong class="info-val" [ngClass]="getDifficultyClass()">{{ getDifficultyLabel() }}</strong>
+      </li>
+      <li class="info-item">
+        <span class="info-key">Période conseillée</span>
+        <strong class="info-val">Toute l'année (Nov. - Mai idéal)</strong>
+      </li>
+      <li class="info-item">
+        <span class="info-key">Statut</span>
+        <span class="status-badge status-active">Disponible</span>
+      </li>
+    </ul>
+
+    <div class="traveler-tips">
+      <h4 class="tips-title">
+        <i class="fa-solid fa-lightbulb text-amber-500 mr-1.5"></i>
+        Conseils Teranga
+      </h4>
+      <p class="tips-text">
+        Prévoyez des chaussures de marche confortables, de l'eau, une protection solaire et un appareil photo pour immortaliser vos souvenirs.
+      </p>
+    </div>
+  </div>
+
+</aside>

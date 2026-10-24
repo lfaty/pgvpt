@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>4.1.1</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath /> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.pgvpt</groupId>
     <artifactId>ms-geolocalisation</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name/>
-    <description/>
-    <url/>
+    <name />
+    <description />
+    <url />
     <licenses>
-        <license/>
+        <license />
     </licenses>
     <developers>
-        <developer/>
+        <developer />
     </developers>
     <scm>
-        <connection/>
-        <developerConnection/>
-        <tag/>
-        <url/>
+        <connection />
+        <developerConnection />
+        <tag />
+        <url />
     </scm>
     <properties>
         <java.version>21</java.version>
@@ -141,6 +142,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.pgvpt.MsGeolocalisationApplication</mainClass>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -201,7 +205,8 @@
                                 ${project.build.directory}/generated-sources/openapi
                             </output>
 
-                            <!-- Rend les interfaces et DTO générés disponibles au projet Spring Boot. -->
+                            <!-- Rend les interfaces et DTO générés disponibles au projet Spring
+                            Boot. -->
                             <addCompileSourceRoot>true</addCompileSourceRoot>
 
                             <apiPackage>
@@ -269,14 +274,16 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <basedir>${project.build.directory}/generated-sources/openapi/src/main/java/com/pgvpt/dto</basedir>
+                    <basedir>
+                        ${project.build.directory}/generated-sources/openapi/src/main/java/com/pgvpt/dto</basedir>
                     <includes>
                         <include>**/*.java</include>
                     </includes>
                     <replacements>
                         <replacement>
                             <token>import com\.fasterxml\.jackson\.annotation\.JsonCreator;</token>
-                            <value>import com.fasterxml.jackson.annotation.JsonCreator;&#10;import com.fasterxml.jackson.annotation.JsonValue;</value>
+                            <value>import com.fasterxml.jackson.annotation.JsonCreator;&#10;import
+                                com.fasterxml.jackson.annotation.JsonValue;</value>
                         </replacement>
                     </replacements>
                     <regex>true</regex>
@@ -292,7 +299,7 @@
                         <image>eclipse-temurin:21-jre-alpine</image>
                     </from>
                     <to>
-<!--                        <image>ms-geolocalisation:latest</image>-->
+                        <!--                        <image>ms-geolocalisation:latest</image>-->
                         <image>ms-geolocalisation:1.0.0</image>
                     </to>
                     <container>

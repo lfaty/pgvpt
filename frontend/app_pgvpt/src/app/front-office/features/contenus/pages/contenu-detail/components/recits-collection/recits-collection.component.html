@@ -1,0 +1,32 @@
+<section *ngIf="otherContenus && otherContenus.length > 0" class="max-w-6xl mx-auto px-6 mt-20 pt-12 border-t border-gray-200">
+  <div class="mb-8">
+    <span class="text-[#D16933] font-bold text-xs uppercase tracking-wider block mb-1">Poursuivre la lecture</span>
+    <h3 class="font-serif text-2xl font-bold text-gray-900">Dans la même collection historique</h3>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <a *ngFor="let other of otherContenus"
+       [routerLink]="['/patrimoines', patrimoineId, 'contenus', other.id]"
+       class="bg-white rounded-2xl p-6 border border-gray-100 shadow-2xs hover:shadow-md hover:border-[#0b5d5e]/30 transition-all flex flex-col justify-between group no-underline">
+      <div>
+        <div class="flex items-center justify-between text-[11px] mb-3">
+          <span class="inline-flex items-center gap-1 font-bold text-[#D16933] bg-[#D16933]/10 px-2.5 py-0.5 rounded-full">
+            <i class="fas" [ngClass]="getContenuTypeIcon(other.type)"></i>
+            {{ getContenuTypeLabel(other.type) }}
+          </span>
+          <span class="text-gray-400 font-medium"><i class="far fa-clock mr-1"></i>{{ getReadingTime(other.corps) }} min</span>
+        </div>
+        <h4 class="font-serif font-bold text-gray-900 text-base group-hover:text-[#0b5d5e] transition-colors line-clamp-2 mb-2 leading-snug">
+          {{ other.titre }}
+        </h4>
+        <p class="text-xs text-gray-600 line-clamp-3 leading-relaxed mb-4">
+          {{ other.resume || (other.corps | slice:0:120) + '...' }}
+        </p>
+      </div>
+      <div class="pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-[#0b5d5e] font-bold">
+        <span>Lire le récit</span>
+        <i class="fas fa-arrow-right text-[10px] transform group-hover:translate-x-1 transition-transform"></i>
+      </div>
+    </a>
+  </div>
+</section>

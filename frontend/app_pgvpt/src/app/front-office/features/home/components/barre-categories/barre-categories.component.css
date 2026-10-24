@@ -1,0 +1,98 @@
+/* =============================================
+   CATEGORIES BAR ELEVATION
+   ============================================= */
+.categories-section {
+  padding: 0;
+  background: #FAFAF9;
+  position: relative;
+  z-index: 20;
+  margin-top: -30px;
+}
+
+.categories-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.categories-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 16px 20px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  gap: 8px;
+}
+
+.category-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  transition: all 0.25s ease;
+  text-decoration: none;
+  min-width: 0;
+}
+
+.category-item:hover {
+  background: #F8FAFC;
+  transform: translateY(-2px);
+}
+
+.category-icon {
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  margin: 0;
+  border-radius: 14px;
+  background: #F1F5F9;
+  transition: transform 0.25s ease;
+}
+
+.category-item:hover .category-icon {
+  transform: scale(1.1);
+}
+
+.category-icon--amber,
+.category-item:hover .category-icon--amber { background: rgba(217, 119, 6, 0.12); color: #D97706; }
+.category-icon--green,
+.category-item:hover .category-icon--green { background: rgba(5, 150, 105, 0.12); color: #059669; }
+.category-icon--red,
+.category-item:hover .category-icon--red   { background: rgba(220, 38, 38, 0.12); color: #DC2626; }
+.category-icon--blue,
+.category-item:hover .category-icon--blue  { background: rgba(37, 99, 235, 0.12); color: #2563EB; }
+.category-icon--purple,
+.category-item:hover .category-icon--purple { background: rgba(124, 58, 237, 0.12); color: #7C3AED; }
+
+.category-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  text-align: left;
+}
+
+.category-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.category-sub {
+  font-size: 0.72rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

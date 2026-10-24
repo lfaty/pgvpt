@@ -1,0 +1,20 @@
+<!-- NAVIGATION INTERNE STICKY -->
+<nav id="internalNav" class="td-subnav sticky top-0 z-[999] bg-white/90 backdrop-blur-xl border-b border-gray-200/70">
+  <div class="absolute top-0 left-0 h-[3px] bg-gradient-to-r from-[#D16933] to-[#F4A261] transition-[width] duration-100" [style.width.%]="scrollProgress"></div>
+  <div class="mx-auto max-w-[1200px] px-6 flex items-center justify-between gap-6">
+    <div class="flex items-center gap-1 overflow-x-auto td-hide-scrollbar py-3 -mx-2 px-2">
+      <button *ngFor="let t of tabs" type="button" [id]="'tab-' + t.id" (click)="selectSection(t.id)"
+              class="shrink-0 px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 transition-all duration-300"
+              [ngClass]="activeSection === t.id
+                ? 'bg-[#0B1A24] text-white shadow-md'
+                : 'text-gray-600 hover:text-[#0B1A24] hover:bg-gray-100'">
+        <i [class]="t.icon + ' text-xs'" [ngClass]="activeSection === t.id ? 'text-[#F4A261]' : 'text-gray-400'"></i>
+        {{ t.label }}
+      </button>
+    </div>
+    <span *ngIf="titre" class="hidden lg:block font-serif font-bold text-[#0B1A24] truncate max-w-[260px] transition-opacity duration-300"
+          [class.opacity-0]="scrollProgress < 8">
+      {{ titre }}
+    </span>
+  </div>
+</nav>

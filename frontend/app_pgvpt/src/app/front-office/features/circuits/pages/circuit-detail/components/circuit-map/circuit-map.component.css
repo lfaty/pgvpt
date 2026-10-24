@@ -1,0 +1,134 @@
+.section-card {
+  background: #FFFFFF;
+  border-radius: 20px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+  padding: 28px;
+  margin-bottom: 30px;
+}
+
+.section-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.section-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0 0 4px;
+}
+
+.section-subtitle {
+  font-size: 0.88rem;
+  color: #64748B;
+  margin: 0;
+}
+
+.btn-recenter {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: 50px;
+  color: #1D4ED8;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-recenter:hover {
+  background: #DBEAFE;
+  color: #1E40AF;
+}
+
+.map-wrapper {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #CBD5E1;
+  position: relative;
+}
+
+.map-view {
+  height: 420px;
+  width: 100%;
+}
+
+:host ::ng-deep .circuit-pin {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 13px;
+  color: #FFFFFF;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  border: 2.5px solid #FFFFFF;
+  transition: transform 0.2s ease;
+}
+
+:host ::ng-deep .circuit-pin:hover {
+  transform: scale(1.15);
+}
+
+:host ::ng-deep .pin-regular {
+  background: #2563EB;
+}
+
+:host ::ng-deep .pin-start {
+  background: #16A34A;
+}
+
+:host ::ng-deep .pin-end {
+  background: #DC2626;
+}
+
+:host ::ng-deep .circuit-popup {
+  padding: 6px;
+  min-width: 180px;
+}
+
+:host ::ng-deep .popup-step {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #2563EB;
+  text-transform: uppercase;
+  display: block;
+}
+
+:host ::ng-deep .popup-title {
+  font-size: 0.95rem;
+  color: #0F172A;
+  display: block;
+  margin-bottom: 6px;
+}
+
+:host ::ng-deep .popup-img-wrapper {
+  width: 100%;
+  height: 90px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+:host ::ng-deep .popup-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+:host ::ng-deep .popup-info {
+  display: flex;
+  gap: 10px;
+  font-size: 0.75rem;
+  color: #64748B;
+}

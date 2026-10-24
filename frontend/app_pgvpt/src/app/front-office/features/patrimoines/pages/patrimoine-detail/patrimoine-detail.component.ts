@@ -1,17 +1,48 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit, HostListener, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PatrimoineFacadeService } from '../../../../../core/services/patrimoine-facade.service';
 import { PatrimoineCardComponent } from '../../components/patrimoine-card/patrimoine-card.component';
 import { PatrimoineUI } from '../../../../../core/models/patrimoine.ui';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+
+import { EntetePatrimoineComponent } from './components/entete-patrimoine/entete-patrimoine.component';
+import { OngletsNavigationComponent } from './components/onglets-navigation/onglets-navigation.component';
+import { ApercuPatrimoineComponent } from './components/apercu-patrimoine/apercu-patrimoine.component';
+import { CaracteristiquesPatrimoineComponent } from './components/caracteristiques-patrimoine/caracteristiques-patrimoine.component';
+import { RecitsPatrimoineComponent } from './components/recits-patrimoine/recits-patrimoine.component';
+import { GalerieMediasComponent } from './components/galerie-medias/galerie-medias.component';
+import { EtatConservationComponent } from './components/etat-conservation/etat-conservation.component';
+import { CarteLocalisationComponent } from './components/carte-localisation/carte-localisation.component';
+import { PatrimoinesSimilairesComponent } from './components/patrimoines-similaires/patrimoines-similaires.component';
+import { VisionneusePleinEcranComponent } from './components/visionneuse-plein-ecran/visionneuse-plein-ecran.component';
+import { ModaleLectureRecitComponent } from './components/modale-lecture-recit/modale-lecture-recit.component';
+import { PlanifierVisiteComponent } from './components/planifier-visite/planifier-visite.component';
 
 @Component({
   selector: 'app-patrimoine-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, PatrimoineCardComponent, FormsModule],
+  encapsulation: ViewEncapsulation.None,
+  imports: [
+    CommonModule,
+    RouterLink,
+    PatrimoineCardComponent,
+    FormsModule,
+    EntetePatrimoineComponent,
+    OngletsNavigationComponent,
+    ApercuPatrimoineComponent,
+    CaracteristiquesPatrimoineComponent,
+    RecitsPatrimoineComponent,
+    GalerieMediasComponent,
+    EtatConservationComponent,
+    CarteLocalisationComponent,
+    PatrimoinesSimilairesComponent,
+    VisionneusePleinEcranComponent,
+    ModaleLectureRecitComponent,
+    PlanifierVisiteComponent
+  ],
   templateUrl: './patrimoine-detail.component.html',
   styleUrl: './patrimoine-detail.component.css'
 })
@@ -142,7 +173,6 @@ export class PatrimoineDetailComponent implements OnInit, AfterViewInit, OnDestr
       patrimoine: this.facadeService.getPatrimoineRaw(id),
       geolocalisation: this.facadeService.getGeolocalisation(id),
       medias: this.facadeService.getMedias(id),
-      allMedias: this.facadeService.getAllMedias(),
       contenus: this.facadeService.getContenus(id),
       similaires: this.facadeService.getSimilaires(id, 3)
     }).subscribe({
@@ -158,7 +188,7 @@ export class PatrimoineDetailComponent implements OnInit, AfterViewInit, OnDestr
         }
         
         this.medias = (data.medias || []).map(m => ({ ...m, url: m.url.startsWith('http') || m.url.startsWith('/') ? m.url : '/' + m.url }));
-        this.allMedias = (data.allMedias || []).map(m => ({ ...m, url: m.url.startsWith('http') || m.url.startsWith('/') ? m.url : '/' + m.url }));
+        this.allMedias = this.medias;
         
         // Remove note from similaires to respect data contract
         this.similaires = (data.similaires || []).map(s => {
@@ -301,92 +331,7 @@ export class PatrimoineDetailComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   getBiodiversiteImage(itemName: string): string {
-    const images: { [key: string]: string } = {
-      'lion': '/assets/images/lion_niokolo.jpg',
-      'léopard': '/assets/images/leopard_niokolo.jpg',
-      'leopard': '/assets/images/leopard_niokolo.jpg',
-      'éléphant': 'https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'elephant': 'https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'lycaon': 'https://images.unsplash.com/photo-1563212722-6b9ce254cb6b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', // Replace missing wild dog
-      'chimpanzé': 'https://images.unsplash.com/photo-1558231908-ee7f1a9b2313?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'aviaire': 'https://images.unsplash.com/photo-1478147427282-58a87a120781?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'oiseau': 'https://images.unsplash.com/photo-1478147427282-58a87a120781?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'marine': 'https://images.unsplash.com/photo-1524704654690-b56c05c78a00?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'arid': 'https://images.unsplash.com/photo-1533161394541-1cecc00cbba4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'désert': 'https://images.unsplash.com/photo-1533161394541-1cecc00cbba4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'rose': 'https://images.unsplash.com/photo-1526487834515-ce1bb72a15c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'mangrove': 'https://images.unsplash.com/photo-1522165078649-823cb4bb7811?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-    };
-    
-    const key = itemName.toLowerCase().trim();
-    for (const [k, url] of Object.entries(images)) {
-      if (key.includes(k)) return url;
-    }
-    
-    return this.mainImage || 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
-  }
-
-  getActivityImage(activityName: string): string {
-    const images: { [key: string]: string } = {
-      'safari': '/assets/images/safari_niokolo.jpg',
-      'randonnée': 'https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'oiseau': 'https://images.unsplash.com/photo-1552728089-57105a8e7ceb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'pirogue': 'https://images.unsplash.com/photo-1534063853177-8c3b7a8dcb92?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'barque': 'https://images.unsplash.com/photo-1534063853177-8c3b7a8dcb92?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'pêche': 'https://images.unsplash.com/photo-1504109586057-7a2ae83d1338?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'dromadaire': 'https://images.unsplash.com/photo-1501554728187-ce583db33af7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'bivouac': 'https://images.unsplash.com/photo-1504280387937-31f4b52c00d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'quad': 'https://images.unsplash.com/photo-1571434680879-138676d05282?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'sel': 'https://images.unsplash.com/photo-1526487834515-ce1bb72a15c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'baignade': 'https://images.unsplash.com/photo-1519046904884-53103b34b206?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'poterie': 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'artisane': 'https://images.unsplash.com/photo-1596774640161-0d32155d0a64?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'culture': 'https://images.unsplash.com/photo-1542385151-efd9000785a0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'visite': 'https://images.unsplash.com/photo-1522878129833-838a904a0e9e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-    };
-    const key = activityName.toLowerCase().trim();
-    for (const [k, url] of Object.entries(images)) {
-      if (key.includes(k)) return url;
-    }
-    return this.mainImage || 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
-  }
-
-  getExperienceDetails(activityName: string): { subtitle: string, description: string, tags: string[] } {
-    const key = activityName.toLowerCase().trim();
-    if (key.includes('safari')) {
-      return {
-        subtitle: 'À la rencontre de la vie sauvage',
-        description: 'Découvrez la faune du parc dans son environnement naturel. L’observation permet de mieux comprendre la diversité des espèces et les équilibres qui structurent cet écosystème.',
-        tags: ['Observation de la faune', 'Savane', 'Forêt-galerie']
-      };
-    }
-    if (key.includes('randonnée') || key.includes('marche')) {
-      return {
-        subtitle: 'Explorer les paysages',
-        description: 'Parcourez les différents paysages du patrimoine et découvrez progressivement la diversité de ses milieux naturels.',
-        tags: ['Randonnée', 'Exploration', 'Nature']
-      };
-    }
-    if (key.includes('oiseau')) {
-      return {
-        subtitle: 'À l\'écoute du paysage',
-        description: 'Une expérience dédiée à la découverte de la diversité avifaunistique du parc et à l\'observation des oiseaux dans leur habitat naturel.',
-        tags: ['Ornithologie', 'Patience', 'Biodiversité']
-      };
-    }
-    if (key.includes('pirogue') || key.includes('barque')) {
-      return {
-        subtitle: 'Au fil de l\'eau',
-        description: 'Laissez-vous porter par les courants pour une exploration paisible des cours d\'eau et des mangroves, à la découverte de la faune aquatique.',
-        tags: ['Navigation', 'Écosystème marin', 'Détente']
-      };
-    }
-    // Default fallback
-    return {
-      subtitle: 'Immersion au cœur du site',
-      description: 'Participez à cette activité pour vivre une expérience unique et authentique, en totale harmonie avec l\'environnement exceptionnel du patrimoine.',
-      tags: ['Découverte', 'Authenticité', 'Nature']
-    };
+    return this.mainImage || '/assets/images/patrimoine_1.jpg';
   }
 
   toggleThreat(index: number): void {

@@ -32,26 +32,50 @@
           </button>
           <div
             class="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
-            <div class="w-52 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5">
+            <div class="w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5">
               <a routerLink="/admin/patrimoines"
                 class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors">
-                <i class="fas fa-th-list w-4 text-center text-gray-400"></i> Lister
+                <i class="fas fa-landmark w-4 text-center text-teal-600"></i> Lister les patrimoines
               </a>
               <a routerLink="/admin/patrimoines/nouveau"
                 class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors">
-                <i class="fas fa-plus w-4 text-center text-gray-400"></i> Ajouter
+                <i class="fas fa-plus-circle w-4 text-center text-teal-600"></i> Nouveau patrimoine
               </a>
+              <div class="my-1 border-t border-gray-100"></div>
               <a routerLink="/admin/medias"
                 class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors">
-                <i class="fas fa-camera-retro w-4 text-center text-gray-400"></i> Médias
+                <i class="fas fa-camera-retro w-4 text-center text-purple-600"></i> Médiathèque & Photos
               </a>
               <a routerLink="/admin/contenus"
                 class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors">
-                <i class="fas fa-file-alt w-4 text-center text-gray-400"></i> Contenus
+                <i class="fas fa-file-lines w-4 text-center text-blue-600"></i> Articles & Contenus
               </a>
-              <a routerLink="/admin/patrimoines/localisation"
+            </div>
+          </div>
+        </div>
+
+        <!-- Géolocalisation Dropdown -->
+        <div class="relative group">
+          <button
+            class="px-3 py-1.5 rounded-md text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1.5">
+            Géolocalisation
+            <i class="fa-solid fa-chevron-down text-[10px] text-white/50 group-hover:text-white group-hover:rotate-180 transition-all duration-200"></i>
+          </button>
+          <div
+            class="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
+            <div class="w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5">
+              <a routerLink="/admin/geolocalisations/zones-touristiques"
                 class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors">
-                <i class="fas fa-map-marked-alt w-4 text-center text-gray-400"></i> Géolocalisation
+                <i class="fas fa-umbrella-beach w-4 text-center text-teal-600"></i> Zones Touristiques
+              </a>
+              <a routerLink="/admin/geolocalisations/zones-geographiques"
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors">
+                <i class="fas fa-globe-africa w-4 text-center text-blue-600"></i> Zones Géographiques
+              </a>
+              <div class="my-1 border-t border-gray-100"></div>
+              <a routerLink="/admin/geolocalisations/referentiel"
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors">
+                <i class="fas fa-landmark-flag w-4 text-center text-amber-600"></i> Référentiel Administratif
               </a>
             </div>
           </div>
@@ -66,10 +90,19 @@
           </button>
           <div
             class="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
-            <div class="w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5">
+            <div class="w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5">
               <a routerLink="/admin/circuits"
                 class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors">
-                <i class="fas fa-route w-4 text-center text-gray-400"></i> Liste
+                <i class="fas fa-route w-4 text-center text-teal-600"></i> Lister les circuits
+              </a>
+              <a routerLink="/admin/circuits/nouveau"
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors">
+                <i class="fas fa-plus-circle w-4 text-center text-teal-600"></i> Nouveau circuit
+              </a>
+              <div class="my-1 border-t border-gray-100"></div>
+              <a routerLink="/admin/activites"
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors">
+                <i class="fas fa-hiking w-4 text-center text-amber-600"></i> Activités touristiques
               </a>
             </div>
           </div>
@@ -84,10 +117,14 @@
           </button>
           <div
             class="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
-            <div class="w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5">
+            <div class="w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5">
               <a routerLink="/admin/activites"
                 class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors">
-                <i class="fas fa-hiking w-4 text-center text-gray-400"></i> Liste
+                <i class="fas fa-hiking w-4 text-center text-emerald-600"></i> Lister les activités
+              </a>
+              <a routerLink="/admin/activites/nouveau"
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors">
+                <i class="fas fa-plus-circle w-4 text-center text-emerald-600"></i> Nouvelle activité
               </a>
             </div>
           </div>
@@ -189,18 +226,25 @@
   <div *ngIf="isMobileMenuOpen" class="lg:hidden absolute top-16 left-0 w-full bg-[#0b5d5e] shadow-xl border-t border-white/10 flex flex-col p-2 max-h-[calc(100vh-4rem)] overflow-y-auto">
     <a routerLink="/admin/dashboard" (click)="toggleMobileMenu()" class="px-4 py-3 text-white/90 font-medium hover:bg-white/10 rounded-md">Tableau de bord</a>
     
-    <div class="px-4 py-2 mt-2 text-xs font-bold text-white/50 uppercase tracking-wider">Patrimoines</div>
-    <a routerLink="/admin/patrimoines" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-th-list w-4 mr-2"></i> Lister</a>
-    <a routerLink="/admin/patrimoines/nouveau" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-plus w-4 mr-2"></i> Ajouter</a>
-    <a routerLink="/admin/medias" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-camera-retro w-4 mr-2"></i> Médias</a>
-    <a routerLink="/admin/contenus" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-file-alt w-4 mr-2"></i> Contenus</a>
-    <a routerLink="/admin/patrimoines/localisation" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-map-marked-alt w-4 mr-2"></i> Géolocalisation</a>
+    <div class="px-4 py-2 mt-2 text-xs font-bold text-white/50 uppercase tracking-wider">Patrimoine</div>
+    <a routerLink="/admin/patrimoines" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-landmark w-4 mr-2"></i> Lister les patrimoines</a>
+    <a routerLink="/admin/patrimoines/nouveau" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-plus-circle w-4 mr-2"></i> Nouveau patrimoine</a>
+    <a routerLink="/admin/medias" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-camera-retro w-4 mr-2"></i> Médiathèque & Photos</a>
+    <a routerLink="/admin/contenus" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-file-lines w-4 mr-2"></i> Articles & Contenus</a>
+
+    <div class="px-4 py-2 mt-2 text-xs font-bold text-white/50 uppercase tracking-wider">Géolocalisation</div>
+    <a routerLink="/admin/geolocalisations/zones-touristiques" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-umbrella-beach w-4 mr-2"></i> Zones Touristiques</a>
+    <a routerLink="/admin/geolocalisations/zones-geographiques" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-globe-africa w-4 mr-2"></i> Zones Géographiques</a>
+    <a routerLink="/admin/geolocalisations/referentiel" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-landmark-flag w-4 mr-2"></i> Référentiel Administratif</a>
 
     <div class="px-4 py-2 mt-2 text-xs font-bold text-white/50 uppercase tracking-wider">Circuits</div>
-    <a routerLink="/admin/circuits" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-route w-4 mr-2"></i> Liste</a>
+    <a routerLink="/admin/circuits" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-route w-4 mr-2"></i> Lister les circuits</a>
+    <a routerLink="/admin/circuits/nouveau" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-plus w-4 mr-2"></i> Nouveau circuit</a>
+    <a routerLink="/admin/activites" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-hiking w-4 mr-2"></i> Activités touristiques</a>
 
     <div class="px-4 py-2 mt-2 text-xs font-bold text-white/50 uppercase tracking-wider">Activités</div>
-    <a routerLink="/admin/activites" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-hiking w-4 mr-2"></i> Liste</a>
+    <a routerLink="/admin/activites" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-hiking w-4 mr-2"></i> Lister les activités</a>
+    <a routerLink="/admin/activites/nouveau" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-plus w-4 mr-2"></i> Nouvelle activité</a>
 
     <div class="px-4 py-2 mt-2 text-xs font-bold text-white/50 uppercase tracking-wider">Réservations</div>
     <a routerLink="/admin/reservations" (click)="toggleMobileMenu()" class="px-4 py-2 text-white/80 text-sm hover:bg-white/10 rounded-md ml-2"><i class="fas fa-calendar-check w-4 mr-2"></i> Liste</a>

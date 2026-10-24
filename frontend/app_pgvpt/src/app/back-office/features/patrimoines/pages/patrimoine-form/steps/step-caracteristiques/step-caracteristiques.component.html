@@ -1,0 +1,418 @@
+<section [formGroup]="form" class="space-y-6 animate-fade-in">
+  <div class="border-b border-gray-100 pb-3 flex items-center justify-between">
+    <div>
+      <h2 class="text-base font-bold text-gray-900 flex items-center gap-2">
+        <i class="fas fa-sliders-h text-[#0b5d5e]"></i>
+        <span>2. Caractéristiques</span>
+      </h2>
+      <p class="text-xs text-gray-500 mt-0.5">Spécialisation selon le type sélectionné à l'Étape 1.</p>
+    </div>
+    <span *ngIf="form.get('type')?.value"
+      class="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+      Type : {{ form.get('type')?.value }}
+    </span>
+  </div>
+
+  <!-- Alerte si aucun type n'est sélectionné -->
+  <div *ngIf="!form.get('type')?.value"
+    class="p-5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <i class="fas fa-exclamation-triangle text-amber-600 text-base"></i>
+      <span>Veuillez sélectionner un <strong>Type</strong> à l'Étape 1 pour afficher les caractéristiques spécifiques.</span>
+    </div>
+    <button type="button" (click)="onGoToStep(1)"
+      class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg transition-colors shrink-0">
+      Retour à l'Étape 1
+    </button>
+  </div>
+
+  <!-- MONUMENT -->
+  <div *ngIf="form.get('type')?.value === 'MONUMENT'" class="space-y-4">
+    <div class="flex items-center gap-2 text-xs font-bold text-[#0b5d5e] uppercase tracking-wider pb-1 border-b border-gray-100">
+      <i class="fas fa-landmark"></i>
+      <span>Monument</span>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">
+          Style architectural <span class="text-rose-500 font-bold">*</span>
+        </label>
+        <input type="text" formControlName="styleArchitectural" placeholder="Ex: Colonial, Soudano-sahélien..."
+          class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#0b5d5e] focus:border-[#0b5d5e]">
+        <span *ngIf="form.get('styleArchitectural')?.touched && form.get('styleArchitectural')?.invalid"
+          class="text-[11px] text-rose-500 mt-1 block">
+          Le style architectural est obligatoire pour un monument.
+        </span>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Année de construction</label>
+        <input type="number" formControlName="anneeConstruction" placeholder="1776"
+          class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Année de rénovation</label>
+        <input type="number" formControlName="anneeRenovation" placeholder="1990"
+          class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Architecte</label>
+        <input type="text" formControlName="architecte" placeholder="Nom de l'architecte"
+          class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Identité de l'architecte</label>
+        <input type="text" formControlName="identiteArchitecte" placeholder="Nationalité, biographie..."
+          class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">
+          Nature du monument <span class="text-rose-500 font-bold">*</span>
+        </label>
+        <select formControlName="natureMonument"
+          class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#0b5d5e] focus:border-[#0b5d5e]">
+          <option value="">Sélectionner une nature</option>
+          <option value="MONUMENT_HISTORIQUE">Monument historique</option>
+          <option value="MONUMENT_COMMEMORATIF">Monument commémoratif</option>
+          <option value="EDIFICE_RELIGIEUX">Édifice religieux</option>
+          <option value="EDIFICE_COLONIAL">Édifice colonial</option>
+          <option value="EDIFICE_ADMINISTRATIF">Édifice administratif</option>
+          <option value="FORTIFICATION">Fortification</option>
+          <option value="PHARE">Phare</option>
+          <option value="PORTE_HISTORIQUE">Porte historique</option>
+          <option value="MAUSOLEE">Mausolée</option>
+          <option value="STATUE">Statue</option>
+          <option value="AUTRE">Autre</option>
+        </select>
+        <span *ngIf="form.get('natureMonument')?.touched && form.get('natureMonument')?.invalid"
+          class="text-[11px] text-rose-500 mt-1 block">
+          La nature du monument est obligatoire.
+        </span>
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Matériaux de construction</label>
+        <app-tag-input formControlName="materiauxConstruction" badgeColor="teal" placeholder="Ajouter un matériau (ex: Pierre de taille, Bois, Marbre)..."></app-tag-input>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Dimensions</label>
+        <input type="text" formControlName="dimensions" placeholder="Ex: 50m x 20m..."
+          class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Commanditaire</label>
+        <input type="text" formControlName="commanditaire" placeholder="Nom du commanditaire"
+          class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800">
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Contexte historique</label>
+        <textarea formControlName="contexteHistorique" rows="2" placeholder="Contexte de construction..."
+          class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800"></textarea>
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Personnages associés</label>
+        <app-tag-input formControlName="personnagesAssocies" badgeColor="amber" placeholder="Ajouter un personnage (ex: Léopold Sédar Senghor, Blaise Diagne)..."></app-tag-input>
+      </div>
+    </div>
+  </div>
+
+  <!-- MUSÉE -->
+  <div *ngIf="form.get('type')?.value === 'MUSEE'" class="space-y-4">
+    <div class="flex items-center gap-2 text-xs font-bold text-[#0b5d5e] uppercase tracking-wider pb-1 border-b border-gray-100">
+      <i class="fas fa-paint-brush"></i>
+      <span>Musée</span>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">
+          Nombre de collections <span class="text-rose-500">*</span>
+        </label>
+        <input type="number" formControlName="nombreCollections" min="0" placeholder="Ex: 5"
+          class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#0b5d5e] focus:border-[#0b5d5e]">
+        <span *ngIf="form.get('nombreCollections')?.touched && form.get('nombreCollections')?.invalid"
+          class="text-[11px] text-rose-500 mt-1 block">
+          Le nombre de collections est obligatoire pour un musée (minimum 0).
+        </span>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Nombre d'œuvres</label>
+        <input type="number" formControlName="nombreOeuvres" min="0" placeholder="Ex: 1200"
+          class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Capacité d'accueil</label>
+        <input type="number" formControlName="capaciteAccueil" min="0" placeholder="Ex: 350"
+          class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800">
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Muséographie</label>
+        <textarea formControlName="museographie" rows="3" placeholder="Parcours scénographique, audio-guides..."
+          class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800"></textarea>
+      </div>
+    </div>
+
+    <!-- Collections Dynamiques -->
+    <div class="pt-6 border-t border-gray-100" formArrayName="collections">
+      <div class="flex items-center justify-between mb-3">
+        <label class="block text-sm font-bold text-gray-700">Collections du Musée</label>
+        <button type="button" (click)="addCollection()"
+          class="text-xs text-[#0b5d5e] hover:underline font-bold flex items-center gap-1">
+          <i class="fas fa-plus"></i> Ajouter une collection
+        </button>
+      </div>
+      <div *ngFor="let col of collectionsArray.controls; let i = index" [formGroupName]="i" [id]="'collection-item-' + i"
+        class="bg-blue-50/50 p-4 rounded-xl mb-3 relative border border-blue-100">
+        <button type="button" (click)="removeCollection(i)"
+          class="absolute top-3 right-3 text-rose-500 hover:text-rose-700">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[11px] font-bold text-gray-500 mb-1">Nom de la collection</label>
+            <input type="text" formControlName="nom" class="w-full text-xs p-2 rounded-lg border border-gray-300">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-gray-500 mb-1">Période</label>
+            <input type="text" formControlName="periode" class="w-full text-xs p-2 rounded-lg border border-gray-300">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-gray-500 mb-1">Nombre d'œuvres</label>
+            <input type="number" formControlName="nombreOeuvres" class="w-full text-xs p-2 rounded-lg border border-gray-300">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-gray-500 mb-1">Origine</label>
+            <input type="text" formControlName="origine" class="w-full text-xs p-2 rounded-lg border border-gray-300">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-[11px] font-bold text-gray-500 mb-1">Thèmes de la collection</label>
+            <app-tag-input formControlName="themes" badgeColor="purple" placeholder="Ajouter un thème (ex: Histoire, Archéologie, Art contemporain)..."></app-tag-input>
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-[11px] font-bold text-gray-500 mb-1">Description</label>
+            <textarea formControlName="description" rows="2" class="w-full text-xs p-2 rounded-lg border border-gray-300"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-2">
+        <button type="button" (click)="addCollection()"
+          class="w-full py-2.5 px-4 rounded-xl border border-dashed border-[#0b5d5e]/30 text-[#0b5d5e] bg-[#0b5d5e]/5 hover:bg-[#0b5d5e]/10 hover:border-[#0b5d5e]/50 text-xs font-bold transition-all flex items-center justify-center gap-2">
+          <i class="fas fa-plus-circle text-sm"></i>
+          <span>Ajouter une collection</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SITE NATUREL -->
+  <div *ngIf="form.get('type')?.value === 'SITE_NATUREL'" class="space-y-4">
+    <div class="flex items-center gap-2 text-xs font-bold text-[#0b5d5e] uppercase tracking-wider pb-1 border-b border-gray-100">
+      <i class="fas fa-tree"></i>
+      <span>Site naturel</span>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">
+          Superficie (ha ou km²) <span class="text-rose-500 font-bold">*</span>
+        </label>
+        <input type="number" step="0.01" formControlName="superficie" placeholder="Ex: 9130"
+          class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#0b5d5e] focus:border-[#0b5d5e]">
+        <span *ngIf="form.get('superficie')?.touched && form.get('superficie')?.invalid"
+          class="text-[11px] text-rose-500 mt-1 block">
+          La superficie est obligatoire pour un site naturel.
+        </span>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">
+          Nature du site <span class="text-rose-500 font-bold">*</span>
+        </label>
+        <select formControlName="natureSite"
+          class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#0b5d5e] focus:border-[#0b5d5e]">
+          <option value="">Sélectionner une nature</option>
+          <option value="PARC_NATIONAL">Parc national</option>
+          <option value="RESERVE_NATURELLE">Réserve naturelle</option>
+          <option value="RESERVE_COMMUNAUTAIRE">Réserve communautaire</option>
+          <option value="AIRE_MARINE_PROTEGEE">Aire marine protégée</option>
+          <option value="FORET">Forêt</option>
+          <option value="MANGROVE">Mangrove</option>
+          <option value="LAC">Lac</option>
+          <option value="LAGON">Lagon</option>
+          <option value="FLEUVE">Fleuve</option>
+          <option value="CASCADE">Cascade</option>
+          <option value="PLAGE">Plage</option>
+          <option value="FALAISE">Falaise</option>
+          <option value="DESERT">Désert</option>
+          <option value="SAVANE">Savane</option>
+          <option value="ZONE_HUMIDE">Zone humide</option>
+          <option value="DELTA">Delta</option>
+          <option value="AUTRE">Autre</option>
+        </select>
+        <span *ngIf="form.get('natureSite')?.touched && form.get('natureSite')?.invalid"
+          class="text-[11px] text-rose-500 mt-1 block">
+          La nature du site est obligatoire.
+        </span>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">
+          Écosystème <span class="text-rose-500 font-bold">*</span>
+        </label>
+        <input type="text" formControlName="ecosysteme" placeholder="Ex: Mangrove, savane arborée..."
+          class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#0b5d5e] focus:border-[#0b5d5e]">
+        <span *ngIf="form.get('ecosysteme')?.touched && form.get('ecosysteme')?.invalid"
+          class="text-[11px] text-rose-500 mt-1 block">
+          L'écosystème est obligatoire pour un site naturel.
+        </span>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Biodiversité</label>
+        <input type="text" formControlName="biodiversite" placeholder="Richesse faunique et floristique..."
+          class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Zone protégée</label>
+        <select formControlName="zoneProtegee"
+          class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800">
+          <option [ngValue]="true">Oui</option>
+          <option [ngValue]="false">Non</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Catégorie de protection</label>
+        <input type="text" formControlName="categorieProtection" placeholder="Ex: Réserve de biosphère..."
+          class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl text-gray-800">
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Risques environnementaux</label>
+        <app-tag-input formControlName="risquesEnvironnementaux" badgeColor="rose" placeholder="Ajouter un risque (ex: Érosion côtière, Braconnage, Pollution)..."></app-tag-input>
+      </div>
+    </div>
+
+    <!-- Espèces Protégées Dynamiques -->
+    <div class="pt-6 border-t border-gray-100" formArrayName="especesProtegees">
+      <div class="flex items-center justify-between mb-3">
+        <label class="block text-sm font-bold text-gray-700">Espèces protégées</label>
+        <button type="button" (click)="addEspeceProtegee()"
+          class="text-xs text-[#0b5d5e] hover:underline font-bold flex items-center gap-1">
+          <i class="fas fa-plus"></i> Ajouter une espèce
+        </button>
+      </div>
+      <div *ngFor="let ep of especesProtegeesArray.controls; let i = index" [formGroupName]="i" [id]="'espece-item-' + i"
+        class="bg-emerald-50/50 p-4 rounded-xl mb-3 relative border border-emerald-100">
+        <button type="button" (click)="removeEspeceProtegee(i)"
+          class="absolute top-3 right-3 text-rose-500 hover:text-rose-700">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-[11px] font-bold text-gray-500 mb-1">Nom commun</label>
+            <input type="text" formControlName="nomCommun" class="w-full text-xs p-2 rounded-lg border border-gray-300">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-gray-500 mb-1">Nom scientifique</label>
+            <input type="text" formControlName="nomScientifique" class="w-full text-xs p-2 rounded-lg border border-gray-300">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-gray-500 mb-1">Nom local</label>
+            <input type="text" formControlName="nomLocal" class="w-full text-xs p-2 rounded-lg border border-gray-300">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-gray-500 mb-1">Type d'espèce</label>
+            <select formControlName="type" class="w-full text-xs p-2 rounded-lg border border-gray-300">
+              <option value="FAUNE">Faune</option>
+              <option value="FLORE">Flore</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-gray-500 mb-1">Statut conservation</label>
+            <input type="text" formControlName="statutConservation" class="w-full text-xs p-2 rounded-lg border border-gray-300">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-gray-500 mb-1">Niveau protection</label>
+            <input type="text" formControlName="niveauProtection" class="w-full text-xs p-2 rounded-lg border border-gray-300">
+          </div>
+          <div class="md:col-span-3">
+            <label class="block text-[11px] font-bold text-gray-500 mb-1">Description</label>
+            <textarea formControlName="description" rows="2" class="w-full text-xs p-2 rounded-lg border border-gray-300"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-2">
+        <button type="button" (click)="addEspeceProtegee()"
+          class="w-full py-2.5 px-4 rounded-xl border border-dashed border-[#0b5d5e]/30 text-[#0b5d5e] bg-[#0b5d5e]/5 hover:bg-[#0b5d5e]/10 hover:border-[#0b5d5e]/50 text-xs font-bold transition-all flex items-center justify-center gap-2">
+          <i class="fas fa-plus-circle text-sm"></i>
+          <span>Ajouter une espèce protégée</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accessibilité -->
+  <div class="mt-8">
+    <div formGroupName="accessibilite" class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+      <div class="col-span-full">
+        <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Accessibilité</h4>
+      </div>
+      
+      <label class="inline-flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" formControlName="accessiblePublic" class="w-4 h-4 rounded text-[#0b5d5e] border-gray-300 focus:ring-[#0b5d5e]">
+        <span class="text-xs font-medium text-gray-700">Accessible public</span>
+      </label>
+      <label class="inline-flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" formControlName="accessibilitePMR" class="w-4 h-4 rounded text-[#0b5d5e] border-gray-300 focus:ring-[#0b5d5e]">
+        <span class="text-xs font-medium text-gray-700">Accessible PMR</span>
+      </label>
+      <label class="inline-flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" formControlName="accesFauteuilRoulant" class="w-4 h-4 rounded text-[#0b5d5e] border-gray-300 focus:ring-[#0b5d5e]">
+        <span class="text-xs font-medium text-gray-700">Fauteuil Roulant</span>
+      </label>
+      <label class="inline-flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" formControlName="accesTransportPublic" class="w-4 h-4 rounded text-[#0b5d5e] border-gray-300 focus:ring-[#0b5d5e]">
+        <span class="text-xs font-medium text-gray-700">Transport Public</span>
+      </label>
+      <label class="inline-flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" formControlName="parking" class="w-4 h-4 rounded text-[#0b5d5e] border-gray-300 focus:ring-[#0b5d5e]">
+        <span class="text-xs font-medium text-gray-700">Parking</span>
+      </label>
+      <label class="inline-flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" formControlName="guideDisponible" class="w-4 h-4 rounded text-[#0b5d5e] border-gray-300 focus:ring-[#0b5d5e]">
+        <span class="text-xs font-medium text-gray-700">Guide disponible</span>
+      </label>
+      <label class="inline-flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" formControlName="guideAudio" class="w-4 h-4 rounded text-[#0b5d5e] border-gray-300 focus:ring-[#0b5d5e]">
+        <span class="text-xs font-medium text-gray-700">Guide audio</span>
+      </label>
+      <label class="inline-flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" formControlName="accesEnfant" class="w-4 h-4 rounded text-[#0b5d5e] border-gray-300 focus:ring-[#0b5d5e]">
+        <span class="text-xs font-medium text-gray-700">Accès Enfant</span>
+      </label>
+
+      <div class="md:col-span-4 mt-2">
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Conditions d'accès</label>
+        <textarea formControlName="conditionsAcces" rows="2" placeholder="Détails sur l'accès..." class="w-full px-4 py-2 text-xs border border-gray-300 rounded-lg"></textarea>
+      </div>
+      
+      <div class="md:col-span-2 mt-2">
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Langues de visite</label>
+        <app-tag-input formControlName="langueVisite" badgeColor="blue" placeholder="Ajouter une langue (ex: Français, Wolof, Anglais)..."></app-tag-input>
+      </div>
+
+      <div class="md:col-span-2 mt-2">
+        <label class="block text-xs font-bold text-gray-700 mb-1.5">Restrictions d'accès</label>
+        <app-tag-input formControlName="restrictions" badgeColor="amber" placeholder="Ajouter une restriction (ex: Interdit aux animaux, Pas de photos)..."></app-tag-input>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation de bas d'étape 2 -->
+  <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
+    <button type="button" (click)="onPrev()"
+      class="px-4 py-2 text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors flex items-center gap-1.5">
+      <i class="fas fa-arrow-left text-[10px]"></i>
+      <span>Précédent</span>
+    </button>
+    <button type="button" (click)="onNext()"
+      class="px-5 py-2.5 bg-[#0b5d5e] hover:bg-[#084b4c] text-white text-xs font-semibold rounded-xl shadow-sm transition-all flex items-center gap-2">
+      <span>Suivant : 3. Histoire & culture</span>
+      <i class="fas fa-arrow-right text-[10px]"></i>
+    </button>
+  </div>
+</section>

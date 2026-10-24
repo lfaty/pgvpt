@@ -5,6 +5,9 @@ import com.pgvpt.exception.ResourceNotFoundException;
 import com.pgvpt.mapper.GeolocalisationMapper;
 import com.pgvpt.model.GeolocalisationEntity;
 import com.pgvpt.model.PointAccesEntity;
+import com.pgvpt.model.ZoneTouristiqueEntity;
+import com.pgvpt.model.VillageEntity;
+import com.pgvpt.model.QuartierEntity;
 import com.pgvpt.record.GeolocalisationSearchCriteria;
 import com.pgvpt.repository.*;
 import com.pgvpt.dto.*;
@@ -13,7 +16,6 @@ import com.pgvpt.client.PatrimoineClient;
 import feign.FeignException;
 
 import jakarta.persistence.criteria.Predicate;
-import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.Point; // Import unique et strict pour le géospatial
 import org.springframework.data.domain.Page;
@@ -26,16 +28,35 @@ import java.util.*;
 
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class GeolocalisationServiceImpl implements GeolocalisationService {
 
     private final GeolocalisationRepository geolocalisationRepository;
     private final PointAccesRepository pointAccesRepository;
+    private final ZoneTouristiqueRepository zoneTouristiqueRepository;
+    private final VillageRepository villageRepository;
+    private final QuartierRepository quartierRepository;
     private final GeolocalisationMapper mapper;
     private final PatrimoineClient patrimoineClient;
 
     private final GeometryFactory gf = new GeometryFactory(new PrecisionModel(), 4326);
+
+    public GeolocalisationServiceImpl(
+            GeolocalisationRepository geolocalisationRepository,
+            PointAccesRepository pointAccesRepository,
+            ZoneTouristiqueRepository zoneTouristiqueRepository,
+            VillageRepository villageRepository,
+            QuartierRepository quartierRepository,
+            GeolocalisationMapper mapper,
+            PatrimoineClient patrimoineClient) {
+        this.geolocalisationRepository = geolocalisationRepository;
+        this.pointAccesRepository = pointAccesRepository;
+        this.zoneTouristiqueRepository = zoneTouristiqueRepository;
+        this.villageRepository = villageRepository;
+        this.quartierRepository = quartierRepository;
+        this.mapper = mapper;
+        this.patrimoineClient = patrimoineClient;
+    }
 
 
     @Override
@@ -69,6 +90,7 @@ public class GeolocalisationServiceImpl implements GeolocalisationService {
 
         GeolocalisationEntity entity = mapper.toEntity(dto);
         entity.setGeom(createSafePoint(dto.getLatitude(), dto.getLongitude()));
+        resolveRelationships(dto.getZoneTouristiqueId(), dto.getVillageId(), dto.getQuartierId(), entity, true);
 
         return mapper.toDto(geolocalisationRepository.save(entity));
     }
@@ -76,13 +98,14 @@ public class GeolocalisationServiceImpl implements GeolocalisationService {
     @Override
     @Transactional
     public Geolocalisation update(UUID id, GeolocalisationUpdate dto) {
-        validateOneOfConstraint(dto.getPatrimoineId(), dto.getEntrepriseId());
+        validateOneOfConstraint(dto.getPatrimoineId(), dto.getEntrepriseId(), id);
 
         GeolocalisationEntity entity = geolocalisationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Géolocalisation introuvable"));
 
         mapper.updateEntity(dto, entity);
         entity.setGeom(createSafePoint(entity.getLatitude(), entity.getLongitude()));
+        resolveRelationships(dto.getZoneTouristiqueId(), dto.getVillageId(), dto.getQuartierId(), entity, false);
 
         return mapper.toDto(geolocalisationRepository.save(entity));
     }
@@ -109,8 +132,29 @@ public class GeolocalisationServiceImpl implements GeolocalisationService {
 
         mapper.updateEntity(dto, entity);
         entity.setGeom(createSafePoint(entity.getLatitude(), entity.getLongitude()));
+        resolveRelationships(dto.getZoneTouristiqueId(), dto.getVillageId(), dto.getQuartierId(), entity, false);
 
         return mapper.toDto(geolocalisationRepository.save(entity));
+    }
+
+    private void resolveRelationships(UUID zoneTouristiqueId, UUID villageId, UUID quartierId, GeolocalisationEntity entity, boolean zoneObligatoire) {
+        if (zoneTouristiqueId != null) {
+            ZoneTouristiqueEntity zone = zoneTouristiqueRepository.findById(zoneTouristiqueId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Zone touristique introuvable avec l'ID : " + zoneTouristiqueId));
+            entity.setZoneTouristique(zone);
+        }
+
+        if (villageId != null) {
+            VillageEntity village = villageRepository.findById(villageId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Village introuvable avec l'ID : " + villageId));
+            entity.setVillage(village);
+        }
+
+        if (quartierId != null) {
+            QuartierEntity quartier = quartierRepository.findById(quartierId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Quartier introuvable avec l'ID : " + quartierId));
+            entity.setQuartier(quartier);
+        }
     }
 
     @Override
@@ -329,13 +373,17 @@ public class GeolocalisationServiceImpl implements GeolocalisationService {
     }
 
     private void validateOneOfConstraint(UUID patrimoineId, UUID entrepriseId) {
+        validateOneOfConstraint(patrimoineId, entrepriseId, null);
+    }
+
+    private void validateOneOfConstraint(UUID patrimoineId, UUID entrepriseId, UUID currentEntityId) {
         if ((patrimoineId == null && entrepriseId == null) || (patrimoineId != null && entrepriseId != null)) {
             throw new BusinessException("Une géolocalisation doit cibler SOIT un patrimoine, SOIT une entreprise.");
         }
 
         if (patrimoineId != null) {
-
-            if (geolocalisationRepository.existsByPatrimoineId(patrimoineId)) {
+            java.util.Optional<GeolocalisationEntity> existing = geolocalisationRepository.findByPatrimoineId(patrimoineId);
+            if (existing.isPresent() && (currentEntityId == null || !existing.get().getId().equals(currentEntityId))) {
                 throw new BusinessException("Le patrimoine avec l'ID " + patrimoineId + " possède déjà une géolocalisation.");
             }
 

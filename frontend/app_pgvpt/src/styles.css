@@ -82,7 +82,7 @@ h2 { margin: 0 0 6px; font-size: 20px; }
   padding: 11px 16px;
   font-weight: 700;
 }
-.actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+.actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
 .primary { background: var(--primary); color: #fff; }
 .secondary { background: #eef2f4; color: #344054; }
 .danger { background: #fff0f0; color: var(--danger); }
@@ -95,4 +95,6 @@ h2 { margin: 0 0 6px; font-size: 20px; }
 /* --- RESPONSIVE --- */
 @media(max-width: 760px) {
   .grid-form, .grid-form-3 { grid-template-columns: 1fr; }
+  .actions { justify-content: stretch; }
+  .actions button { flex: 1 1 auto; }
 }

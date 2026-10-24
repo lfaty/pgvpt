@@ -1,0 +1,56 @@
+<div class="relative bg-gradient-to-b from-white via-[#FDFCF9] to-[#FAFAF9] pt-14 pb-20 px-6 border-b border-gray-200/60" *ngIf="contenu">
+  <div class="max-w-4xl mx-auto">
+    
+    <!-- Badges Type, Langue & Temps de lecture -->
+    <div class="flex flex-wrap items-center gap-2.5 mb-6">
+      <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#0b5d5e]/10 text-[#0b5d5e] text-xs font-bold tracking-wide">
+        <i class="fas" [ngClass]="getContenuTypeIcon(contenu.type)"></i>
+        {{ getContenuTypeLabel(contenu.type) }}
+      </span>
+
+      <span *ngIf="contenu.langue" class="px-2.5 py-0.5 rounded-md bg-gray-100 text-gray-700 text-[11px] font-mono uppercase font-bold">
+        {{ contenu.langue === 'fr' ? 'Français' : (contenu.langue === 'wo' ? 'Wolof' : contenu.langue) }}
+      </span>
+
+      <span class="text-xs text-gray-300">•</span>
+      <span class="text-xs text-gray-500 font-medium flex items-center gap-1">
+        <i class="far fa-clock text-gray-400"></i> {{ getReadingTime(contenu.corps) }} min de lecture
+      </span>
+
+      <span class="text-xs text-gray-300">•</span>
+      <span class="text-xs text-gray-500 font-medium">
+        <i class="far fa-calendar-alt text-gray-400 mr-1"></i> Publié le {{ (contenu.createdAt | date:'d MMMM y') || 'Récemment' }}
+      </span>
+    </div>
+
+    <!-- Grand Titre éditorial -->
+    <h1 class="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.15] tracking-tight mb-8">
+      {{ contenu.titre }}
+    </h1>
+
+    <!-- Chapeau de l'article (Résumé) en exergue -->
+    <div *ngIf="contenu.resume"
+         class="font-serif text-lg sm:text-2xl text-gray-700 italic leading-relaxed border-l-4 border-[#D16933] pl-6 sm:pl-8 py-3 bg-[#D16933]/5 rounded-r-2xl mb-10 shadow-2xs">
+      {{ contenu.resume }}
+    </div>
+
+    <!-- Signature institutionnelle & scientifique -->
+    <div class="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-gray-200/80 text-xs text-gray-500">
+      <div class="flex items-center gap-3.5">
+        <div class="w-11 h-11 rounded-full bg-gradient-to-tr from-[#0b5d5e] to-[#087F5B] text-white flex items-center justify-center text-base font-bold shadow-xs">
+          <i class="fas fa-feather-pointed"></i>
+        </div>
+        <div>
+          <div class="font-bold text-gray-900 text-sm">Inventaire du Patrimoine Culturel</div>
+          <div class="text-[11px] text-gray-500">PGVPT • République du Sénégal</div>
+        </div>
+      </div>
+
+      <div *ngIf="patrimoine" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 text-xs font-medium">
+        <i class="fas fa-landmark text-[#0b5d5e]"></i>
+        <span>Site associé : <strong>{{ patrimoine.nom }}</strong></span>
+      </div>
+    </div>
+
+  </div>
+</div>

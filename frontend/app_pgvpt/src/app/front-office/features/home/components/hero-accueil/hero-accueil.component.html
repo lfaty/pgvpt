@@ -1,0 +1,65 @@
+<section class="hero">
+  <div class="hero-bg">
+    <ng-container *ngFor="let img of heroImages; let i = index">
+      <img [src]="img" [alt]="'Sénégal ' + i"
+        class="hero-bg-img"
+        [class.hero-bg-img--active]="currentHeroIndex === i">
+    </ng-container>
+    <div class="hero-gradient-overlay"></div>
+  </div>
+
+  <div class="hero-content">
+    <span class="hero-badge"><i class="fa-solid fa-earth-africa mr-2 text-secondary"></i> Portail National du Patrimoine Sénégalais</span>
+    <h1 class="hero-title">Découvrez l'Âme &amp; la Mémoire du Sénégal</h1>
+    <p class="hero-subtitle">
+      Parcourez les trésors millénaires, les réserves naturelles et les sanctuaires vivants de la Teranga à travers un regard scientifique et immersif.
+    </p>
+
+    <!-- Search Bar -->
+    <div class="hero-search-wrapper">
+      <div class="hero-search">
+        <div class="search-field">
+          <i class="fa-solid fa-magnifying-glass search-field-icon"></i>
+          <input type="text" [ngModel]="searchQuery" (ngModelChange)="onQueryChange($event)" placeholder="Rechercher un monument, une île, une réserve..." class="search-field-input" (keyup.enter)="onSearch()">
+        </div>
+        <button class="search-button" (click)="onSearch()">
+          <span>Explorer</span>
+          <i class="fa-solid fa-arrow-right ml-2"></i>
+        </button>
+      </div>
+
+      <!-- Quick Tags -->
+      <div class="hero-quick-tags">
+        <span class="quick-tags-label"><i class="fa-solid fa-compass mr-1 text-xs"></i> Suggestions :</span>
+        <button type="button" class="quick-tag-chip" (click)="quickSearch('Gorée')">Île de Gorée</button>
+        <button type="button" class="quick-tag-chip" (click)="quickSearch('Saint-Louis')">Saint-Louis</button>
+        <button type="button" class="quick-tag-chip" (click)="quickSearch('Saloum')">Delta du Saloum</button>
+        <button type="button" class="quick-tag-chip" (click)="quickSearch('Djoudj')">Parc du Djoudj</button>
+        <button type="button" class="quick-tag-chip" (click)="quickSearch('Casamance')">Casamance</button>
+      </div>
+    </div>
+
+    <!-- Hero Stats Ribbon (dynamique & interactif) -->
+    <div class="hero-stats-ribbon">
+      <div class="stat-ribbon-item" (click)="filterUnesco()" role="button" tabindex="0" title="Voir les sites classés UNESCO">
+        <span class="stat-number">{{ unescoCount }}</span>
+        <span class="stat-label">Sites classés UNESCO</span>
+      </div>
+      <div class="stat-ribbon-divider"></div>
+      <div class="stat-ribbon-item" (click)="scrollToSection('senegal-map')" role="button" tabindex="0" title="Explorer la géographie des régions">
+        <span class="stat-number">{{ regionsCount }}</span>
+        <span class="stat-label">Régions documentées</span>
+      </div>
+      <div class="stat-ribbon-divider"></div>
+      <div class="stat-ribbon-item" (click)="goToCatalogue()" role="button" tabindex="0" title="Explorer les archives & médias">
+        <span class="stat-number">{{ totalMedias }}</span>
+        <span class="stat-label">Archives &amp; Médias HD</span>
+      </div>
+      <div class="stat-ribbon-divider"></div>
+      <div class="stat-ribbon-item" (click)="scrollToSection('recits-section')" role="button" tabindex="0" title="Découvrir les chroniques & récits">
+        <span class="stat-number">{{ totalContenus }}</span>
+        <span class="stat-label">Récits &amp; Guides vivants</span>
+      </div>
+    </div>
+  </div>
+</section>

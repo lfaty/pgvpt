@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.UUID;
 
-@FeignClient(name = "ms-geolocalisation", url = "http://localhost:3002", contextId = "GeolocalisationClient")
+@FeignClient(name = "ms-geolocalisation", contextId = "geolocalisationClient")
 public interface GeolocalisationClient {
 
-    @GetMapping("/patrimoines/{patrimoineId}/geolocalisation")
+    @GetMapping("/api/v1/geolocalisations/patrimoines/{patrimoineId}/geolocalisation")
     GeolocalisationResponse getByPatrimoine(@PathVariable("patrimoineId") UUID patrimoineId);
 }

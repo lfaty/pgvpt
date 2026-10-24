@@ -3,7 +3,6 @@ package com.pgvpt.controller;
 import com.pgvpt.api.*;
 import com.pgvpt.dto.*;
 import com.pgvpt.service.ZoneService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -14,10 +13,13 @@ import java.util.UUID;
 
 
 @RestController
-@RequiredArgsConstructor
 public class ZoneGeographiqueController implements ZoneGeographiqueApi {
 
     private final ZoneService service;
+
+    public ZoneGeographiqueController(ZoneService service) {
+        this.service = service;
+    }
 
     @Override
     public ResponseEntity<ZoneGeographique> createZoneGeographique(ZoneGeographiqueCreate zoneGeographiqueCreate) {

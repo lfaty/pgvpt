@@ -1,0 +1,99 @@
+/* =============================================
+   5. CIRCUITS TOURISTIQUES
+   ============================================= */
+.circuits-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 32px;
+}
+
+@media (min-width: 768px) {
+  .circuits-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.circuit-card {
+  background: #ffffff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+}
+
+.circuit-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.circuit-image {
+  position: relative;
+  height: 260px;
+}
+
+.circuit-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.circuit-image-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 20px;
+}
+
+.circuit-duration-badge {
+  align-self: flex-start;
+  background: #D97706;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.circuit-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.circuit-body {
+  padding: 24px;
+}
+
+.circuit-desc {
+  font-size: 0.9rem;
+  color: #6B7280;
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+
+.circuit-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #F3F4F6;
+  padding-top: 16px;
+}
+
+.circuit-difficulty {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #9CA3AF;
+  text-transform: uppercase;
+}
+
+.circuit-price {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1E3A8A;
+}

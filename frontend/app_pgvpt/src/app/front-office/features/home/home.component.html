@@ -1,367 +1,53 @@
 <div class="home-page">
+  <!-- Alerte Backend Inaccessible -->
+  <div *ngIf="backendError" class="bg-rose-600 text-white px-4 py-2.5 text-center text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 shadow-sm">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <span>Serveur backend non détecté ou inaccessible — Les données dynamiques ne peuvent pas être chargées.</span>
+  </div>
 
-  <!-- 1. HERO -->
-  <section class="hero">
-    <div class="hero-bg">
-      <ng-container *ngFor="let img of heroImages; let i = index">
-        <img [src]="img" [alt]="'Sénégal ' + i"
-          class="hero-bg-img"
-          [class.hero-bg-img--active]="currentHeroIndex === i">
-      </ng-container>
-      <div class="hero-gradient-overlay"></div>
-    </div>
+  <!-- 1. HERO ACCUEIL -->
+  <app-hero-accueil
+    [heroImages]="heroImages"
+    [currentHeroIndex]="currentHeroIndex"
+    [(searchQuery)]="searchQuery"
+    [unescoCount]="unescoCount"
+    [regionsCount]="regionsCount"
+    [totalMedias]="totalMedias"
+    [totalContenus]="totalContenus"
+    [patrimoinesLength]="patrimoines.length"
+    (search)="onSearch()"
+    (quickSearchEvent)="quickSearch($event)"
+    (filterUnescoEvent)="filterUnesco()"
+    (scrollToSectionEvent)="scrollToSection($event)"
+    (goToCatalogueEvent)="goToCatalogue()">
+  </app-hero-accueil>
 
-    <div class="hero-content">
-      <span class="hero-badge"><i class="fa-solid fa-earth-africa mr-2 text-secondary"></i> Portail National du Patrimoine Sénégalais</span>
-      <h1 class="hero-title">Découvrez l'Âme &amp; la Mémoire du Sénégal</h1>
-      <p class="hero-subtitle">
-        Parcourez les trésors millénaires, les réserves naturelles et les sanctuaires vivants de la Teranga à travers un regard scientifique et immersif.
-      </p>
+  <!-- 2. BARRE DES CATÉGORIES -->
+  <app-barre-categories></app-barre-categories>
 
-      <!-- Search Bar -->
-      <div class="hero-search-wrapper">
-        <div class="hero-search">
-          <div class="search-field">
-            <i class="fa-solid fa-magnifying-glass search-field-icon"></i>
-            <input type="text" [(ngModel)]="searchQuery" placeholder="Rechercher un monument, une île, une réserve..." class="search-field-input" (keyup.enter)="onSearch()">
-          </div>
-          <button class="search-button" (click)="onSearch()">
-            <span>Explorer</span>
-            <i class="fa-solid fa-arrow-right ml-2"></i>
-          </button>
-        </div>
+  <!-- 3. CARROUSELS DE PATRIMOINES -->
+  <app-carrousel-patrimoines
+    [categoriesGroups]="categoriesGroups">
+  </app-carrousel-patrimoines>
 
-        <!-- Quick Tags -->
-        <div class="hero-quick-tags">
-          <span class="quick-tags-label"><i class="fa-solid fa-compass mr-1 text-xs"></i> Suggestions :</span>
-          <button type="button" class="quick-tag-chip" (click)="quickSearch('Gorée')">Île de Gorée</button>
-          <button type="button" class="quick-tag-chip" (click)="quickSearch('Saint-Louis')">Saint-Louis</button>
-          <button type="button" class="quick-tag-chip" (click)="quickSearch('Saloum')">Delta du Saloum</button>
-          <button type="button" class="quick-tag-chip" (click)="quickSearch('Djoudj')">Parc du Djoudj</button>
-          <button type="button" class="quick-tag-chip" (click)="quickSearch('Casamance')">Casamance</button>
-        </div>
-      </div>
+  <!-- 4. CARTE INTERACTIVE ACCUEIL -->
+  <app-carte-interactive-accueil
+    [patrimoines]="patrimoines">
+  </app-carte-interactive-accueil>
 
-      <!-- Hero Stats Ribbon (dynamique & interactif) -->
-      <div class="hero-stats-ribbon">
-        <div class="stat-ribbon-item" (click)="filterUnesco()" role="button" tabindex="0" title="Voir les sites classés UNESCO">
-          <span class="stat-number">{{ unescoCount > 0 ? unescoCount : (patrimoines.length > 0 ? unescoCount : '7') }}</span>
-          <span class="stat-label">Sites classés UNESCO</span>
-        </div>
-        <div class="stat-ribbon-divider"></div>
-        <div class="stat-ribbon-item" (click)="scrollToSection('senegal-map')" role="button" tabindex="0" title="Explorer la géographie des régions">
-          <span class="stat-number">{{ regionsCount > 0 ? regionsCount : '14' }}</span>
-          <span class="stat-label">Régions documentées</span>
-        </div>
-        <div class="stat-ribbon-divider"></div>
-        <div class="stat-ribbon-item" (click)="goToCatalogue()" role="button" tabindex="0" title="Explorer les archives & médias">
-          <span class="stat-number">{{ totalMedias > 0 ? totalMedias : '100%' }}</span>
-          <span class="stat-label">Archives &amp; Médias HD</span>
-        </div>
-        <div class="stat-ribbon-divider"></div>
-        <div class="stat-ribbon-item" (click)="scrollToSection('recits-section')" role="button" tabindex="0" title="Découvrir les chroniques & récits">
-          <span class="stat-number">{{ totalContenus > 0 ? totalContenus : 'Libre' }}</span>
-          <span class="stat-label">Récits &amp; Guides vivants</span>
-        </div>
-      </div>
-    </div>
-  </section>
+  <!-- 5. CIRCUITS TOURISTIQUES -->
+  <app-section-circuits
+    [circuits]="circuits">
+  </app-section-circuits>
 
-  <!-- 2. CATEGORIES BAR -->
-  <section class="categories-section">
-    <div class="categories-container">
-      <div class="categories-bar">
+  <!-- 6. CHRONIQUES ET RÉCITS -->
+  <app-section-chroniques
+    [recentContenus]="recentContenus"
+    [patrimoines]="patrimoines"
+    [allMedias]="allMedias">
+  </app-section-chroniques>
 
-        <a routerLink="/patrimoines" [queryParams]="{category: 'PATRIMOINE_CULTUREL'}" class="category-item">
-          <div class="category-icon category-icon--amber"><i class="fa-solid fa-landmark text-2xl"></i></div>
-          <div class="category-meta">
-            <span class="category-label">Culturel</span>
-            <span class="category-sub">Monuments &amp; Cités</span>
-          </div>
-        </a>
-
-        <a routerLink="/patrimoines" [queryParams]="{category: 'PATRIMOINE_NATUREL'}" class="category-item">
-          <div class="category-icon category-icon--green"><i class="fa-solid fa-leaf text-2xl"></i></div>
-          <div class="category-meta">
-            <span class="category-label">Naturel</span>
-            <span class="category-sub">Parcs &amp; Réserves</span>
-          </div>
-        </a>
-
-        <a routerLink="/patrimoines" [queryParams]="{category: 'PATRIMOINE_MEMORIEL'}" class="category-item">
-          <div class="category-icon category-icon--red"><i class="fa-solid fa-dove text-2xl"></i></div>
-          <div class="category-meta">
-            <span class="category-label">Mémoriel</span>
-            <span class="category-sub">Lieux de Mémoire</span>
-          </div>
-        </a>
-
-        <a routerLink="/patrimoines" [queryParams]="{category: 'PATRIMOINE_COLONIAL'}" class="category-item">
-          <div class="category-icon category-icon--blue"><i class="fa-solid fa-monument text-2xl"></i></div>
-          <div class="category-meta">
-            <span class="category-label">Colonial &amp; Urbain</span>
-            <span class="category-sub">Comptoirs &amp; Architecture</span>
-          </div>
-        </a>
-
-        <a routerLink="/patrimoines" [queryParams]="{category: 'PATRIMOINE_RELIGIEUX'}" class="category-item">
-          <div class="category-icon category-icon--purple"><i class="fa-solid fa-mosque text-2xl"></i></div>
-          <div class="category-meta">
-            <span class="category-label">Spirituel</span>
-            <span class="category-sub">Sanctuaires sacrés</span>
-          </div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- 3. CARROUSELS DYNAMIQUES PAR CATÉGORIE -->
-  <ng-container *ngFor="let group of categoriesGroups">
-    <section class="section group-carousel" [ngClass]="getCategoryTheme(group.categoryId).bgClass" *ngIf="group.items.length > 0">
-      <div class="section-container">
-        <div class="section-header">
-          <div>
-            <h2 class="section-title">Patrimoine {{ group.label.toLowerCase() }}</h2>
-            <p class="section-subtitle">Explorez les trésors de la catégorie {{ group.label }}.</p>
-          </div>
-          <a routerLink="/patrimoines" [queryParams]="{category: group.categoryId}" class="section-link">
-            Voir tout
-            <i class="fa-solid fa-arrow-right link-arrow"></i>
-          </a>
-        </div>
-
-        <div class="carousel-container-premium">
-          <div class="patrimoines-grid-carousel" #catCarousel>
-            <div *ngFor="let item of group.items" class="patrimoine-mini-card" [routerLink]="['/patrimoines', item.id]">
-              <div class="mini-card-image">
-                <img [src]="item.imageUrl || (item.photoPrincipale) || 'assets/images/activite_saloum.jpg'" [alt]="item.nom" loading="lazy">
-                <div class="mini-card-type-badge" [ngClass]="getCategoryTheme(group.categoryId).badgeClass">{{ group.label }}</div>
-              </div>
-              <div class="mini-card-body">
-                <div class="mini-card-top-row">
-                  <p class="mini-card-location">
-                    <i class="fa-solid fa-location-dot mini-loc-icon mr-1"></i>
-                    {{ item.region || 'Sénégal' }}
-                  </p>
-                </div>
-                <h3 class="mini-card-title">{{ item.nom }}</h3>
-                <p class="mini-card-desc">{{ item.descriptionCourte || item.description }}</p>
-                <div class="mini-card-cta-row">
-                  <span class="mini-card-cta-text">Découvrir le site</span>
-                  <i class="fa-solid fa-arrow-right mini-card-cta-arrow ml-1"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Boutons de navigation en bas du carrousel, côte à côte et visibles -->
-          <div class="carousel-controls-bottom">
-            <button class="carousel-nav-btn" (click)="scrollCarousel(catCarousel, -1)" aria-label="Défiler à gauche" title="Précédent">
-              <i class="fa-solid fa-chevron-left text-lg"></i>
-            </button>
-            <button class="carousel-nav-btn" (click)="scrollCarousel(catCarousel, 1)" aria-label="Défiler à droite" title="Suivant">
-              <i class="fa-solid fa-chevron-right text-lg"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-  </ng-container>
-
-  <!-- État vide (Si aucun patrimoine dans la BDD) -->
-  <section class="section" *ngIf="categoriesGroups.length === 0">
-    <div class="section-container flex flex-col items-center justify-center py-20 px-6 bg-[#F6F4EE] rounded-[24px] border border-dashed border-gray-300 text-center fade-slide-up">
-      <div class="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-sm mb-6">
-         <i class="fa-solid fa-person-digging text-[#D16933] text-4xl"></i>
-      </div>
-      <h3 class="font-serif text-3xl font-bold text-gray-900 mb-4">Le catalogue est en cours de création</h3>
-      <p class="text-base text-gray-600 max-w-xl">
-         Notre équipe d'experts est actuellement sur le terrain pour recenser et documenter les plus beaux patrimoines du Sénégal. Les premières fiches interactives seront publiées très prochainement !
-      </p>
-    </div>
-  </section>
-
-  <!-- 4. CARTE INTERACTIVE -->
-  <section class="section section--light section--map-showcase">
-    <div class="section-container">
-      <div class="section-header section-header--center">
-        <div class="map-section-badge">
-          <span class="map-badge-pulse"></span>
-          GÉOGRAPHIE CULTURELLE &amp; VISITES
-        </div>
-        <h2 class="section-title">Cartographie des Trésors du Sénégal</h2>
-        <p class="section-subtitle">Visualisez la répartition géographique des patrimoines naturels, culturels et mémoriels sur l'ensemble des 14 régions.</p>
-      </div>
-
-      <div class="map-wrapper-luxury">
-        <div class="map-layout-modern">
-
-          <!-- Controls Panel -->
-          <div class="map-controls-panel">
-            <div class="panel-header-row">
-              <div class="panel-title-wrap">
-                <i class="fa-solid fa-sliders text-[#0B5D5E] mr-2"></i>
-                <span>Filtres thématiques</span>
-              </div>
-              <button type="button" class="reset-filter-btn" (click)="resetFilters()" title="Réinitialiser tous les filtres">
-                <i class="fa-solid fa-rotate-left mr-1 text-xs"></i>
-                Réinitialiser
-              </button>
-            </div>
-
-            <!-- Categories Interactive Pills -->
-            <div class="filter-pills-list">
-              <button 
-                *ngFor="let cat of categoriesList" 
-                type="button"
-                class="category-filter-pill"
-                [class.pill--active]="filterCategories[cat.key]"
-                (click)="toggleCategoryFilter(cat.key)">
-                <span class="pill-dot" [style.background-color]="cat.color"></span>
-                <span class="pill-label"><i [class]="cat.icon" class="mr-1.5 text-xs"></i> {{ cat.label }}</span>
-                <span class="pill-count">{{ getCategoryCount(cat.key) }}</span>
-              </button>
-            </div>
-
-            <!-- Region selector -->
-            <div class="region-filter-wrapper">
-              <label class="region-filter-label">
-                <i class="fa-solid fa-location-dot text-[#0B5D5E] mr-1.5 text-xs"></i>
-                Filtrer par Région
-              </label>
-              <div class="select-styled-container">
-                <select [(ngModel)]="filterRegion" (change)="onFilterChange()" class="filter-region-select-modern">
-                  <option value="Toutes">Toutes les régions (14)</option>
-                  <option *ngFor="let region of regions" [value]="region">{{ region }}</option>
-                </select>
-                <i class="fa-solid fa-chevron-down select-chevron"></i>
-              </div>
-            </div>
-
-            <!-- Live Status Counter -->
-            <div class="map-status-card">
-              <div class="status-indicator-dot"></div>
-              <div class="status-text">
-                <strong>{{ filteredCount }}</strong> patrimoine(s) affiché(s) sur la carte
-              </div>
-            </div>
-          </div>
-
-          <!-- Leaflet Map Canvas -->
-          <div class="map-viewport-container">
-            <div id="senegal-map" class="leaflet-map-canvas"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 5. CHRONIQUES & RÉCITS VIVANTS -->
-  <section id="recits-section" class="section section--recits-showcase" *ngIf="recentContenus && recentContenus.length > 0">
-    <div class="section-container">
-      <div class="recits-showcase-header">
-        <div class="recits-showcase-titles">
-          <div class="recits-badge">
-            <span class="recits-badge-dot"></span>
-            CHRONIQUES DU PATRIMOINE
-          </div>
-          <h2 class="section-title">Récits &amp; Guides Vivants</h2>
-          <p class="section-subtitle">
-            Plongez dans les légendes orales, les archives coloniales et les guides exclusifs de nos conservateurs.
-          </p>
-        </div>
-        <a routerLink="/recits" class="btn-all-recits">
-          <span>Découvrir tous les récits</span>
-          <i class="fa-solid fa-arrow-right ml-2 text-sm"></i>
-        </a>
-      </div>
-
-      <div class="recits-cards-grid">
-        <article class="recit-card-luxury" *ngFor="let item of recentContenus">
-          <a [routerLink]="['/patrimoines', item.patrimoineId, 'contenus', item.id]" class="recit-card-media">
-            <img [src]="getArticleImage(item)" [alt]="item.titre" loading="lazy">
-            <div class="recit-card-badges">
-              <span class="type-pill">
-                <i [class]="getContenuTypeIcon(item.type || item.typeContenu)" class="mr-1 text-xs"></i> {{ getContenuTypeLabel(item.type || item.typeContenu) }}
-              </span>
-              <span class="read-time-pill">
-                <i class="fa-regular fa-clock mr-1 text-xs"></i> {{ getReadingTime(item.corps || item.texte || item.resume) }} min
-              </span>
-            </div>
-            <div class="recit-card-gradient"></div>
-          </a>
-
-          <div class="recit-card-body">
-            <div class="recit-patrimoine-ref">
-              <i class="fa-solid fa-location-dot mr-1.5 text-xs text-[#0B5D5E]"></i>
-              <span>{{ getPatrimoineNom(item.patrimoineId) }}</span>
-            </div>
-
-            <h3 class="recit-card-title">
-              <a [routerLink]="['/patrimoines', item.patrimoineId, 'contenus', item.id]">
-                {{ item.titre }}
-              </a>
-            </h3>
-
-            <p class="recit-card-excerpt">
-              {{ (item.resume || item.corps || item.texte) | slice:0:130 }}...
-            </p>
-
-            <div class="recit-card-footer">
-              <span class="recit-date" *ngIf="item.createdAt || item.dateCreation">
-                {{ (item.createdAt || item.dateCreation) | date:'dd MMM yyyy' }}
-              </span>
-              <a [routerLink]="['/patrimoines', item.patrimoineId, 'contenus', item.id]" class="recit-read-link">
-                <span>Lire le récit</span>
-                <i class="fa-solid fa-arrow-right ml-1.5 text-xs"></i>
-              </a>
-            </div>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- 8. STORYTELLING -->
-  <section class="storytelling">
-    <div class="storytelling-layout">
-      <div class="storytelling-image">
-        <img src="assets/images/storytelling.jpg" alt="La Teranga">
-        <div class="storytelling-image-overlay"></div>
-      </div>
-      <div class="storytelling-content">
-        <div class="storytelling-bg-pattern"></div>
-        <div class="storytelling-text">
-          <span class="storytelling-label">L'Esprit du Sénégal</span>
-          <h2 class="storytelling-title">Vivez la vraie Teranga</h2>
-          <p class="storytelling-desc">
-            Bien plus qu'une simple hospitalité, la Teranga est l'âme du Sénégal. C'est ce sentiment d'être accueilli
-            comme un membre de la famille, cette chaleur humaine qui transforme un simple voyage en une aventure
-            inoubliable. Sur notre plateforme, chaque expérience est pensée pour vous plonger au cœur de cette tradition
-            ancestrale.
-          </p>
-          <a routerLink="/a-propos" class="storytelling-link">
-            Découvrir notre histoire
-            <i class="fa-solid fa-arrow-right ml-2"></i>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 9. CTA FINAL -->
-  <section class="cta-section">
-    <div class="cta-bg-shape"></div>
-    <div class="cta-content">
-      <h2 class="cta-title">Prêt pour l'aventure ?</h2>
-      <p class="cta-subtitle">Créez votre compte gratuitement pour enregistrer vos lieux favoris,
-        réserver vos circuits et préparer votre voyage au Sénégal.</p>
-      <div class="cta-buttons">
-        <button class="cta-btn cta-btn--primary">Créer un compte</button>
-        <button routerLink="/patrimoines" class="cta-btn cta-btn--outline">Parcourir le catalogue</button>
-      </div>
-    </div>
-  </section>
+  <!-- 6. ESPRIT TERANGA ET APPEL À L'ACTION -->
+  <app-section-esprit-teranga></app-section-esprit-teranga>
 
 </div>

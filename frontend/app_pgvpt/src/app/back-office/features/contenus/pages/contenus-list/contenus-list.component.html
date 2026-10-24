@@ -1,17 +1,6 @@
 <div class="space-y-6 pb-12 font-sans">
 
   <!-- ═══════════════════════════════════════════════════════════ -->
-  <!-- TOAST DE NOTIFICATION FLOTTANT                              -->
-  <!-- ═══════════════════════════════════════════════════════════ -->
-  <div *ngIf="notificationMessage"
-       class="fixed bottom-6 right-6 z-50 bg-gray-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-gray-700 animate-bounce">
-    <div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs">
-      <i class="fas fa-check"></i>
-    </div>
-    <span class="text-xs font-medium">{{ notificationMessage }}</span>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════════════ -->
   <!-- 1. EN-TÊTE : Titre & Action Principale                      -->
   <!-- ═══════════════════════════════════════════════════════════ -->
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
@@ -537,38 +526,17 @@
   </div>
 
   <!-- ═══════════════════════════════════════════════════════════ -->
-  <!-- 6. MODAL DE CONFIRMATION DE SUPPRESSION                     -->
+  <!-- 6. MODAL DE CONFIRMATION DE SUPPRESSION (SHARED)             -->
   <!-- ═══════════════════════════════════════════════════════════ -->
-  <div *ngIf="deleteModalContenu"
-       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity"
-       aria-modal="true" role="dialog">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 text-center border border-gray-100 animate-scale-up">
-      <div class="w-14 h-14 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
-        <i class="fas fa-trash-alt"></i>
-      </div>
-      <h3 class="text-lg font-bold text-gray-900 mb-2">Confirmer la suppression</h3>
-      <p class="text-xs text-gray-500 mb-2">
-        Êtes-vous sûr de vouloir supprimer définitivement le contenu éditorial :
-      </p>
-      <div class="p-3 bg-gray-50 rounded-xl border border-gray-200 text-xs font-semibold text-gray-800 mb-6 truncate">
-        {{ deleteModalContenu?.titre }}
-      </div>
-      <div class="flex items-center justify-end gap-3">
-        <button type="button"
-                (click)="closeDeleteModal()"
-                [disabled]="isDeleting"
-                class="flex-1 py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
-          Annuler
-        </button>
-        <button type="button"
-                (click)="confirmSuppression()"
-                [disabled]="isDeleting"
-                class="flex-1 py-2.5 px-4 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2">
-          <i *ngIf="isDeleting" class="fas fa-spinner fa-spin"></i>
-          <span>{{ isDeleting ? 'Suppression...' : 'Supprimer' }}</span>
-        </button>
-      </div>
-    </div>
-  </div>
+  <app-confirm-modal
+    [isOpen]="!!deleteModalContenu"
+    title="Confirmer la suppression"
+    message="Êtes-vous sûr de vouloir supprimer définitivement le contenu éditorial :"
+    [itemName]="deleteModalContenu?.titre"
+    [isProcessing]="isDeleting"
+    confirmText="Supprimer"
+    (confirm)="confirmSuppression()"
+    (cancel)="closeDeleteModal()">
+  </app-confirm-modal>
 
 </div>

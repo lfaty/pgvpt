@@ -49,8 +49,8 @@ public class GeolocalisationEntity extends BaseEntity {
     private UUID patrimoineId = null;
     private UUID entrepriseId = null;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "zone_touristique_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "zone_touristique_id")
     private ZoneTouristiqueEntity zoneTouristique = null;
 
     @ManyToOne

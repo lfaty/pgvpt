@@ -1,0 +1,59 @@
+<!-- LIGHTBOX MODAL -->
+<div class="fixed inset-0 z-[100] bg-black/95 flex flex-col backdrop-blur-sm transition-opacity duration-300"
+     *ngIf="isOpen && medias.length > 0"
+     (click)="onClose()">
+  
+  <!-- Top Bar -->
+  <div class="flex justify-between items-center p-6 text-white absolute top-0 w-full z-10 bg-gradient-to-b from-black/80 to-transparent">
+    <div class="font-bold text-sm">
+      {{ currentIndex + 1 }} / {{ medias.length }}
+    </div>
+    <button class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition" (click)="onClose()">
+      <i class="fa-solid fa-xmark text-xl"></i>
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex items-center justify-center relative w-full h-full p-4 md:p-12" (click)="$event.stopPropagation()">
+    <!-- Left Arrow -->
+    <button class="absolute left-4 md:left-8 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition z-10" 
+            *ngIf="medias.length > 1"
+            (click)="onPrev($event)">
+      <i class="fa-solid fa-chevron-left text-xl"></i>
+    </button>
+
+    <!-- Media Display -->
+    <div class="max-w-6xl max-h-full w-full h-full flex flex-col items-center justify-center relative select-none">
+      <!-- Photo -->
+      <img *ngIf="['PHOTO', 'CARTE', 'ARCHIVE_NUMERISEE', 'PANORAMA_360'].includes(medias[currentIndex].type)" 
+           [src]="medias[currentIndex].url" 
+           [alt]="medias[currentIndex].nom || 'Photo'"
+           class="max-w-full max-h-[85vh] object-contain shadow-2xl rounded-sm fade-in">
+      
+      <!-- Video -->
+      <video *ngIf="medias[currentIndex].type === 'VIDEO'" 
+             [src]="medias[currentIndex].url" 
+             controls autoplay class="max-w-full max-h-[85vh] shadow-2xl rounded-sm fade-in"></video>
+
+      <!-- Legend / Info -->
+      <div class="absolute bottom-4 left-0 right-0 text-center">
+        <div class="inline-block bg-black/70 backdrop-blur-md px-6 py-3 rounded-2xl text-white max-w-2xl mx-auto shadow-lg">
+           <h4 class="font-bold text-lg leading-tight mb-1">{{ medias[currentIndex].nom || 'Média' }}</h4>
+           <p class="text-sm text-white/80 line-clamp-2" *ngIf="medias[currentIndex].description">{{ medias[currentIndex].description }}</p>
+           <div class="mt-2 text-xs text-white/50 flex gap-4 justify-center" *ngIf="medias[currentIndex].auteur || medias[currentIndex].credit">
+              <span *ngIf="medias[currentIndex].auteur"><i class="fa-solid fa-user-edit mr-1"></i> {{ medias[currentIndex].auteur }}</span>
+              <span *ngIf="medias[currentIndex].auteur && medias[currentIndex].credit"> • </span>
+              <span *ngIf="medias[currentIndex].credit"><i class="fa-solid fa-camera mr-1"></i> {{ medias[currentIndex].credit }}</span>
+           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Arrow -->
+    <button class="absolute right-4 md:right-8 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition z-10" 
+            *ngIf="medias.length > 1"
+            (click)="onNext($event)">
+      <i class="fa-solid fa-chevron-right text-xl"></i>
+    </button>
+  </div>
+</div>

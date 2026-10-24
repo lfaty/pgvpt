@@ -1,0 +1,141 @@
+<!-- CARTE « PRÉPARER VOTRE VISITE » -->
+<aside class="td-card overflow-hidden" *ngIf="patrimoine">
+
+  <!-- En-tête sombre premium -->
+  <div class="relative bg-gradient-to-br from-[#0B1A24] via-[#122B3A] to-[#163447] text-white px-6 pt-6 pb-7 overflow-hidden">
+    <!-- Décoration -->
+    <div class="absolute -right-10 -top-10 w-36 h-36 rounded-full bg-[#D16933]/15 blur-3xl"></div>
+    <div class="absolute -left-6 -bottom-6 w-24 h-24 rounded-full bg-[#F4A261]/10 blur-2xl"></div>
+    <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#F4A261] to-transparent opacity-50"></div>
+
+    <p class="relative text-[10px] font-extrabold uppercase tracking-[0.22em] text-[#F4A261] mb-1.5">Préparer votre visite</p>
+    <h3 class="relative font-serif text-xl font-bold leading-tight line-clamp-2">{{ patrimoine.nom }}</h3>
+
+    <!-- Statut du jour -->
+    <div class="relative mt-4">
+      <ng-container *ngIf="todaySchedule; else noSchedule">
+        <span *ngIf="todaySchedule.ouvert" class="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-emerald-400/15 backdrop-blur-sm text-emerald-300 text-xs font-bold border border-emerald-400/10">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 td-pulse"></span>
+          Ouvert · {{ hm(todaySchedule.heureOuverture) }} – {{ hm(todaySchedule.heureFermeture) }}
+        </span>
+        <span *ngIf="!todaySchedule.ouvert" class="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-rose-400/15 text-rose-300 text-xs font-bold border border-rose-400/10">
+          <span class="w-2 h-2 rounded-full bg-rose-400"></span> Fermé aujourd'hui
+        </span>
+      </ng-container>
+      <ng-template #noSchedule>
+        <span class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/8 text-white/80 text-xs font-semibold border border-white/5">
+          <i class="fa-regular fa-clock text-[#F4A261]"></i>
+          {{ acc.accessiblePublic ? 'Site ouvert · horaires à confirmer' : 'Horaires à confirmer' }}
+        </span>
+      </ng-template>
+    </div>
+  </div>
+
+  <div class="p-5 space-y-5">
+
+    <!-- Où se trouve le site -->
+    <div *ngIf="locationRows.length">
+      <h4 class="td-aside-title"><i class="fa-solid fa-location-dot"></i> Localisation</h4>
+      <dl class="space-y-2">
+        <div *ngFor="let r of locationRows" class="flex items-center justify-between gap-3 text-[13px] py-1.5 border-b border-gray-50 last:border-b-0">
+          <dt class="flex items-center gap-2 text-gray-400">
+            <i [class]="r.icon + ' text-[10px] w-4 text-center'"></i>
+            <span>{{ r.label }}</span>
+          </dt>
+          <dd class="font-semibold text-gray-800 text-right truncate max-w-[55%]" [title]="r.value">{{ r.value }}</dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Horaires complets -->
+    <div *ngIf="patrimoine.horaires?.length">
+      <h4 class="td-aside-title"><i class="fa-regular fa-clock"></i> Horaires</h4>
+      <ul class="text-[13px]">
+        <li *ngFor="let h of patrimoine.horaires"
+            class="flex justify-between py-2 border-b border-gray-50 last:border-b-0"
+            [ngClass]="todaySchedule?.jour === h.jour ? 'font-bold text-[#D16933]' : 'text-gray-600'">
+          <span class="capitalize flex items-center gap-2">
+            <span *ngIf="todaySchedule?.jour === h.jour" class="w-1.5 h-1.5 rounded-full bg-[#D16933]"></span>
+            {{ h.jour | lowercase }}
+          </span>
+          <span *ngIf="h.ouvert" class="tabular-nums">{{ hm(h.heureOuverture) }} – {{ hm(h.heureFermeture) }}</span>
+          <span *ngIf="!h.ouvert" class="text-rose-400 font-semibold text-xs">Fermé</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Services sur place -->
+    <div *ngIf="patrimoine.accessibilite">
+      <h4 class="td-aside-title justify-between">
+        <span class="flex items-center gap-2"><i class="fa-solid fa-concierge-bell"></i> Services</span>
+        <span class="px-2 py-0.5 rounded-full bg-[#F6F4EE] text-[10px] font-bold text-gray-500 normal-case tracking-normal">{{ availableCount }}/{{ services.length }}</span>
+      </h4>
+      <div class="grid grid-cols-2 gap-2">
+        <div *ngFor="let s of sortedServices"
+             class="flex items-center gap-2.5 p-2.5 rounded-xl text-xs transition-all"
+             [ngClass]="acc[s.key] ? 'bg-emerald-50/50 border border-emerald-100/50' : 'bg-gray-50/50 border border-gray-100/50'">
+          <span class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-[10px]"
+                [ngClass]="acc[s.key] ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-100 text-gray-300'">
+            <i [class]="s.icon"></i>
+          </span>
+          <span class="leading-tight" [ngClass]="acc[s.key] ? 'text-gray-700 font-medium' : 'text-gray-400 line-through'">{{ s.label }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Langues de visite -->
+    <div *ngIf="acc.langueVisite?.length">
+      <h4 class="td-aside-title"><i class="fa-solid fa-language"></i> Visites guidées</h4>
+      <div class="flex flex-wrap gap-1.5">
+        <span *ngFor="let l of acc.langueVisite" class="px-3 py-1.5 rounded-full bg-[#0B1A24] text-white text-[11px] font-semibold">{{ l }}</span>
+      </div>
+    </div>
+
+    <!-- Contact -->
+    <div *ngIf="patrimoine.contact && (patrimoine.contact.telephone || patrimoine.contact.email || patrimoine.contact.siteWeb)">
+      <h4 class="td-aside-title"><i class="fa-regular fa-address-book"></i> Contact</h4>
+      <div class="space-y-2">
+        <a *ngIf="patrimoine.contact.telephone" [href]="'tel:' + patrimoine.contact.telephone"
+           class="flex items-center gap-3 p-2.5 rounded-xl bg-gray-50 hover:bg-emerald-50 text-gray-700 hover:text-emerald-700 transition-colors text-sm group">
+          <span class="w-8 h-8 rounded-lg bg-white border border-gray-100 text-gray-400 group-hover:text-emerald-500 group-hover:border-emerald-200 flex items-center justify-center text-xs transition-colors">
+            <i class="fa-solid fa-phone"></i>
+          </span>
+          <span class="font-medium">{{ patrimoine.contact.telephone }}</span>
+        </a>
+        <a *ngIf="patrimoine.contact.email" [href]="'mailto:' + patrimoine.contact.email"
+           class="flex items-center gap-3 p-2.5 rounded-xl bg-gray-50 hover:bg-blue-50 text-gray-700 hover:text-blue-700 transition-colors text-sm group">
+          <span class="w-8 h-8 rounded-lg bg-white border border-gray-100 text-gray-400 group-hover:text-blue-500 group-hover:border-blue-200 flex items-center justify-center text-xs transition-colors">
+            <i class="fa-solid fa-envelope"></i>
+          </span>
+          <span class="font-medium truncate">{{ patrimoine.contact.email }}</span>
+        </a>
+        <a *ngIf="patrimoine.contact.siteWeb" [href]="patrimoine.contact.siteWeb" target="_blank" rel="noopener"
+           class="flex items-center gap-3 p-2.5 rounded-xl bg-gray-50 hover:bg-[#D16933]/5 text-gray-700 hover:text-[#D16933] transition-colors text-sm group">
+          <span class="w-8 h-8 rounded-lg bg-white border border-gray-100 text-gray-400 group-hover:text-[#D16933] group-hover:border-[#D16933]/20 flex items-center justify-center text-xs transition-colors">
+            <i class="fa-solid fa-globe"></i>
+          </span>
+          <span class="font-medium">Site officiel</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[9px] ml-auto text-gray-300"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="space-y-2.5 pt-2">
+      <a *ngIf="itineraireUrl" id="btn-itineraire-sidebar" [href]="itineraireUrl" target="_blank" rel="noopener"
+         class="td-cta w-full flex items-center justify-center gap-2.5 px-5 py-3.5 rounded-xl bg-gradient-to-r from-[#D16933] to-[#C45A28] hover:from-[#B9582A] hover:to-[#A84D22] text-white font-bold text-sm shadow-lg shadow-[#D16933]/25">
+        <i class="fa-solid fa-route"></i> Obtenir l'itinéraire
+      </a>
+      <button id="btn-voir-carte" type="button" (click)="navigate.emit('localisation')"
+              class="td-cta w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl border-2 border-[#0B1A24] text-[#0B1A24] hover:bg-[#0B1A24] hover:text-white font-bold text-sm transition-colors">
+        <i class="fa-solid fa-map-location-dot"></i> Voir sur la carte
+      </button>
+    </div>
+
+    <!-- Gestionnaire disclaimer -->
+    <p *ngIf="gestionnaire" class="text-[10px] leading-relaxed text-gray-400 flex gap-2 pt-2 border-t border-gray-100">
+      <i class="fa-solid fa-circle-info mt-0.5 text-gray-300"></i>
+      <span>Site géré par <strong class="text-gray-500">{{ gestionnaire }}</strong>. Informations à confirmer avant votre visite.</span>
+    </p>
+  </div>
+</aside>

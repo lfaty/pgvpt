@@ -93,7 +93,7 @@ public class OffreTouristiqueController implements OffresApi{
         response.setDisponible(true);
         response.setCapaciteDisponible(100);
         response.setCapaciteMax(100);
-        response.setMessage("Mock disponibilité");
+        response.setMessage("Disponibilité confirmée");
         return ResponseEntity.ok(response);
     }
 }

@@ -1,0 +1,97 @@
+<div class="min-h-screen bg-[#FBFBFA] text-gray-800 pb-24 font-sans">
+  
+  <!-- BARRE SUPÉRIEURE DE NAVIGATION ÉPURÉE -->
+  <header class="bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30 shadow-2xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
+      
+      <!-- Fil d'Ariane -->
+      <nav class="flex items-center gap-2 text-xs text-gray-500 overflow-x-auto whitespace-nowrap">
+        <a routerLink="/" class="hover:text-[#0b5d5e] transition-colors"><i class="fas fa-home"></i></a>
+        <span class="text-gray-300">/</span>
+        <a routerLink="/patrimoines" class="hover:text-[#0b5d5e] transition-colors font-medium">Patrimoines</a>
+        <ng-container *ngIf="patrimoine">
+          <span class="text-gray-300">/</span>
+          <a [routerLink]="['/patrimoines', patrimoine.id]" class="hover:text-[#0b5d5e] transition-colors font-medium">
+            {{ patrimoine.nom }}
+          </a>
+        </ng-container>
+        <span class="text-gray-300">/</span>
+        <span class="text-gray-800 font-bold truncate max-w-xs" *ngIf="media">{{ media.nom }}</span>
+      </nav>
+
+      <!-- Bouton Retour au site -->
+      <div class="flex items-center gap-2 shrink-0">
+        <a [routerLink]="patrimoineId ? ['/patrimoines', patrimoineId] : ['/patrimoines']" 
+           class="px-4 py-1.5 bg-[#0b5d5e] hover:bg-[#084b4c] text-white text-xs font-bold rounded-lg shadow-2xs transition-colors flex items-center gap-1.5">
+          <i class="fas fa-arrow-left text-[10px]"></i>
+          <span>Retour au site</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ÉTAT DE CHARGEMENT -->
+  <div *ngIf="loading" class="flex flex-col items-center justify-center py-32">
+    <div class="w-12 h-12 border-4 border-[#0b5d5e]/20 border-t-[#0b5d5e] rounded-full animate-spin mb-4"></div>
+    <p class="text-sm font-medium text-gray-500">Ouverture de la ressource documentaire...</p>
+  </div>
+
+  <!-- ÉTAT D'ERREUR -->
+  <div *ngIf="!loading && error" class="max-w-xl mx-auto mt-20 p-8 bg-white rounded-3xl border border-red-100 text-center shadow-sm">
+    <div class="w-16 h-16 rounded-full bg-red-50 text-red-500 flex items-center justify-center mx-auto mb-4 text-2xl">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+    <h3 class="font-serif text-xl font-bold text-gray-900 mb-2">Média introuvable</h3>
+    <p class="text-sm text-gray-600 mb-6">{{ error }}</p>
+    <a [routerLink]="patrimoineId ? ['/patrimoines', patrimoineId] : ['/patrimoines']" 
+       class="inline-flex items-center px-6 py-2.5 bg-[#0b5d5e] text-white rounded-xl font-bold text-xs shadow-sm hover:bg-[#084b4c] transition">
+      Retourner au patrimoine
+    </a>
+  </div>
+
+  <!-- CONTENU PRINCIPAL DE LA RESSOURCE -->
+  <main *ngIf="!loading && media" class="max-w-7xl mx-auto px-4 sm:px-6 pt-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- COLONNE VISUELLE : STUDIO D'INSPECTION (8 colonnes) -->
+      <section class="lg:col-span-8 space-y-4">
+        
+        <!-- ÉCRAN D'AFFICHAGE DU MÉDIA -->
+        <app-visualiseur-media
+          [media]="media"
+          [zoomLevel]="zoomLevel"
+          [isFullscreen]="isFullscreen"
+          (zoomInEvent)="zoomIn()"
+          (zoomOutEvent)="zoomOut()"
+          (resetZoomEvent)="resetZoom()"
+          (toggleFullscreenEvent)="toggleFullscreen($event)">
+        </app-visualiseur-media>
+
+        <!-- RECOMMANDATION DES AUTRES MÉDIAS DE LA COLLECTION DU SITE -->
+        <app-medias-associes
+          [relatedMedias]="relatedMedias"
+          [patrimoineId]="patrimoineId">
+        </app-medias-associes>
+
+      </section>
+
+      <!-- COLONNE FICHE D'ARCHIVE & MÉTIER (4 colonnes) -->
+      <aside class="lg:col-span-4 space-y-6">
+        
+        <!-- FICHE D'INVENTAIRE MUSÉAL -->
+        <app-fiche-inventaire-media
+          [media]="media">
+        </app-fiche-inventaire-media>
+
+        <!-- SITE HISTORIQUE RATTACHÉ -->
+        <app-site-culturel-rattache
+          [patrimoine]="patrimoine">
+        </app-site-culturel-rattache>
+
+      </aside>
+
+    </div>
+  </main>
+
+</div>

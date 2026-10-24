@@ -6,10 +6,13 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MediaApiService } from '../../../../../core/services/api/media-api.service';
 import { PatrimoineApiService } from '../../../../../core/services/api/patrimoine-api.service';
 
+import { ToastService } from '../../../../../core/services/toast.service';
+import { ConfirmModalComponent } from '../../../../../shared/components/confirm-modal/confirm-modal.component';
+
 @Component({
   selector: 'app-medias-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ConfirmModalComponent],
   templateUrl: './medias-list.component.html',
   styleUrls: ['./medias-list.component.css']
 })
@@ -35,7 +38,6 @@ export class MediasListComponent implements OnInit {
   // Modal de confirmation de suppression
   deleteModalMedia: any = null;
   isDeleting: boolean = false;
-  notificationMessage: string | null = null;
 
   mediaTypes = ['PHOTO', 'VIDEO', 'AUDIO', 'DOCUMENT', 'PANORAMA_360', 'MODELE_3D', 'CARTE', 'ARCHIVE_NUMERISEE'];
   statuts = ['PUBLIE', 'VALIDE', 'BROUILLON', 'ARCHIVE'];
@@ -43,7 +45,8 @@ export class MediasListComponent implements OnInit {
   constructor(
     private mediaApi: MediaApiService,
     private patrimoineApi: PatrimoineApiService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -168,14 +171,13 @@ export class MediasListComponent implements OnInit {
       error: (err) => {
         this.isDeleting = false;
         console.error('Erreur lors de la suppression', err);
-        alert("Erreur lors de la suppression du média.");
+        this.toastService.error("Erreur lors de la suppression du média.");
       }
     });
   }
 
   showToast(msg: string): void {
-    this.notificationMessage = msg;
-    setTimeout(() => this.notificationMessage = null, 4000);
+    this.toastService.success(msg);
   }
 
   getSafeUrl(url: string): SafeResourceUrl {

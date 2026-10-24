@@ -9,9 +9,9 @@ info:
     name: PGVPT
     email: contact@pgvpt.sn
 servers:
-  - url: http://localhost:3002/api/v1/geolocalisations
+  - url: http://localhost:3002/api/v1
     description: Environnement local
-  - url: https://api.pgvpt.sn/geolocalisation/api/v1
+  - url: https://api.pgvpt.sn/api/v1
     description: Environnement de production
 tags:
   - name: Referentiel administratif
@@ -169,7 +169,7 @@ paths:
         - bearerAuth: []
     parameters:
       - $ref: '#/components/parameters/GeolocalisationId'
-  /patrimoines/{patrimoineId}/geolocalisation:
+  /geolocalisations/patrimoines/{patrimoineId}/geolocalisation:
     get:
       tags:
         - Geolocalisations
@@ -240,7 +240,7 @@ paths:
         - bearerAuth: []
     parameters:
       - $ref: '#/components/parameters/PatrimoineId'
-  /patrimoines/{patrimoineId}/points-acces:
+  /geolocalisations/patrimoines/{patrimoineId}/points-acces:
     get:
       tags:
         - Geospatial
@@ -285,7 +285,7 @@ paths:
         - bearerAuth: []
     parameters:
       - $ref: '#/components/parameters/PatrimoineId'
-  /points-acces/{id}:
+  /geolocalisations/points-acces/{id}:
     put:
       tags:
         - Geospatial
@@ -498,7 +498,7 @@ paths:
                 $ref: '#/components/schemas/Distance'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /cartographie/patrimoines:
+  /geolocalisations/cartographie/patrimoines:
     get:
       tags:
         - Geospatial
@@ -528,7 +528,7 @@ paths:
                   $ref: '#/components/schemas/FeaturePatrimoine'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /cartographie/geojson:
+  /geolocalisations/cartographie/geojson:
     get:
       tags:
         - Geospatial
@@ -544,7 +544,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
       parameters: []
-  /pays:
+  /geolocalisations/pays:
     get:
       tags:
         - Referentiel administratif
@@ -589,7 +589,7 @@ paths:
       parameters: []
       security:
         - bearerAuth: []
-  /pays/{id}:
+  /geolocalisations/pays/{id}:
     get:
       tags:
         - Referentiel administratif
@@ -650,7 +650,7 @@ paths:
         - bearerAuth: []
     parameters:
       - $ref: '#/components/parameters/PaysId'
-  /regions:
+  /geolocalisations/regions:
     get:
       tags:
         - Referentiel administratif
@@ -695,7 +695,7 @@ paths:
       parameters: []
       security:
         - bearerAuth: []
-  /regions/{id}:
+  /geolocalisations/regions/{id}:
     get:
       tags:
         - Referentiel administratif
@@ -756,7 +756,7 @@ paths:
         - bearerAuth: []
     parameters:
       - $ref: '#/components/parameters/RegionId'
-  /departements:
+  /geolocalisations/departements:
     get:
       tags:
         - Referentiel administratif
@@ -801,7 +801,7 @@ paths:
       parameters: []
       security:
         - bearerAuth: []
-  /departements/{id}:
+  /geolocalisations/departements/{id}:
     get:
       tags:
         - Referentiel administratif
@@ -862,7 +862,7 @@ paths:
         - bearerAuth: []
     parameters:
       - $ref: '#/components/parameters/DepartementId'
-  /communes:
+  /geolocalisations/communes:
     get:
       tags:
         - Referentiel administratif
@@ -907,7 +907,7 @@ paths:
       parameters: []
       security:
         - bearerAuth: []
-  /communes/{id}:
+  /geolocalisations/communes/{id}:
     get:
       tags:
         - Referentiel administratif
@@ -968,7 +968,7 @@ paths:
         - bearerAuth: []
     parameters:
       - $ref: '#/components/parameters/CommuneId'
-  /villages:
+  /geolocalisations/villages:
     get:
       tags:
         - Referentiel administratif
@@ -1013,7 +1013,7 @@ paths:
       parameters: []
       security:
         - bearerAuth: []
-  /villages/{id}:
+  /geolocalisations/villages/{id}:
     get:
       tags:
         - Referentiel administratif
@@ -1074,7 +1074,7 @@ paths:
         - bearerAuth: []
     parameters:
       - $ref: '#/components/parameters/VillageId'
-  /quartiers:
+  /geolocalisations/quartiers:
     get:
       tags:
         - Referentiel administratif
@@ -1119,7 +1119,7 @@ paths:
       parameters: []
       security:
         - bearerAuth: []
-  /quartiers/{id}:
+  /geolocalisations/quartiers/{id}:
     get:
       tags:
         - Referentiel administratif
@@ -1180,7 +1180,7 @@ paths:
         - bearerAuth: []
     parameters:
       - $ref: '#/components/parameters/QuartierId'
-  /zones-geographiques:
+  /geolocalisations/zones-geographiques:
     get:
       tags:
         - Zone geographique
@@ -1225,7 +1225,7 @@ paths:
       parameters: []
       security:
         - bearerAuth: []
-  /zones-geographiques/{id}:
+  /geolocalisations/zones-geographiques/{id}:
     get:
       tags:
         - Zone geographique
@@ -1286,7 +1286,7 @@ paths:
         - bearerAuth: []
     parameters:
       - $ref: '#/components/parameters/ZoneGeographiqueId'
-  /zones-touristiques:
+  /geolocalisations/zones-touristiques:
     get:
       tags:
         - Zone touristique
@@ -1331,7 +1331,7 @@ paths:
       parameters: []
       security:
         - bearerAuth: []
-  /zones-touristiques/{id}:
+  /geolocalisations/zones-touristiques/{id}:
     get:
       tags:
         - Zone touristique
@@ -3168,6 +3168,13 @@ components:
           - regionId
       x-business-rules:
         - Une région appartient à une seule zone géographique.
+    ypePatrimoine:
+      type: string
+      enum:
+        - SITE_NATUREL
+        - MUSEE
+        - MONUMENT
+      description: Type de patrimoine géré par ms-patrimoine.
     TypePatrimoine:
       type: string
       enum:

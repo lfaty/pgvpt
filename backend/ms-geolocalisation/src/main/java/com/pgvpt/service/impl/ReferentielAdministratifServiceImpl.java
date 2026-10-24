@@ -1,6 +1,7 @@
 package com.pgvpt.service.impl;
 
 import com.pgvpt.dto.*;
+import com.pgvpt.exception.BusinessException;
 import com.pgvpt.exception.ResourceNotFoundException;
 import com.pgvpt.mapper.ReferentielAdministratifMapper;
 import com.pgvpt.model.*;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -25,6 +27,9 @@ public class ReferentielAdministratifServiceImpl implements ReferentielAdministr
     private final CommuneRepository communeRepository;
     private final VillageRepository villageRepository;
     private final QuartierRepository quartierRepository;
+    private final GeolocalisationRepository geolocalisationRepository;
+    private final ZoneTouristiqueRepository zoneTouristiqueRepository;
+    private final ZoneGeographiqueRegionRepository zoneGeographiqueRegionRepository;
 
     private final ReferentielAdministratifMapper mapper;
 
@@ -64,8 +69,15 @@ public class ReferentielAdministratifServiceImpl implements ReferentielAdministr
 
     @Override
     public void deletePays(UUID id) {
-        if (!paysRepository.existsById(id))
-            throw new ResourceNotFoundException("Pays introuvable");
+        PaysEntity pays = paysRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Pays introuvable"));
+
+        // Suppression en cascade des régions rattachées
+        List<RegionEntity> regions = regionRepository.findByPaysEntity_Id(id);
+        for (RegionEntity region : regions) {
+            deleteRegion(region.getId());
+        }
+
         paysRepository.deleteById(id);
     }
 
@@ -82,13 +94,33 @@ public class ReferentielAdministratifServiceImpl implements ReferentielAdministr
     @Override
     @Transactional
     public Region createRegion(RegionCreate dto) {
-        try {
-            RegionEntity entity = mapper.toEntityRegion(dto);
-            return mapper.toDtoRegion(regionRepository.save(entity));
-        } catch (Exception e) {
-            e.printStackTrace(); // Affichera la cause exacte (le "Caused by") dans la console
-            throw e;
+        PaysEntity pays;
+        if (dto.getPaysId() != null) {
+            pays = paysRepository.findById(dto.getPaysId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Pays introuvable avec l'ID: " + dto.getPaysId()));
+        } else {
+            pays = paysRepository.findByCodeIgnoreCase("SEN")
+                    .or(() -> paysRepository.findByCodeIgnoreCase("SN"))
+                    .or(() -> paysRepository.findByNomIgnoreCase("Sénégal"))
+                    .or(() -> paysRepository.findByNomIgnoreCase("Senegal"))
+                    .orElseGet(() -> {
+                        PaysEntity sen = new PaysEntity();
+                        sen.setCode("SEN");
+                        sen.setNom("Sénégal");
+                        sen.setCodeIso2("SN");
+                        sen.setCodeIso3("SEN");
+                        sen.setDevise("Franc CFA");
+                        sen.setCodeDevise("XOF");
+                        sen.setIndicatifTelephonique("+221");
+                        sen.setLangueOfficielle("Français");
+                        sen.setContinent("Afrique");
+                        sen.setActif(true);
+                        return paysRepository.save(sen);
+                    });
         }
+        RegionEntity entity = mapper.toEntityRegion(dto);
+        entity.setPaysEntity(pays);
+        return mapper.toDtoRegion(regionRepository.save(entity));
     }
 
     @Override
@@ -110,8 +142,18 @@ public class ReferentielAdministratifServiceImpl implements ReferentielAdministr
 
     @Override
     public void deleteRegion(UUID id) {
-        if (!regionRepository.existsById(id))
-            throw new ResourceNotFoundException("Region introuvable");
+        RegionEntity region = regionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Region introuvable"));
+
+        // Dissocier les liaisons avec les zones géographiques
+        zoneGeographiqueRegionRepository.deleteByRegionId(id);
+
+        // Suppression en cascade des départements rattachés
+        List<DepartementEntity> departements = departementRepository.findByRegion_Id(id);
+        for (DepartementEntity departement : departements) {
+            deleteDepartement(departement.getId());
+        }
+
         regionRepository.deleteById(id);
     }
 
@@ -126,9 +168,25 @@ public class ReferentielAdministratifServiceImpl implements ReferentielAdministr
     }
 
     @Override
+    public PageDepartement getDepartementsByRegion(UUID regionId, Pageable pageable) {
+        Page<DepartementEntity> page = departementRepository.findByRegion_Id(regionId, pageable);
+        return new PageDepartement()
+                .content(page.getContent().stream().map(mapper::toDtoDept).toList())
+                .page(page.getNumber()).size(page.getSize())
+                .totalElements(page.getTotalElements()).totalPages(page.getTotalPages())
+                .first(page.isFirst()).last(page.isLast());
+    }
+
+    @Override
     @Transactional
     public Departement createDepartement(DepartementCreate dto) {
+        if (dto.getRegionId() == null) {
+            throw new IllegalArgumentException("La région parente est obligatoire pour créer un département.");
+        }
+        RegionEntity region = regionRepository.findById(dto.getRegionId())
+                .orElseThrow(() -> new ResourceNotFoundException("Région introuvable avec l'ID: " + dto.getRegionId()));
         DepartementEntity entity = mapper.toEntityDept(dto);
+        entity.setRegion(region);
         return mapper.toDtoDept(departementRepository.save(entity));
     }
 
@@ -150,8 +208,18 @@ public class ReferentielAdministratifServiceImpl implements ReferentielAdministr
 
     @Override
     public void deleteDepartement(UUID id) {
-        if (!departementRepository.existsById(id))
-            throw new ResourceNotFoundException("Departement introuvable");
+        DepartementEntity departement = departementRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Departement introuvable"));
+
+        // Dissocier des zones touristiques
+        zoneTouristiqueRepository.detachDepartement(id);
+
+        // Suppression en cascade des communes rattachées
+        List<CommuneEntity> communes = communeRepository.findByDepartement_Id(id);
+        for (CommuneEntity commune : communes) {
+            deleteCommune(commune.getId());
+        }
+
         departementRepository.deleteById(id);
     }
 
@@ -166,8 +234,25 @@ public class ReferentielAdministratifServiceImpl implements ReferentielAdministr
     }
 
     @Override
+    public PageCommune getCommunesByDepartement(UUID departementId, Pageable pageable) {
+        Page<CommuneEntity> page = communeRepository.findByDepartement_Id(departementId, pageable);
+        return new PageCommune()
+                .content(page.getContent().stream().map(mapper::toDtoCom).toList())
+                .page(page.getNumber()).size(page.getSize())
+                .totalElements(page.getTotalElements()).totalPages(page.getTotalPages())
+                .first(page.isFirst()).last(page.isLast());
+    }
+
+    @Override
+    @Transactional
     public Commune createCommune(CommuneCreate dto) {
+        if (dto.getDepartementId() == null) {
+            throw new IllegalArgumentException("Le département parent est obligatoire pour créer une commune.");
+        }
+        DepartementEntity departement = departementRepository.findById(dto.getDepartementId())
+                .orElseThrow(() -> new ResourceNotFoundException("Département introuvable avec l'ID: " + dto.getDepartementId()));
         CommuneEntity entity = mapper.toEntityCom(dto);
+        entity.setDepartement(departement);
         return mapper.toDtoCom(communeRepository.save(entity));
     }
 
@@ -188,14 +273,40 @@ public class ReferentielAdministratifServiceImpl implements ReferentielAdministr
 
     @Override
     public void deleteCommune(UUID id) {
-        if (!communeRepository.existsById(id))
-            throw new ResourceNotFoundException("Commune introuvable");
+        CommuneEntity commune = communeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Commune introuvable"));
+
+        // Dissocier des zones touristiques
+        zoneTouristiqueRepository.detachCommune(id);
+
+        // Suppression en cascade des villages rattachés
+        List<VillageEntity> villages = villageRepository.findByCommune_Id(id);
+        for (VillageEntity village : villages) {
+            deleteVillage(village.getId());
+        }
+
+        // Suppression en cascade des quartiers restants rattachés directement à la commune
+        List<QuartierEntity> quartiers = quartierRepository.findByCommune_Id(id);
+        for (QuartierEntity quartier : quartiers) {
+            deleteQuartier(quartier.getId());
+        }
+
         communeRepository.deleteById(id);
     }
 
     @Override
     public PageVillage getVillages(Pageable pageable) {
         Page<VillageEntity> page = villageRepository.findAll(pageable);
+        return new PageVillage()
+                .content(page.getContent().stream().map(mapper::toDtoVil).toList())
+                .page(page.getNumber()).size(page.getSize())
+                .totalElements(page.getTotalElements()).totalPages(page.getTotalPages())
+                .first(page.isFirst()).last(page.isLast());
+    }
+
+    @Override
+    public PageVillage getVillagesByCommune(UUID communeId, Pageable pageable) {
+        Page<VillageEntity> page = villageRepository.findByCommune_Id(communeId, pageable);
         return new PageVillage()
                 .content(page.getContent().stream().map(mapper::toDtoVil).toList())
                 .page(page.getNumber()).size(page.getSize())
@@ -226,13 +337,35 @@ public class ReferentielAdministratifServiceImpl implements ReferentielAdministr
 
     @Override
     public void deleteVillage(UUID id) {
-        if (!villageRepository.existsById(id)) throw new ResourceNotFoundException("Village introuvable");
+        VillageEntity village = villageRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Village introuvable"));
+
+        // Dissocier de la géolocalisation et des zones touristiques
+        geolocalisationRepository.detachVillage(id);
+        zoneTouristiqueRepository.detachVillage(id);
+
+        // Suppression en cascade des quartiers rattachés
+        List<QuartierEntity> quartiers = quartierRepository.findByVillage_Id(id);
+        for (QuartierEntity quartier : quartiers) {
+            deleteQuartier(quartier.getId());
+        }
+
         villageRepository.deleteById(id);
     }
 
     @Override
     public PageQuartier getQuartiers(Pageable pageable) {
         Page<QuartierEntity> page = quartierRepository.findAll(pageable);
+        return new PageQuartier()
+                .content(page.getContent().stream().map(mapper::toDtoQuart).toList())
+                .page(page.getNumber()).size(page.getSize())
+                .totalElements(page.getTotalElements()).totalPages(page.getTotalPages())
+                .first(page.isFirst()).last(page.isLast());
+    }
+
+    @Override
+    public PageQuartier getQuartiersByCommune(UUID communeId, Pageable pageable) {
+        Page<QuartierEntity> page = quartierRepository.findByCommune_Id(communeId, pageable);
         return new PageQuartier()
                 .content(page.getContent().stream().map(mapper::toDtoQuart).toList())
                 .page(page.getNumber()).size(page.getSize())
@@ -263,7 +396,12 @@ public class ReferentielAdministratifServiceImpl implements ReferentielAdministr
 
     @Override
     public void deleteQuartier(UUID id) {
-        if (!quartierRepository.existsById(id)) throw new ResourceNotFoundException("Quartier introuvable");
+        if (!quartierRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Quartier introuvable");
+        }
+
+        geolocalisationRepository.detachQuartier(id);
+
         quartierRepository.deleteById(id);
     }
 }

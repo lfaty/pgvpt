@@ -1,0 +1,71 @@
+<header class="detail-hero" [style.background-image]="'linear-gradient(to bottom, rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.85)), url(' + (circuit.imageUrl || 'assets/images/activite_saloum.jpg') + ')'">
+  <div class="hero-inner">
+    
+    <!-- Top Bar: Breadcrumb & Back Button -->
+    <div class="hero-top-nav">
+      <a routerLink="/circuits" class="back-button">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Tous les circuits</span>
+      </a>
+      <div class="breadcrumb">
+        <a routerLink="/">Accueil</a>
+        <span class="separator">/</span>
+        <a routerLink="/circuits">Circuits</a>
+        <span class="separator">/</span>
+        <span class="current">{{ circuit.nom }}</span>
+      </div>
+    </div>
+
+    <!-- Badges -->
+    <div class="hero-badges">
+      <span class="badge-type">
+        <i class="fa-solid fa-compass mr-1.5"></i>
+        {{ getTypeLabel() }}
+      </span>
+      <span class="badge-difficulty" [ngClass]="getDifficultyClass()">
+        <span class="difficulty-dot"></span>
+        {{ getDifficultyLabel() }}
+      </span>
+    </div>
+
+    <!-- Title & Description -->
+    <h1 class="hero-title">{{ circuit.nom }}</h1>
+    <p class="hero-description">{{ circuit.description || 'Une aventure immersive et inoubliable à la découverte des merveilles culturelles, naturelles et historiques du Sénégal.' }}</p>
+
+    <!-- Key Stats Pills -->
+    <div class="hero-stats">
+      <div class="stat-pill">
+        <i class="fa-solid fa-map-pin stat-icon"></i>
+        <div class="stat-content">
+          <span class="stat-value">{{ circuit.etapes?.length || 0 }}</span>
+          <span class="stat-label">Étapes</span>
+        </div>
+      </div>
+
+      <div class="stat-pill">
+        <i class="fa-solid fa-clock stat-icon"></i>
+        <div class="stat-content">
+          <span class="stat-value">{{ formatDuree() }}</span>
+          <span class="stat-label">Durée totale</span>
+        </div>
+      </div>
+
+      <div class="stat-pill" *ngIf="circuit.distanceKm">
+        <i class="fa-solid fa-route stat-icon"></i>
+        <div class="stat-content">
+          <span class="stat-value">{{ circuit.distanceKm }} km</span>
+          <span class="stat-label">Distance</span>
+        </div>
+      </div>
+
+      <div class="stat-pill">
+        <i class="fa-solid fa-tag stat-icon"></i>
+        <div class="stat-content">
+          <span class="stat-value">{{ formatPrix() }}</span>
+          <span class="stat-label">Tarif estimé</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</header>

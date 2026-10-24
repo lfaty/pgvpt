@@ -1,0 +1,503 @@
+<div class="space-y-6 animate-fade-in-up pb-12">
+  <!-- En-tête -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+    <div>
+      <div class="flex items-center gap-3">
+        <span class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
+          <i class="fas fa-globe-africa"></i>
+        </span>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">Zones Géographiques</h2>
+          <p class="text-xs text-gray-500 mt-0.5">
+            Découpage territorial regroupant plusieurs régions administratives du Sénégal.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button type="button" routerLink="/admin/dashboard"
+              class="px-4 py-2 border border-gray-300 text-gray-700 text-xs font-medium rounded-xl hover:bg-gray-50 transition-colors">
+        <i class="fas fa-arrow-left mr-1.5"></i> Retour
+      </button>
+      <button type="button" (click)="openCreateModal()"
+              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition-colors shadow-sm flex items-center gap-2">
+        <i class="fas fa-plus"></i> Nouvelle Zone Géographique
+      </button>
+    </div>
+  </div>
+
+  <!-- Liste des Zones Géographiques -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div *ngFor="let zg of filteredZones" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <span class="px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-blue-100 text-blue-800 border border-blue-200">
+            {{ zg.code }}
+          </span>
+          <span class="w-2.5 h-2.5 rounded-full" [ngClass]="zg.actif ? 'bg-emerald-500' : 'bg-gray-300'"></span>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900 mb-1">{{ zg.nom }}</h3>
+        <p class="text-xs text-gray-500 mb-4 line-clamp-2">{{ zg.description || 'Aucune description' }}</p>
+
+        <!-- Régions associées -->
+        <div class="mb-4">
+          <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Régions rattachées</p>
+          <div class="flex flex-wrap gap-1.5" *ngIf="zg.regions && zg.regions.length > 0">
+            <span *ngFor="let reg of zg.regions" class="text-xs px-2.5 py-1 bg-blue-50 text-blue-700 border border-blue-100 rounded-lg font-medium flex items-center gap-1.5 shadow-2xs">
+              <i class="fas fa-map-pin text-[10px] text-blue-500"></i>
+              <span>{{ getRegionName(reg) }}</span>
+            </span>
+          </div>
+          <p *ngIf="!zg.regions || zg.regions.length === 0" class="text-xs text-gray-400 italic">Aucune région spécifiée</p>
+        </div>
+      </div>
+
+      <div class="pt-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+        <div class="flex items-center gap-2">
+          <span *ngIf="zg.superficieKm2" class="flex items-center gap-1 font-medium text-gray-700">
+            <i class="fas fa-vector-square text-blue-500"></i> {{ zg.superficieKm2 | number }} km²
+          </span>
+          <span *ngIf="!zg.superficieKm2" class="text-gray-400 italic text-[11px]">
+            Superficie non définie
+          </span>
+        </div>
+
+        <div class="flex items-center gap-1">
+          <button type="button" (click)="openViewModal(zg)"
+                  class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
+                  title="Consulter les détails">
+            <i class="fas fa-eye text-sm"></i>
+          </button>
+          <button type="button" (click)="openEditModal(zg)"
+                  class="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-colors"
+                  title="Modifier la zone géographique">
+            <i class="fas fa-edit text-sm"></i>
+          </button>
+          <button type="button" (click)="deleteZone(zg)"
+                  class="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
+                  title="Supprimer la zone géographique">
+            <i class="fas fa-trash-alt text-sm"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE CRÉATION MULTI-ÉTAPES (WIZARD) -->
+  <div *ngIf="showCreateModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-xl w-full overflow-hidden shadow-2xl border border-gray-100 animate-scale-up flex flex-col max-h-[90vh]">
+      
+      <!-- En-tête de la Modal -->
+      <div class="px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white flex justify-between items-center shadow-sm">
+        <div>
+          <h3 class="font-bold text-lg flex items-center gap-2">
+            <i class="fas fa-layer-group"></i> {{ isEditMode ? 'Modifier la Zone Géographique' : 'Nouvelle Zone Géographique' }}
+          </h3>
+          <p class="text-xs text-blue-100 mt-0.5">
+            Étape {{ currentStep }} sur {{ totalSteps }} : 
+            <span *ngIf="currentStep === 1">Informations Générales</span>
+            <span *ngIf="currentStep === 2">Régions Administratives</span>
+            <span *ngIf="currentStep === 3">Géométrie & Confirmation</span>
+          </p>
+        </div>
+        <button type="button" (click)="closeCreateModal()" class="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors">
+          <i class="fas fa-times text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Stepper Progress Bar -->
+      <div class="px-6 py-3.5 bg-gray-50 border-b border-gray-100">
+        <div class="flex items-center justify-between">
+          
+          <!-- Étape 1 -->
+          <button type="button" (click)="goToStep(1)" class="flex items-center gap-2 text-left group transition-all">
+            <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-sm"
+                  [ngClass]="currentStep === 1 ? 'bg-blue-600 text-white ring-4 ring-blue-100' : (isStep1Valid() ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500')">
+              <i *ngIf="isStep1Valid() && currentStep > 1" class="fas fa-check text-[10px]"></i>
+              <span *ngIf="!isStep1Valid() || currentStep === 1">1</span>
+            </span>
+            <div class="hidden sm:block">
+              <p class="text-[11px] font-bold uppercase tracking-wider"
+                 [ngClass]="currentStep === 1 ? 'text-blue-600 font-extrabold' : 'text-gray-500'">1. Général</p>
+              <p class="text-[10px] text-gray-400">Code & Nom</p>
+            </div>
+          </button>
+
+          <div class="flex-1 h-0.5 mx-3 transition-colors duration-300" 
+               [ngClass]="isStep1Valid() ? 'bg-emerald-400' : 'bg-gray-200'"></div>
+
+          <!-- Étape 2 -->
+          <button type="button" (click)="goToStep(2)" class="flex items-center gap-2 text-left group transition-all" [disabled]="!isStep1Valid()">
+            <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-sm"
+                  [ngClass]="currentStep === 2 ? 'bg-blue-600 text-white ring-4 ring-blue-100' : (isStep2Valid() ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500')">
+              <i *ngIf="isStep2Valid() && currentStep > 2" class="fas fa-check text-[10px]"></i>
+              <span *ngIf="!isStep2Valid() || currentStep <= 2">2</span>
+            </span>
+            <div class="hidden sm:block">
+              <p class="text-[11px] font-bold uppercase tracking-wider"
+                 [ngClass]="currentStep === 2 ? 'text-blue-600 font-extrabold' : 'text-gray-500'">2. Régions</p>
+              <p class="text-[10px] text-gray-400">Rattachement</p>
+            </div>
+          </button>
+
+          <div class="flex-1 h-0.5 mx-3 transition-colors duration-300"
+               [ngClass]="isStep2Valid() ? 'bg-emerald-400' : 'bg-gray-200'"></div>
+
+          <!-- Étape 3 -->
+          <button type="button" (click)="goToStep(3)" class="flex items-center gap-2 text-left group transition-all" [disabled]="!isStep1Valid() || !isStep2Valid()">
+            <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-sm"
+                  [ngClass]="currentStep === 3 ? 'bg-blue-600 text-white ring-4 ring-blue-100' : (isStep3Valid() ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500')">
+              <span>3</span>
+            </span>
+            <div class="hidden sm:block">
+              <p class="text-[11px] font-bold uppercase tracking-wider"
+                 [ngClass]="currentStep === 3 ? 'text-blue-600 font-extrabold' : 'text-gray-500'">3. Géométrie</p>
+              <p class="text-[10px] text-gray-400">Centre & Récap</p>
+            </div>
+          </button>
+
+        </div>
+      </div>
+
+      <form [formGroup]="zoneForm" (ngSubmit)="submitCreate()" class="flex flex-col flex-1 overflow-hidden">
+        
+        <!-- Corps de l'étape active -->
+        <div class="p-6 space-y-4 overflow-y-auto flex-1">
+          
+          <!-- ==================== ÉTAPE 1 : IDENTIFICATION ==================== -->
+          <div *ngIf="currentStep === 1" class="space-y-4 animate-fade-in-up">
+            <div class="flex items-start gap-3 p-3 bg-blue-50/70 border border-blue-100 rounded-xl text-xs text-blue-900">
+              <i class="fas fa-info-circle text-blue-600 mt-0.5"></i>
+              <div>
+                <p class="font-bold">Identification de la Zone</p>
+                <p class="text-blue-700/80">Définissez un identifiant unique (ex: code normalisé) et le libellé officiel de la zone.</p>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase mb-1">
+                Code de la Zone <span class="text-rose-500">*</span>
+              </label>
+              <div class="relative">
+                <input type="text" formControlName="code" placeholder="ex: ZG-CASAMANCE"
+                       class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none uppercase font-mono transition-all"
+                       [ngClass]="{'border-rose-400 ring-2 ring-rose-100': zoneForm.get('code')?.invalid && zoneForm.get('code')?.touched}">
+                <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-400">
+                  <i *ngIf="zoneForm.get('code')?.valid" class="fas fa-check text-emerald-500"></i>
+                </div>
+              </div>
+              <p *ngIf="zoneForm.get('code')?.invalid && zoneForm.get('code')?.touched" class="text-xs text-rose-500 mt-1 flex items-center gap-1">
+                <i class="fas fa-exclamation-circle text-[10px]"></i> Le code est obligatoire (min. 3 caractères).
+              </p>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase mb-1">
+                Nom de la Zone <span class="text-rose-500">*</span>
+              </label>
+              <div class="relative">
+                <input type="text" formControlName="nom" placeholder="ex: Zone Géographique Casamance"
+                       class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                       [ngClass]="{'border-rose-400 ring-2 ring-rose-100': zoneForm.get('nom')?.invalid && zoneForm.get('nom')?.touched}">
+                <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-400">
+                  <i *ngIf="zoneForm.get('nom')?.valid" class="fas fa-check text-emerald-500"></i>
+                </div>
+              </div>
+              <p *ngIf="zoneForm.get('nom')?.invalid && zoneForm.get('nom')?.touched" class="text-xs text-rose-500 mt-1 flex items-center gap-1">
+                <i class="fas fa-exclamation-circle text-[10px]"></i> Le nom est obligatoire (min. 3 caractères).
+              </p>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Description (facultative)</label>
+              <textarea formControlName="description" rows="3" placeholder="Présentation générale, spécificités territoriales ou vocation de la zone..."
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"></textarea>
+            </div>
+          </div>
+
+          <!-- ==================== ÉTAPE 2 : RÉGIONS RATTACHÉES ==================== -->
+          <div *ngIf="currentStep === 2" class="space-y-4 animate-fade-in-up">
+            <div class="flex items-center justify-between p-3 bg-indigo-50/70 border border-indigo-100 rounded-xl text-xs text-indigo-900">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-map-marked-alt text-indigo-600"></i>
+                <span>Cochez les régions administratives composant cette zone.</span>
+              </div>
+              <span class="px-2.5 py-1 bg-indigo-600 text-white font-bold rounded-lg text-[11px] shadow-sm">
+                {{ (zoneForm.get('regionIds')?.value || []).length }} sélectionnée(s)
+              </span>
+            </div>
+
+            <!-- Barre d'outils de sélection rapide -->
+            <div class="flex items-center justify-between gap-2 text-xs">
+              <span class="text-gray-500 font-medium">Régions disponibles : {{ availableRegions.length }}</span>
+              <div class="flex gap-2">
+                <button type="button" (click)="selectAllRegions()" class="px-2.5 py-1 text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-colors">
+                  <i class="fas fa-check-double mr-1"></i> Tout cocher
+                </button>
+                <button type="button" (click)="deselectAllRegions()" class="px-2.5 py-1 text-gray-500 hover:bg-gray-100 rounded-lg font-medium transition-colors">
+                  <i class="fas fa-undo mr-1"></i> Tout décocher
+                </button>
+              </div>
+            </div>
+
+            <!-- Liste des régions avec sélection par carte -->
+            <div *ngIf="availableRegions.length > 0" class="max-h-60 overflow-y-auto pr-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label *ngFor="let r of availableRegions"
+                     class="flex items-center gap-3 p-2.5 border rounded-xl cursor-pointer transition-all text-xs"
+                     [ngClass]="isRegionSelected(r.id) ? 'border-blue-500 bg-blue-50/50 shadow-sm' : 'border-gray-200 bg-white hover:border-blue-200 hover:bg-gray-50/50'">
+                <input type="checkbox"
+                       [checked]="isRegionSelected(r.id)"
+                       (change)="onRegionToggle(r.id, $event)"
+                       class="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-gray-300">
+                <div class="flex-1 min-w-0">
+                  <p class="font-bold text-gray-800 truncate" [ngClass]="{'text-blue-900': isRegionSelected(r.id)}">
+                    {{ r.nom }}
+                  </p>
+                  <p class="text-[10px] text-gray-400 font-mono">{{ r.code }}</p>
+                </div>
+                <i *ngIf="isRegionSelected(r.id)" class="fas fa-check-circle text-blue-600 text-sm"></i>
+              </label>
+            </div>
+
+            <div *ngIf="availableRegions.length === 0" class="p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-start gap-2">
+              <i class="fas fa-exclamation-triangle text-amber-600 mt-0.5"></i>
+              <span>Aucune région trouvée dans le système. Créez au moins une région dans le Référentiel Administratif avant de créer une zone géographique.</span>
+            </div>
+
+            <p *ngIf="zoneForm.get('regionIds')?.touched && (zoneForm.get('regionIds')?.value || []).length === 0"
+               class="text-xs text-rose-500 flex items-center gap-1 font-medium">
+              <i class="fas fa-exclamation-circle text-[10px]"></i> Au moins une région doit être rattachée.
+            </p>
+          </div>
+
+          <!-- ==================== ÉTAPE 3 : GÉOMÉTRIE & RÉCAPITULATIF ==================== -->
+          <div *ngIf="currentStep === 3" class="space-y-4 animate-fade-in-up">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Superficie (km²)</label>
+                <input type="number" formControlName="superficieKm2" placeholder="ex: 12000"
+                       class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Latitude Centre</label>
+                <input type="number" step="0.0001" formControlName="latitudeCentre" placeholder="ex: 12.56"
+                       class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Longitude Centre</label>
+                <input type="number" step="0.0001" formControlName="longitudeCentre" placeholder="ex: -16.27"
+                       class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none">
+              </div>
+            </div>
+
+            <!-- Carte Récapitulative -->
+            <div class="p-4 bg-gradient-to-br from-blue-50/70 to-indigo-50/50 border border-blue-200/60 rounded-2xl space-y-3">
+              <div class="flex items-center justify-between pb-2 border-b border-blue-200/40">
+                <span class="text-xs font-bold uppercase tracking-wider text-blue-900 flex items-center gap-1.5">
+                  <i class="fas fa-clipboard-check text-blue-600"></i> Récapitulatif avant création
+                </span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-600 text-white">
+                  {{ zoneForm.get('code')?.value || 'CODE' }}
+                </span>
+              </div>
+
+              <div>
+                <p class="text-sm font-bold text-gray-900">{{ zoneForm.get('nom')?.value || 'Nom non défini' }}</p>
+                <p *ngIf="zoneForm.get('description')?.value" class="text-xs text-gray-600 mt-0.5 italic line-clamp-2">
+                  "{{ zoneForm.get('description')?.value }}"
+                </p>
+              </div>
+
+              <div>
+                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                  Régions rattachées ({{ getSelectedRegions().length }}) :
+                </p>
+                <div class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
+                  <span *ngFor="let r of getSelectedRegions()" class="text-xs px-2.5 py-1 bg-white text-blue-800 border border-blue-200 rounded-lg font-medium shadow-2xs">
+                    <i class="fas fa-map-pin text-[10px] mr-1 text-blue-500"></i>{{ r.nom }}
+                  </span>
+                </div>
+              </div>
+
+              <div *ngIf="zoneForm.get('superficieKm2')?.value || zoneForm.get('latitudeCentre')?.value" class="text-xs text-gray-600 flex items-center gap-4 pt-1 border-t border-blue-200/30">
+                <span *ngIf="zoneForm.get('superficieKm2')?.value">
+                  <i class="fas fa-vector-square mr-1 text-blue-500"></i>{{ zoneForm.get('superficieKm2')?.value | number }} km²
+                </span>
+                <span *ngIf="zoneForm.get('latitudeCentre')?.value && zoneForm.get('longitudeCentre')?.value">
+                  <i class="fas fa-map-marker-alt mr-1 text-blue-500"></i>GPS : {{ zoneForm.get('latitudeCentre')?.value }}, {{ zoneForm.get('longitudeCentre')?.value }}
+                </span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Pied de page avec boutons de navigation par étape -->
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+          <div>
+            <button *ngIf="currentStep > 1" type="button" (click)="prevStep()"
+                    class="px-4 py-2 border border-gray-300 text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-100 transition-colors flex items-center gap-1.5 shadow-2xs">
+              <i class="fas fa-arrow-left"></i> Précédent
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button type="button" (click)="closeCreateModal()"
+                    class="px-4 py-2 border border-gray-300 text-gray-600 text-xs font-semibold rounded-xl hover:bg-gray-100 transition-colors">
+              Annuler
+            </button>
+            
+            <!-- Bouton Suivant (Étape 1 et 2) -->
+            <button *ngIf="currentStep < totalSteps" type="button" (click)="nextStep()" [disabled]="!canProceed()"
+                    class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition-colors shadow-sm disabled:opacity-50 flex items-center gap-1.5">
+              Suivant <i class="fas fa-arrow-right"></i>
+            </button>
+
+            <!-- Bouton Final de Création / Modification (Étape 3) -->
+            <button *ngIf="currentStep === totalSteps" type="submit" [disabled]="zoneForm.invalid || isSubmitting"
+                    class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2">
+              <i *ngIf="!isSubmitting" class="fas fa-check"></i>
+              <i *ngIf="isSubmitting" class="fas fa-circle-notch fa-spin text-xs"></i>
+              <span>{{ isSubmitting ? 'Enregistrement en cours...' : (isEditMode ? 'Enregistrer les modifications' : 'Créer la zone') }}</span>
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE CONSULTATION / DÉTAILS -->
+  <div *ngIf="showViewModal && selectedItem" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-xl w-full overflow-hidden shadow-2xl border border-gray-100 animate-scale-up flex flex-col max-h-[90vh]">
+      
+      <!-- En-tête -->
+      <div class="px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white flex justify-between items-center shadow-sm">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-white">
+            <i class="fas fa-globe-africa text-base"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base leading-tight">Détails de la Zone Géographique</h3>
+            <p class="text-xs text-blue-100 mt-0.5 font-mono">{{ selectedItem.code }}</p>
+          </div>
+        </div>
+        <button type="button" (click)="closeViewModal()" class="text-white/80 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors">
+          <i class="fas fa-times text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Contenu -->
+      <div class="p-6 space-y-5 overflow-y-auto flex-1">
+        
+        <!-- Titre & Badges -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2.5 py-0.5 rounded-md text-xs font-mono font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                {{ selectedItem.code }}
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium"
+                    [ngClass]="selectedItem.actif ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-gray-100 text-gray-600'">
+                <span class="w-1.5 h-1.5 rounded-full" [ngClass]="selectedItem.actif ? 'bg-emerald-500' : 'bg-gray-400'"></span>
+                {{ selectedItem.actif ? 'Active' : 'Inactive' }}
+              </span>
+            </div>
+            <h2 class="text-xl font-bold text-gray-900">{{ selectedItem.nom }}</h2>
+          </div>
+
+          <div class="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-100 rounded-xl self-start sm:self-center shadow-2xs">
+            <i class="fas fa-map-marked-alt"></i>
+            <span>{{ selectedItem.regions?.length || 0 }} région(s) rattachée(s)</span>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Description</h4>
+          <p class="text-sm text-gray-700 leading-relaxed bg-gray-50/80 p-3.5 rounded-xl border border-gray-100">
+            {{ selectedItem.description || 'Aucune description détaillée renseignée pour cette zone géographique.' }}
+          </p>
+        </div>
+
+        <!-- Régions rattachées -->
+        <div>
+          <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Régions Administratives Rattachées</h4>
+          <div class="flex flex-wrap gap-2 p-3.5 bg-blue-50/40 border border-blue-100 rounded-xl max-h-40 overflow-y-auto" *ngIf="selectedItem.regions && selectedItem.regions.length > 0">
+            <span *ngFor="let reg of selectedItem.regions" class="text-xs px-3 py-1.5 bg-white text-blue-800 border border-blue-200 rounded-lg font-medium shadow-2xs flex items-center gap-1.5">
+              <i class="fas fa-map-pin text-[10px] text-blue-500"></i>
+              <span>{{ getRegionName(reg) }}</span>
+            </span>
+          </div>
+          <p *ngIf="!selectedItem.regions || selectedItem.regions.length === 0" class="text-xs text-gray-400 italic p-3 bg-gray-50 rounded-xl border border-gray-100">
+            Aucune région administrative associée à cette zone géographique.
+          </p>
+        </div>
+
+        <!-- Métriques géographiques (Superficie & GPS) -->
+        <div>
+          <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Caractéristiques Géographiques</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="p-3 bg-gray-50 rounded-xl border border-gray-100 flex items-center gap-3">
+              <div class="w-9 h-9 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                <i class="fas fa-vector-square"></i>
+              </div>
+              <div>
+                <p class="text-[11px] text-gray-400 font-medium">Superficie estimée</p>
+                <p class="text-sm font-bold text-gray-800">
+                  {{ selectedItem.superficieKm2 ? (selectedItem.superficieKm2 | number) + ' km²' : 'Non renseignée' }}
+                </p>
+              </div>
+            </div>
+
+            <div class="p-3 bg-gray-50 rounded-xl border border-gray-100 flex items-center gap-3">
+              <div class="w-9 h-9 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                <i class="fas fa-map-marker-alt"></i>
+              </div>
+              <div>
+                <p class="text-[11px] text-gray-400 font-medium">Coordonnées du centre</p>
+                <p class="text-xs font-mono font-bold text-gray-800" *ngIf="selectedItem.latitudeCentre && selectedItem.longitudeCentre">
+                  {{ selectedItem.latitudeCentre | number:'1.2-4' }}, {{ selectedItem.longitudeCentre | number:'1.2-4' }}
+                </p>
+                <p class="text-xs text-gray-400 italic" *ngIf="!selectedItem.latitudeCentre">
+                  Non renseignées
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Pied de page -->
+      <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+        <button type="button" (click)="closeViewModal()"
+                class="px-4 py-2 border border-gray-300 text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-100 transition-colors">
+          Fermer
+        </button>
+
+        <button type="button" (click)="closeViewModal(); openEditModal(selectedItem)"
+                class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-xl transition-colors shadow-sm flex items-center gap-2">
+          <i class="fas fa-edit"></i> Modifier cette zone
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal de confirmation de suppression (Shared) -->
+  <app-confirm-modal
+    [isOpen]="!!zoneToDelete"
+    title="Supprimer la zone géographique ?"
+    message="Confirmez-vous la suppression définitive de cette zone géographique ?"
+    [itemName]="zoneToDelete?.nom"
+    [isProcessing]="isDeleting"
+    confirmText="Supprimer"
+    (confirm)="confirmDeleteZone()"
+    (cancel)="cancelDeleteZone()">
+  </app-confirm-modal>
+
+</div>

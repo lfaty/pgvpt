@@ -27,11 +27,20 @@ public interface GeolocalisationMapper {
     // --- Mappings pour Geolocalisation ---
 
     @Mapping(target = "geom", source = ".", qualifiedByName = "dtoToPoint")
+    @Mapping(target = "zoneTouristique", ignore = true)
+    @Mapping(target = "village", ignore = true)
+    @Mapping(target = "quartier", ignore = true)
     GeolocalisationEntity toEntity(GeolocalisationCreate dto);
 
     @Mapping(target = "geom", source = ".", qualifiedByName = "dtoToPoint")
+    @Mapping(target = "zoneTouristique", ignore = true)
+    @Mapping(target = "village", ignore = true)
+    @Mapping(target = "quartier", ignore = true)
     void updateEntity(GeolocalisationUpdate dto, @MappingTarget GeolocalisationEntity entity);
 
+    @Mapping(target = "zoneTouristiqueId", source = "zoneTouristique.id")
+    @Mapping(target = "villageId", source = "village.id")
+    @Mapping(target = "quartierId", source = "quartier.id")
     Geolocalisation toDto(GeolocalisationEntity entity);
 
     // --- Mappings pour PointAcces ---

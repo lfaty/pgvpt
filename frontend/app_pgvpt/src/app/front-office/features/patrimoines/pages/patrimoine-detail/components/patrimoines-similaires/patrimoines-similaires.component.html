@@ -1,0 +1,20 @@
+<!-- VOUS AIMEREZ AUSSI -->
+<section class="bg-[#FAFAF7] border-t border-gray-100" *ngIf="similaires && similaires.length > 0">
+  <div class="mx-auto max-w-[1200px] px-6 py-20">
+    <div class="flex items-end justify-between gap-4 mb-10">
+      <div>
+        <p class="td-kicker">Pour aller plus loin</p>
+        <h2 class="font-serif text-3xl md:text-4xl font-bold text-[#0B1A24]">Vous aimerez aussi</h2>
+        <p class="text-sm text-gray-500 mt-2">D'autres trésors du Sénégal à ajouter à votre itinéraire.</p>
+      </div>
+      <a routerLink="/patrimoines" class="hidden md:inline-flex items-center gap-2 text-sm font-bold text-[#D16933] hover:gap-3 transition-all">
+        Tout explorer <i class="fa-solid fa-arrow-right text-xs"></i>
+      </a>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" #similarCarousel>
+      <div *ngFor="let p of similaires" class="td-lift">
+        <app-patrimoine-card [patrimoine]="p"></app-patrimoine-card>
+      </div>
+    </div>
+  </div>
+</section>

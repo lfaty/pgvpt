@@ -1,0 +1,52 @@
+<!-- Loading Screen -->
+<div *ngIf="isLoading" class="loading-container">
+  <div class="loading-spinner"></div>
+  <p class="loading-text">Chargement de l'itinéraire...</p>
+</div>
+
+<!-- Error Screen -->
+<div *ngIf="hasError && !isLoading" class="error-container">
+  <div class="error-icon">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+  </div>
+  <h2 class="error-title">Impossible d'afficher le circuit</h2>
+  <p class="error-desc">{{ errorMessage }}</p>
+  <a routerLink="/circuits" class="btn-back">
+    <i class="fa-solid fa-arrow-left"></i>
+    Retour au catalogue des circuits
+  </a>
+</div>
+
+<!-- Main Circuit Detail Content -->
+<div *ngIf="!isLoading && !hasError && circuit" class="circuit-detail-page">
+
+  <!-- 1. HERO HEADER -->
+  <app-circuit-hero [circuit]="circuit"></app-circuit-hero>
+
+  <!-- 2. MAIN CONTENT LAYOUT (GRID) -->
+  <main class="detail-container">
+    <div class="detail-grid">
+      
+      <!-- Colonne Gauche : Carte et Timeline des étapes -->
+      <div class="content-left">
+        <!-- Carte Leaflet de l'itinéraire -->
+        <app-circuit-map
+          [etapes]="circuit.etapes || []"
+          [(activeStepIndex)]="activeStepIndex">
+        </app-circuit-map>
+
+        <!-- Timeline détaillée des étapes -->
+        <app-circuit-timeline
+          [etapes]="circuit.etapes || []"
+          [activeStepIndex]="activeStepIndex"
+          (locateStep)="onLocateStep($event)">
+        </app-circuit-timeline>
+      </div>
+
+      <!-- Colonne Droite : Sidebar Réservation & Infos pratiques -->
+      <app-circuit-sidebar [circuit]="circuit"></app-circuit-sidebar>
+
+    </div>
+  </main>
+
+</div>

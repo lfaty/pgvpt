@@ -7,6 +7,8 @@ yarn-error.log*
 # Build and compiled output
 **/target/
 target/
+**/target_classes/
+**/target_test-classes/
 **/dist/
 dist/
 **/out-tsc/
@@ -45,3 +47,14 @@ Thumbs.db
 # Generated shell scripts
 **/git_push.sh
 git_push.sh
+
+# Test documentation and local guides
+DONNEES_TEST_*.md
+backend/**/*test*.md
+backend/**/test-data/
+
+# Scripts Windows CMD & Maven wrapper cmd
+*.cmd
+**/mvnw.cmd
+
+

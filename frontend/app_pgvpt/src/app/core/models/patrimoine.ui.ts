@@ -1,7 +1,7 @@
-import { Patrimoine } from '../api/patrimoine/model/patrimoine';
-import { Monument } from '../api/patrimoine/model/monument';
-import { Musee } from '../api/patrimoine/model/musee';
-import { SiteNaturel } from '../api/patrimoine/model/site-naturel';
+import { Patrimoine } from '../openapi/patrimoine/model/patrimoine';
+import { Monument } from '../openapi/patrimoine/model/monument';
+import { Musee } from '../openapi/patrimoine/model/musee';
+import { SiteNaturel } from '../openapi/patrimoine/model/site-naturel';
 
 export type PatrimoineComplet = Patrimoine | Monument | Musee | SiteNaturel;
 
@@ -24,7 +24,7 @@ export type PatrimoineUI = PatrimoineComplet & {
   commune?: string;
   /** Image principale — résolue depuis photoPrincipale (ms-patrimoine) */
   imageUrl?: string;
-  /** ID du media choisi comme Hero par l'admin (Mock data extension) */
+  /** ID du media choisi comme Hero par l'admin */
   heroMediaId?: string;
   /** Latitude — résolue depuis ms-geolocalisation */
   latitude?: number;

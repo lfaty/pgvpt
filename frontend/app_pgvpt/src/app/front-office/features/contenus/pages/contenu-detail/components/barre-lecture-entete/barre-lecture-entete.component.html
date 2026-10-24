@@ -1,0 +1,38 @@
+<header class="bg-white/95 backdrop-blur-md border-b border-gray-100 py-3.5 px-6 sticky top-0 z-30 shadow-2xs">
+  <div class="max-w-6xl mx-auto flex items-center justify-between gap-4">
+    
+    <!-- Fil d'Ariane -->
+    <nav class="flex items-center gap-2 text-xs text-gray-500 overflow-x-auto whitespace-nowrap">
+      <a routerLink="/" class="hover:text-[#0b5d5e] transition-colors"><i class="fas fa-home"></i></a>
+      <span class="text-gray-300">/</span>
+      <a routerLink="/patrimoines" class="hover:text-[#0b5d5e] transition-colors font-medium">Patrimoines</a>
+      <ng-container *ngIf="patrimoine">
+        <span class="text-gray-300">/</span>
+        <a [routerLink]="['/patrimoines', patrimoine.id]" class="hover:text-[#0b5d5e] transition-colors font-medium">
+          {{ patrimoine.nom }}
+        </a>
+      </ng-container>
+      <span class="text-gray-300">/</span>
+      <span class="text-gray-800 font-bold truncate max-w-xs" *ngIf="contenu">{{ contenu.titre }}</span>
+    </nav>
+
+    <!-- Contrôles de lecture & retour -->
+    <div class="flex items-center gap-3 shrink-0">
+      <!-- Bouton confort taille police -->
+      <button type="button" (click)="toggleFontSize()"
+              class="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:text-[#0b5d5e] hover:border-[#0b5d5e] text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+              title="Ajuster la taille du texte pour le confort de lecture">
+        <i class="fas fa-font"></i>
+        <span>{{ fontSizeMode === 'large' ? 'Taille normale' : 'Agrandir texte' }}</span>
+      </button>
+
+      <!-- Bouton retour au site hôte -->
+      <a *ngIf="patrimoine" [routerLink]="['/patrimoines', patrimoine.id]"
+         class="px-4 py-1.5 bg-[#0b5d5e] hover:bg-[#084b4c] text-white text-xs font-bold rounded-lg shadow-2xs transition-colors flex items-center gap-1.5">
+        <i class="fas fa-arrow-left text-[10px]"></i>
+        <span>Retour au site</span>
+      </a>
+    </div>
+
+  </div>
+</header>

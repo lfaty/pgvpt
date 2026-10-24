@@ -4,7 +4,6 @@ import com.pgvpt.api.GeospatialApi;
 import com.pgvpt.dto.*;
 import com.pgvpt.record.GeolocalisationSearchCriteria;
 import com.pgvpt.service.GeolocalisationService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,10 +15,13 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequiredArgsConstructor
 public class GeospatialController implements GeospatialApi {
 
     private final GeolocalisationService service;
+
+    public GeospatialController(GeolocalisationService service) {
+        this.service = service;
+    }
 
     @Override
     public ResponseEntity<Distance> calculerDistance(Double latitudeDepart, Double longitudeDepart, Double latitudeArrivee, Double longitudeArrivee) {

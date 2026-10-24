@@ -97,11 +97,7 @@
             (change)="filtrerParRegion($any($event.target).value)"
             class="text-xs font-medium bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#0b5d5e] focus:border-[#0b5d5e]">
             <option value="TOUTES">Toutes les régions</option>
-            <option value="Dakar">Dakar</option>
-            <option value="Saint-Louis">Saint-Louis</option>
-            <option value="Fatick">Fatick (Saloum)</option>
-            <option value="Tambacounda">Tambacounda</option>
-            <option value="Kaolack">Kaolack</option>
+            <option *ngFor="let reg of regionsDisponibles" [value]="reg">{{ reg }}</option>
           </select>
         </div>
       </div>
@@ -119,7 +115,7 @@
             </span>
           </div>
           <p class="text-xs text-gray-600 mt-1">
-            <strong>Activités disponibles :</strong> {{ selectedSite.activitesExemples.join(', ') }}
+            <strong>Détails :</strong> {{ selectedSite.activitesExemples.join(', ') }}
           </p>
         </div>
         <div class="flex items-center gap-2 shrink-0">
@@ -147,7 +143,7 @@
           </a>
         </div>
 
-        <div class="space-y-3.5">
+        <div class="space-y-3.5" *ngIf="topActivites.length > 0; else noTopActivites">
           <div *ngFor="let act of topActivites"
             class="p-3 rounded-xl border border-gray-100 hover:border-emerald-200 hover:bg-emerald-50/20 transition-all flex items-start gap-3">
             <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-xs text-gray-600 shrink-0 mt-0.5">
@@ -167,6 +163,12 @@
             </div>
           </div>
         </div>
+        <ng-template #noTopActivites>
+          <div class="py-8 text-center text-gray-400 text-xs">
+            <i class="fas fa-hiking text-2xl mb-2 text-gray-300 block"></i>
+            Aucune activité enregistrée en base pour le moment.
+          </div>
+        </ng-template>
       </div>
 
       <!-- Carte : Répartition des Activités -->
@@ -175,10 +177,10 @@
           <div class="w-8 h-8 rounded-lg bg-[#0b5d5e]/10 text-[#0b5d5e] flex items-center justify-center">
             <i class="fas fa-chart-pie text-sm"></i>
           </div>
-          <h3 class="text-sm font-bold text-gray-900">Types d'activités (65)</h3>
+          <h3 class="text-sm font-bold text-gray-900">Types d'activités ({{ stats[1].total }})</h3>
         </div>
 
-        <div class="space-y-3">
+        <div class="space-y-3" *ngIf="repartitionActivites.length > 0; else noRepartition">
           <div *ngFor="let rep of repartitionActivites">
             <div class="flex justify-between items-center text-xs mb-1">
               <span class="font-medium text-gray-700 flex items-center gap-1.5">
@@ -193,6 +195,11 @@
             </div>
           </div>
         </div>
+        <ng-template #noRepartition>
+          <div class="py-4 text-center text-gray-400 text-xs">
+            Aucune répartition disponible.
+          </div>
+        </ng-template>
       </div>
 
     </div>
@@ -231,13 +238,12 @@
 
     <!-- TABLEAU PATRIMOINES -->
     <div *ngIf="activeTab === 'patrimoines'" class="overflow-x-auto">
-      <table class="w-full text-left border-collapse">
+      <table *ngIf="recentsPatrimoines.length > 0; else noPatrimoinesTable" class="w-full text-left border-collapse">
         <thead>
           <tr class="bg-gray-50/75 text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100">
             <th class="py-3 px-5">Nom du Site</th>
             <th class="py-3 px-5">Région</th>
             <th class="py-3 px-5">Catégorie</th>
-            <th class="py-3 px-5">Activités liées</th>
             <th class="py-3 px-5">Date</th>
             <th class="py-3 px-5">Statut</th>
             <th class="py-3 px-5 text-right">Actions</th>
@@ -248,11 +254,6 @@
             <td class="py-3.5 px-5 font-bold text-gray-900">{{ p.nom }}</td>
             <td class="py-3.5 px-5 text-gray-600"><i class="fa-solid fa-location-dot text-rose-500 mr-1 text-xs"></i>{{ p.region }}</td>
             <td class="py-3.5 px-5 text-gray-600">{{ p.categorie }}</td>
-            <td class="py-3.5 px-5">
-              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-semibold text-[11px]">
-                <i class="fas fa-hiking text-[10px]"></i> {{ p.activitesCount }} activités
-              </span>
-            </td>
             <td class="py-3.5 px-5 text-gray-400">{{ p.date }}</td>
             <td class="py-3.5 px-5">
               <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border" [ngClass]="p.statutBadge">
@@ -267,17 +268,21 @@
           </tr>
         </tbody>
       </table>
+      <ng-template #noPatrimoinesTable>
+        <div class="py-12 text-center text-gray-400 text-xs">
+          <i class="fas fa-landmark text-3xl mb-3 text-gray-300 block"></i>
+          Aucun patrimoine trouvé dans la base de données.
+        </div>
+      </ng-template>
     </div>
 
     <!-- TABLEAU ACTIVITÉS -->
     <div *ngIf="activeTab === 'activites'" class="overflow-x-auto">
-      <table class="w-full text-left border-collapse">
+      <table *ngIf="recentsActivites.length > 0; else noActivitesTable" class="w-full text-left border-collapse">
         <thead>
           <tr class="bg-gray-50/75 text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100">
             <th class="py-3 px-5">Intitulé de l'Activité</th>
-            <th class="py-3 px-5">Site Rattaché</th>
-            <th class="py-3 px-5">Catégorie</th>
-            <th class="py-3 px-5">Durée</th>
+            <th class="py-3 px-5">Code</th>
             <th class="py-3 px-5">Tarif estimatif</th>
             <th class="py-3 px-5">Disponibilité</th>
             <th class="py-3 px-5 text-right">Actions</th>
@@ -286,9 +291,7 @@
         <tbody class="divide-y divide-gray-100 text-xs">
           <tr *ngFor="let a of recentsActivites" class="hover:bg-gray-50/50 transition-colors">
             <td class="py-3.5 px-5 font-bold text-gray-900">{{ a.nom }}</td>
-            <td class="py-3.5 px-5 text-gray-600"><i class="fa-solid fa-landmark text-gray-400 mr-1 text-xs"></i>{{ a.site }} ({{ a.region }})</td>
             <td class="py-3.5 px-5 text-gray-600">{{ a.type }}</td>
-            <td class="py-3.5 px-5 text-gray-600 font-medium"><i class="fa-regular fa-clock text-gray-400 mr-1 text-xs"></i>{{ a.duree }}</td>
             <td class="py-3.5 px-5 font-bold text-gray-800">{{ a.prix }}</td>
             <td class="py-3.5 px-5">
               <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border" [ngClass]="a.statutBadge">
@@ -303,17 +306,22 @@
           </tr>
         </tbody>
       </table>
+      <ng-template #noActivitesTable>
+        <div class="py-12 text-center text-gray-400 text-xs">
+          <i class="fas fa-hiking text-3xl mb-3 text-gray-300 block"></i>
+          Aucune activité trouvée dans la base de données.
+        </div>
+      </ng-template>
     </div>
 
     <!-- TABLEAU CIRCUITS -->
     <div *ngIf="activeTab === 'circuits'" class="overflow-x-auto">
-      <table class="w-full text-left border-collapse">
+      <table *ngIf="recentsCircuits.length > 0; else noCircuitsTable" class="w-full text-left border-collapse">
         <thead>
           <tr class="bg-gray-50/75 text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100">
             <th class="py-3 px-5">Nom du Circuit</th>
-            <th class="py-3 px-5">Itinéraire / Étapes</th>
+            <th class="py-3 px-5">Étapes</th>
             <th class="py-3 px-5">Durée</th>
-            <th class="py-3 px-5">Activités incluses</th>
             <th class="py-3 px-5">Statut</th>
             <th class="py-3 px-5 text-right">Actions</th>
           </tr>
@@ -322,12 +330,7 @@
           <tr *ngFor="let c of recentsCircuits" class="hover:bg-gray-50/50 transition-colors">
             <td class="py-3.5 px-5 font-bold text-gray-900">{{ c.nom }}</td>
             <td class="py-3.5 px-5 text-gray-600"><i class="fa-solid fa-route text-amber-500 mr-1 text-xs"></i>{{ c.etapes }}</td>
-            <td class="py-3.5 px-5 text-gray-600 font-medium"><i class="fa-regular fa-calendar text-gray-400 mr-1 text-xs"></i>{{ c.duree }}</td>
-            <td class="py-3.5 px-5">
-              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-semibold text-[11px]">
-                <i class="fas fa-hiking text-[10px]"></i> {{ c.activitesCount }} étapes & activités
-              </span>
-            </td>
+            <td class="py-3.5 px-5 text-gray-600 font-medium"><i class="fa-regular fa-clock text-gray-400 mr-1 text-xs"></i>{{ c.duree }}</td>
             <td class="py-3.5 px-5">
               <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border" [ngClass]="c.statutBadge">
                 {{ c.statut }}
@@ -341,6 +344,12 @@
           </tr>
         </tbody>
       </table>
+      <ng-template #noCircuitsTable>
+        <div class="py-12 text-center text-gray-400 text-xs">
+          <i class="fas fa-route text-3xl mb-3 text-gray-300 block"></i>
+          Aucun circuit trouvé dans la base de données.
+        </div>
+      </ng-template>
     </div>
 
   </div>

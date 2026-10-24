@@ -1,0 +1,186 @@
+<!-- SECTION : GALERIE -->
+<section id="galerie" class="scroll-mt galerie-section section-white page-galerie">
+  <div class="mx-auto max-w-[1200px] px-6 py-16 font-sans text-gray-800">
+    <h3 class="font-serif text-3xl font-bold text-gray-900 mb-12">Médiathèque</h3>
+
+    <!-- Barre de Filtres Multimédias -->
+    <div class="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center mb-8 border-b border-gray-200 pb-6 fade-slide-up" *ngIf="galerieMedias.length > 0">
+      
+      <!-- Filtres par Type (Scroll horizontal sur mobile) -->
+      <div class="flex overflow-x-auto gap-2 pb-2 w-full md:w-auto hide-scrollbar">
+        <!-- TOUT -->
+        <button (click)="setMediaFilter('ALL')" 
+                class="shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-colors border"
+                [ngClass]="activeMediaFilter === 'ALL' ? 'bg-[#D16933] text-white border-[#D16933]' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'">
+          Tout ({{ galerieMedias.length }})
+        </button>
+        
+        <!-- TYPES DYNAMIQUES -->
+        <button *ngFor="let tab of mediaTabs"
+                (click)="setMediaFilter(tab.type)" 
+                class="shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-colors border"
+                [ngClass]="activeMediaFilter === tab.type ? 'bg-[#D16933] text-white border-[#D16933]' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+                [hidden]="tab.count === 0">
+          {{ tab.label }} ({{ tab.count }})
+        </button>
+      </div>
+
+      <!-- Recherche et Tri -->
+      <div class="flex gap-3 w-full md:w-auto shrink-0">
+        <!-- Recherche -->
+        <div class="relative w-full md:w-52 flex items-center">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none z-10"></i>
+          <input type="text" [(ngModel)]="mediaSearchQuery" (input)="onSearchChange()" placeholder="Rechercher..." 
+                 class="w-full bg-white text-gray-800 text-xs rounded-full !pl-9 !pr-4 !py-2 border border-gray-200 focus:ring-2 focus:ring-[#D16933]/50 focus:border-[#D16933] outline-none shadow-sm transition-all box-border">
+        </div>
+        
+        <!-- Tri -->
+        <select [(ngModel)]="mediaSortOrder" (change)="onSortChange()" class="bg-white text-gray-800 text-sm rounded-full px-4 py-2 border border-gray-200 focus:ring-2 focus:ring-[#D16933]/50 focus:border-[#D16933] outline-none font-bold cursor-pointer shadow-sm">
+          <option value="NEWEST">Plus récents</option>
+          <option value="OLDEST">Plus anciens</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="flex flex-col gap-12">
+      
+      <!-- État vide : Aucune image ou média -->
+      <div *ngIf="galerieMedias.length === 0" class="flex flex-col items-center justify-center py-16 px-6 bg-[#F6F4EE] rounded-[24px] border border-dashed border-gray-300 text-center fade-slide-up">
+         <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-sm mb-4">
+            <i class="fa-solid fa-images text-[#D16933] text-2xl"></i>
+         </div>
+         <h4 class="font-serif text-xl font-bold text-gray-900 mb-2">Médiathèque en préparation</h4>
+         <p class="text-sm text-gray-600 max-w-md">
+            Nous rassemblons actuellement les plus belles ressources visuelles pour enrichir cette section. Revenez très vite !
+         </p>
+      </div>
+
+      <!-- PHOTOS -->
+      <div *ngIf="filteredPhotos.length > 0" class="fade-slide-up">
+        <div class="flex items-center justify-between mb-4">
+          <h4 class="font-serif text-xl font-bold text-gray-900"><i class="fa-regular fa-image mr-2 text-gray-500"></i>Photos</h4>
+        </div>
+        <div class="flex overflow-x-auto gap-4 pb-4 snap-x hide-scrollbar">
+           <div class="shrink-0 w-[75vw] sm:w-[280px] h-[200px] rounded-[16px] overflow-hidden relative group cursor-pointer snap-start shadow-sm hover:shadow-md transition" 
+                *ngFor="let m of filteredPhotos; let i = index" 
+                [routerLink]="['/patrimoines', patrimoine?.id, 'medias', m.id]">
+              <img [src]="m.url" [alt]="m.nom || 'Photo'" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" [ngClass]="{'sepia': m.type === 'ARCHIVE_NUMERISEE'}">
+              
+              <!-- Type Badge -->
+              <div class="absolute top-2 left-2 z-10" *ngIf="m.type === 'CARTE' || m.type === 'ARCHIVE_NUMERISEE'">
+                <span class="bg-white/90 text-gray-900 px-2 py-1 rounded text-[10px] font-bold uppercase shadow-sm">
+                  <i class="fa-solid" [ngClass]="m.type === 'CARTE' ? 'fa-map' : 'fa-archive'"></i> {{ m.type === 'CARTE' ? 'Carte' : 'Archive' }}
+                </span>
+              </div>
+
+              <!-- Hover Details -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                <h5 class="text-white font-bold text-sm leading-tight mb-1">{{ m.nom }}</h5>
+                <p class="text-white/80 text-[10px] line-clamp-2 mb-2" *ngIf="m.description">{{ m.description }}</p>
+                <p class="text-white/60 text-[9px]" *ngIf="m.auteur || m.credit">
+                  <span *ngIf="m.auteur"><i class="fa-solid fa-user-edit mr-1"></i> {{ m.auteur }}</span>
+                  <span *ngIf="m.auteur && m.credit"> • </span>
+                  <span *ngIf="m.credit"><i class="fa-solid fa-camera mr-1"></i> {{ m.credit }}</span>
+                </p>
+              </div>
+           </div>
+        </div>
+      </div>
+
+      <!-- VIDEOS -->
+      <div *ngIf="filteredVideos.length > 0" class="fade-slide-up">
+        <div class="flex items-center justify-between mb-4">
+          <h4 class="font-serif text-xl font-bold text-gray-900"><i class="fa-solid fa-video mr-2 text-gray-500"></i>Vidéos</h4>
+        </div>
+        <div class="flex overflow-x-auto gap-4 pb-4 snap-x hide-scrollbar">
+           <div class="shrink-0 w-[85vw] sm:w-[350px] h-[200px] rounded-[16px] overflow-hidden relative group cursor-pointer snap-start bg-black shadow-sm hover:shadow-md transition" 
+                *ngFor="let m of filteredVideos; let i = index" 
+                [routerLink]="['/patrimoines', patrimoine?.id, 'medias', m.id]">
+              <!-- Video miniature -->
+              <video [src]="m.url" class="w-full h-full object-cover pointer-events-none"></video>
+              <div class="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/10 transition">
+                <div class="w-16 h-16 rounded-full bg-black/60 text-white flex items-center justify-center backdrop-blur-sm">
+                  <i class="fa-solid fa-play text-2xl ml-1"></i>
+                </div>
+              </div>
+           </div>
+        </div>
+      </div>
+
+      <!-- IMMERSIONS -->
+      <div *ngIf="filteredImmersions.length > 0" class="fade-slide-up">
+        <div class="flex items-center justify-between mb-4">
+          <h4 class="font-serif text-xl font-bold text-gray-900"><i class="fa-solid fa-vr-cardboard mr-2 text-gray-500"></i>Vues Immersives</h4>
+        </div>
+        <div class="flex overflow-x-auto gap-4 pb-4 snap-x hide-scrollbar">
+           <div class="shrink-0 w-[75vw] sm:w-[280px] h-[200px] rounded-[16px] overflow-hidden relative group cursor-pointer snap-start shadow-sm hover:shadow-md transition" 
+                *ngFor="let m of filteredImmersions; let i = index" 
+                [routerLink]="['/patrimoines', patrimoine?.id, 'medias', m.id]">
+              <!-- Fallback to placeholder if it's a 3D model without miniature -->
+              <img [src]="m.url" [alt]="m.nom || 'Vue 360'" class="w-full h-full object-cover transition duration-500 blur-[2px] group-hover:blur-0" *ngIf="m.type === 'PANORAMA_360'">
+              <div class="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center" *ngIf="m.type === 'MODELE_3D'">
+                 <i class="fa-solid fa-cube text-4xl text-white/20"></i>
+              </div>
+              
+              <!-- Play Icon center -->
+              <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/30 transition duration-500" [ngClass]="{'group-hover:opacity-0': m.type === 'PANORAMA_360'}">
+                <div class="w-12 h-12 rounded-full bg-black/70 text-white flex items-center justify-center mb-2 shadow-lg backdrop-blur-sm">
+                   <i class="fa-solid" [ngClass]="m.type === 'PANORAMA_360' ? 'fa-vr-cardboard' : 'fa-cube'"></i>
+                </div>
+                <span class="bg-black/70 text-white px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm">{{ m.type === 'PANORAMA_360' ? 'Vue 360°' : 'Modèle 3D' }}</span>
+             </div>
+
+              <!-- Hover Details (Bottom) -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                <h5 class="text-white font-bold text-sm leading-tight mb-1">{{ m.nom }}</h5>
+                <p class="text-white/80 text-[10px] line-clamp-2" *ngIf="m.description">{{ m.description }}</p>
+              </div>
+           </div>
+        </div>
+      </div>
+
+      <!-- AUDIOS -->
+      <div *ngIf="filteredAudios.length > 0" class="fade-slide-up">
+        <div class="flex items-center justify-between mb-4">
+          <h4 class="font-serif text-xl font-bold text-gray-900"><i class="fa-solid fa-headphones mr-2 text-gray-500"></i>Audioguides</h4>
+        </div>
+        <div class="flex overflow-x-auto gap-4 pb-4 snap-x hide-scrollbar">
+           <div class="shrink-0 w-[75vw] sm:w-[280px] h-[160px] rounded-[16px] overflow-hidden relative group snap-start border border-gray-100 bg-[#F6F4EE] p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition cursor-pointer" 
+                *ngFor="let m of filteredAudios" 
+                [routerLink]="['/patrimoines', patrimoine?.id, 'medias', m.id]">
+              <div class="flex items-start gap-3">
+                 <div class="w-10 h-10 rounded-full bg-[#D16933] text-white flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-headphones text-lg"></i>
+                 </div>
+                 <div>
+                    <h5 class="text-sm font-bold text-gray-900 line-clamp-1" [title]="m.nom">{{ m.nom || 'Piste audio' }}</h5>
+                    <p class="text-[10px] text-gray-500 line-clamp-2 leading-tight mt-0.5" *ngIf="m.description">{{ m.description }}</p>
+                 </div>
+              </div>
+              <audio [src]="m.url" controls class="w-full h-8 opacity-80 mt-3"></audio>
+           </div>
+        </div>
+      </div>
+
+      <!-- DOCUMENTS -->
+      <div *ngIf="filteredDocuments.length > 0" class="fade-slide-up">
+        <div class="flex items-center justify-between mb-4">
+          <h4 class="font-serif text-xl font-bold text-gray-900"><i class="fa-solid fa-file-pdf mr-2 text-gray-500"></i>Documents & Brochures</h4>
+        </div>
+        <div class="flex overflow-x-auto gap-4 pb-4 snap-x hide-scrollbar">
+           <div class="shrink-0 w-[200px] h-[160px] rounded-[16px] overflow-hidden relative group snap-start border border-gray-100 bg-gray-50 hover:bg-gray-100 transition p-4 flex flex-col justify-between items-center text-center shadow-sm hover:shadow-md cursor-pointer" 
+                *ngFor="let m of filteredDocuments"
+                [routerLink]="['/patrimoines', patrimoine?.id, 'medias', m.id]">
+              <i class="fa-solid fa-file-pdf text-4xl text-red-500 mb-2"></i>
+              <div>
+                 <p class="text-xs font-bold text-gray-900 line-clamp-2 mb-1" [title]="m.nom">{{ m.nom || 'Document PDF' }}</p>
+                 <p class="text-[9px] text-gray-500 line-clamp-1" *ngIf="m.description">{{ m.description }}</p>
+              </div>
+              <a [href]="m.url" target="_blank" class="text-[10px] bg-white px-3 py-1.5 rounded-full font-bold shadow-sm hover:shadow-md text-gray-800 mt-2">Ouvrir le fichier</a>
+           </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>

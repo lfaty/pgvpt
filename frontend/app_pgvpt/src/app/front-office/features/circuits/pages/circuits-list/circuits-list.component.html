@@ -1,0 +1,168 @@
+<div class="circuits-page">
+  
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-bg-pattern"></div>
+    <div class="hero-blob hero-blob-1"></div>
+    <div class="hero-blob hero-blob-2"></div>
+    
+    <div class="hero-content">
+      <span class="hero-badge">
+        <i class="fa-solid fa-route mr-2"></i> Itinéraires & Découverte
+      </span>
+      <h1 class="hero-title">Circuits Touristiques du Sénégal</h1>
+      <p class="hero-subtitle">
+        Parcourez le pays de la Teranga à travers des itinéraires guidés d'exception, alliant patrimoine historique, réserves naturelles et traditions locales.
+      </p>
+    </div>
+  </section>
+
+  <!-- Filter & Search Bar -->
+  <section class="filter-section">
+    <div class="filter-bar">
+      
+      <!-- Search Input -->
+      <div class="search-wrapper">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" 
+               [(ngModel)]="searchTerm" 
+               (input)="applyFilters()"
+               class="search-input" 
+               placeholder="Rechercher un circuit, une région, un thème...">
+      </div>
+
+      <div class="filter-divider"></div>
+
+      <!-- Filters group -->
+      <div class="filters-group">
+        <!-- Type Select -->
+        <div class="select-wrapper">
+          <i class="fa-solid fa-compass select-icon"></i>
+          <select [(ngModel)]="selectedType" (change)="applyFilters()" class="filter-select">
+            <option *ngFor="let t of types" [value]="t.value">
+              {{ t.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Difficulty Select -->
+        <div class="select-wrapper">
+          <i class="fa-solid fa-mountain select-icon"></i>
+          <select [(ngModel)]="selectedDifficulte" (change)="applyFilters()" class="filter-select">
+            <option *ngFor="let d of difficultes" [value]="d.value">
+              {{ d.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Duration Select -->
+        <div class="select-wrapper">
+          <i class="fa-solid fa-clock select-icon"></i>
+          <select [(ngModel)]="selectedDureeMax" (change)="applyFilters()" class="filter-select">
+            <option *ngFor="let dur of durees" [value]="dur.value">
+              {{ dur.label }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Results Section -->
+  <section class="results-section">
+    
+    <!-- Result count & active filters -->
+    <div class="results-header">
+      <div class="results-count" *ngIf="!isLoading && !hasError && filteredCircuits.length > 0">
+        <span class="count-number">{{ filteredCircuits.length }}</span>
+        <span class="count-label">circuits disponibles</span>
+      </div>
+      <div class="results-count results-count--empty" *ngIf="!isLoading && !hasError && filteredCircuits.length === 0">
+        <span class="count-label">Aucun circuit trouvé</span>
+      </div>
+
+      <!-- Active Filter Tags -->
+      <div class="active-filters">
+        <span class="filter-tag" *ngIf="selectedType !== 'TOUS'">
+          Type : {{ selectedTypeLabel }}
+          <button (click)="clearType()" class="filter-tag-remove" aria-label="Supprimer le filtre type">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </span>
+
+        <span class="filter-tag" *ngIf="selectedDifficulte !== 'TOUTES'">
+          Difficulté : {{ selectedDifficulteLabel }}
+          <button (click)="clearDifficulte()" class="filter-tag-remove" aria-label="Supprimer le filtre difficulté">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </span>
+
+        <span class="filter-tag" *ngIf="selectedDureeMax !== 'TOUTES'">
+          {{ selectedDureeMax === 'COURT' ? 'Moins de 2h' : (selectedDureeMax === 'MOYEN' ? '2h - 5h' : '+ de 5h') }}
+          <button (click)="selectedDureeMax='TOUTES'; applyFilters()" class="filter-tag-remove" aria-label="Supprimer le filtre durée">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </span>
+
+        <span class="filter-tag" *ngIf="searchTerm.trim() !== ''">
+          "{{ searchTerm }}"
+          <button (click)="clearSearch()" class="filter-tag-remove" aria-label="Supprimer la recherche">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </span>
+      </div>
+    </div>
+
+    <!-- Loading Skeletons -->
+    <div class="circuits-grid" *ngIf="isLoading">
+      <div class="skeleton-card" *ngFor="let s of [1, 2, 3, 4, 5, 6]">
+        <div class="skeleton-image"></div>
+        <div class="skeleton-body">
+          <div class="skeleton-line skeleton-title"></div>
+          <div class="skeleton-line skeleton-desc"></div>
+          <div class="skeleton-line skeleton-desc skeleton-short"></div>
+          <div class="skeleton-metrics"></div>
+          <div class="skeleton-footer"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="hasError && !isLoading" class="error-container">
+      <div class="error-icon">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h3 class="error-title">Une erreur est survenue</h3>
+      <p class="error-text">{{ errorMessage }}</p>
+      <button (click)="loadData()" class="btn-retry">
+        <i class="fa-solid fa-rotate-right"></i>
+        Réessayer
+      </button>
+    </div>
+
+    <!-- The Grid -->
+    <div class="circuits-grid" *ngIf="!isLoading && !hasError && filteredCircuits.length > 0">
+      <div *ngFor="let c of filteredCircuits; let i = index" 
+           class="card-wrapper"
+           [style.animation-delay]="(i * 70) + 'ms'">
+        <app-circuit-card [circuit]="c"></app-circuit-card>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && !hasError && filteredCircuits.length === 0" class="empty-state">
+      <div class="empty-icon-wrapper">
+        <i class="fa-solid fa-route empty-icon"></i>
+      </div>
+      <h3 class="empty-title">Aucun circuit ne correspond à vos critères</h3>
+      <p class="empty-desc">
+        Essayez d'élargir votre recherche, de changer le niveau de difficulté ou de réinitialiser vos filtres.
+      </p>
+      <button (click)="resetAllFilters()" class="btn-reset">
+        <i class="fa-solid fa-rotate-left"></i>
+        Réinitialiser tous les filtres
+      </button>
+    </div>
+
+  </section>
+</div>

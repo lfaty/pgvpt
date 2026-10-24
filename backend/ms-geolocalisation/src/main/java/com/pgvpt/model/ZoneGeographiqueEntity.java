@@ -28,6 +28,5 @@ public class ZoneGeographiqueEntity extends BaseEntity {
     private Boolean actif = true;
 
     @OneToMany(mappedBy = "zoneGeographique", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ZoneGeographiqueRegionEntity> regionLinks ;
-
+    private List<ZoneGeographiqueRegionEntity> regionLinks = new ArrayList<>();
 }

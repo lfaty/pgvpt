@@ -1,0 +1,27 @@
+<div *ngIf="lightboxOpen && selectedLightboxMedia"
+     class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+     (click)="closeLightbox()">
+  
+  <div class="relative max-w-5xl w-full max-h-[90vh] flex flex-col items-center"
+       (click)="$event.stopPropagation()">
+    
+    <!-- Bouton fermer -->
+    <button type="button" (click)="closeLightbox()"
+            class="absolute -top-12 right-0 text-white/80 hover:text-white text-xl transition-colors cursor-pointer"
+            title="Fermer (Échap)">
+      <i class="fas fa-times"></i>
+    </button>
+
+    <!-- Image agrandie -->
+    <img [src]="selectedLightboxMedia.url" [alt]="selectedLightboxMedia.nom"
+         class="max-h-[80vh] w-auto max-w-full rounded-2xl shadow-2xl object-contain">
+
+    <!-- Légende et auteur sous l'image -->
+    <div class="mt-4 text-center text-white/90 text-sm">
+      <h4 class="font-bold text-base">{{ selectedLightboxMedia.nom }}</h4>
+      <p *ngIf="selectedLightboxMedia.description" class="text-xs text-white/70 mt-1 max-w-xl mx-auto">{{ selectedLightboxMedia.description }}</p>
+      <span *ngIf="selectedLightboxMedia.auteur" class="text-[11px] text-white/50 block mt-1">Crédit : {{ selectedLightboxMedia.auteur }}</span>
+    </div>
+
+  </div>
+</div>

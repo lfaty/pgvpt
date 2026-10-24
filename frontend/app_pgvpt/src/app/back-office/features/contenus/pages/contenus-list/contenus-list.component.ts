@@ -5,10 +5,13 @@ import { RouterModule } from '@angular/router';
 import { PatrimoineFacadeService } from '../../../../../core/services/patrimoine-facade.service';
 import { ContenuApiService } from '../../../../../core/services/api/contenu-api.service';
 
+import { ToastService } from '../../../../../core/services/toast.service';
+import { ConfirmModalComponent } from '../../../../../shared/components/confirm-modal/confirm-modal.component';
+
 @Component({
   selector: 'app-contenus-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ConfirmModalComponent],
   templateUrl: './contenus-list.component.html',
   styleUrls: ['./contenus-list.component.css']
 })
@@ -32,7 +35,6 @@ export class ContenusListComponent implements OnInit {
   // Modal de confirmation de suppression
   deleteModalContenu: any = null;
   isDeleting: boolean = false;
-  notificationMessage: string | null = null;
 
   types = [
     'ARTICLE', 'DESCRIPTION', 'HISTORIQUE', 'RECIT', 'TEMOIGNAGE', 'GUIDE_VISITE', 'ACTUALITE'
@@ -43,7 +45,8 @@ export class ContenusListComponent implements OnInit {
 
   constructor(
     private facade: PatrimoineFacadeService,
-    private contenuApi: ContenuApiService
+    private contenuApi: ContenuApiService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -138,16 +141,13 @@ export class ContenusListComponent implements OnInit {
       error: (err) => {
         this.isDeleting = false;
         console.error('Erreur lors de la suppression', err);
-        alert("Une erreur est survenue lors de la suppression : " + (err?.error?.message || err?.message || 'Erreur inconnue'));
+        this.toastService.error("Une erreur est survenue lors de la suppression : " + (err?.error?.message || err?.message || 'Erreur inconnue'));
       }
     });
   }
 
   showToast(message: string): void {
-    this.notificationMessage = message;
-    setTimeout(() => {
-      this.notificationMessage = null;
-    }, 4000);
+    this.toastService.success(message);
   }
 
   getStatutBadgeClass(statut: string): string {

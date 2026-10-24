@@ -1,0 +1,64 @@
+<ng-container *ngFor="let group of categoriesGroups">
+  <section class="section group-carousel" [ngClass]="getCategoryTheme(group.categoryId).bgClass" *ngIf="group.items.length > 0">
+    <div class="section-container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">{{ group.label }}</h2>
+          <p class="section-subtitle">Découvrez notre sélection pour cette catégorie d'exception</p>
+        </div>
+        <a [routerLink]="['/patrimoines']" [queryParams]="{category: group.categoryId}" class="section-link">
+          <span>Tout voir</span>
+          <i class="fa-solid fa-arrow-right link-arrow"></i>
+        </a>
+      </div>
+
+      <div class="carousel-container-premium">
+        <div class="patrimoines-grid-carousel" #catCarousel>
+          <div *ngFor="let item of group.items" class="patrimoine-mini-card" [routerLink]="['/patrimoines', item.id]">
+            <div class="mini-card-image">
+              <img [src]="item.imageUrl || (item.photoPrincipale) || 'assets/images/activite_saloum.jpg'" [alt]="item.nom" loading="lazy">
+              <div class="mini-card-type-badge" [ngClass]="getCategoryTheme(group.categoryId).badgeClass">{{ group.label }}</div>
+            </div>
+            <div class="mini-card-body">
+              <div class="mini-card-top-row">
+                <p class="mini-card-location">
+                  <i class="fa-solid fa-location-dot mini-loc-icon mr-1"></i>
+                  {{ item.region || 'Sénégal' }}
+                </p>
+              </div>
+              <h3 class="mini-card-title">{{ item.nom }}</h3>
+              <p class="mini-card-desc">{{ item.descriptionCourte || item.description }}</p>
+              <div class="mini-card-cta-row">
+                <span class="mini-card-cta-text">Découvrir le site</span>
+                <i class="fa-solid fa-arrow-right mini-card-cta-arrow ml-1"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Boutons de navigation en bas du carrousel -->
+        <div class="carousel-controls-bottom">
+          <button class="carousel-nav-btn" (click)="scrollCarousel(catCarousel, -1)" aria-label="Défiler à gauche" title="Précédent">
+            <i class="fa-solid fa-chevron-left text-lg"></i>
+          </button>
+          <button class="carousel-nav-btn" (click)="scrollCarousel(catCarousel, 1)" aria-label="Défiler à droite" title="Suivant">
+            <i class="fa-solid fa-chevron-right text-lg"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</ng-container>
+
+<!-- État vide (Si aucun patrimoine dans la BDD) -->
+<section class="section" *ngIf="categoriesGroups.length === 0">
+  <div class="section-container flex flex-col items-center justify-center py-20 px-6 bg-[#F6F4EE] rounded-[24px] border border-dashed border-gray-300 text-center fade-slide-up">
+    <div class="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-sm mb-6">
+       <i class="fa-solid fa-person-digging text-[#D16933] text-4xl"></i>
+    </div>
+    <h3 class="font-serif text-3xl font-bold text-gray-900 mb-4">Le catalogue est en cours de création</h3>
+    <p class="text-base text-gray-600 max-w-xl">
+       Notre équipe d'experts est actuellement sur le terrain pour recenser et documenter les plus beaux patrimoines du Sénégal. Les premières fiches interactives seront publiées très prochainement !
+    </p>
+  </div>
+</section>

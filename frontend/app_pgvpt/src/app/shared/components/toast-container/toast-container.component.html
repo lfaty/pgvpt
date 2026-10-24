@@ -1,0 +1,49 @@
+<div class="fixed top-5 right-5 z-[9999] flex flex-col gap-3 max-w-md w-full pointer-events-none px-4 sm:px-0">
+  <div *ngFor="let toast of toasts"
+       class="pointer-events-auto w-full bg-white/95 backdrop-blur-md rounded-2xl border shadow-xl p-4 transition-all duration-300 animate-slide-in relative overflow-hidden"
+       [ngClass]="getBorderColor(toast.type)">
+    
+    <!-- En-tête Toast -->
+    <div class="flex items-start gap-3">
+      <!-- Icône du statut -->
+      <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-base"
+           [ngClass]="getIconColor(toast.type)">
+        <i [class]="getIconClass(toast.type)"></i>
+      </div>
+
+      <!-- Contenu texte -->
+      <div class="flex-1 min-w-0 pt-0.5">
+        <h4 class="text-sm font-bold text-gray-900 leading-snug break-words">
+          {{ toast.title }}
+        </h4>
+        <p class="text-xs text-gray-600 mt-1 leading-relaxed break-words whitespace-pre-line">
+          {{ toast.message }}
+        </p>
+
+
+      </div>
+
+      <!-- Bouton Fermer -->
+      <button type="button"
+              (click)="dismiss(toast.id)"
+              class="text-gray-400 hover:text-gray-700 p-1 rounded-lg hover:bg-gray-100 transition-colors shrink-0 text-xs"
+              title="Fermer cette notification">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Barre de défilement temporelle (Timer progress) -->
+    <div *ngIf="toast.duration && toast.duration > 0"
+         class="absolute bottom-0 left-0 right-0 h-1 bg-gray-100 overflow-hidden">
+      <div class="h-full toast-progress-bar"
+           [ngClass]="{
+             'bg-red-500': toast.type === 'error',
+             'bg-amber-500': toast.type === 'warning',
+             'bg-emerald-500': toast.type === 'success',
+             'bg-blue-500': toast.type === 'info'
+           }"
+           [style.animation-duration.ms]="toast.duration">
+      </div>
+    </div>
+  </div>
+</div>

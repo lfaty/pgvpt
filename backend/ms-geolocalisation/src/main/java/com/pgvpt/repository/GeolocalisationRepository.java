@@ -21,6 +21,21 @@ public interface GeolocalisationRepository extends JpaRepository<Geolocalisation
     Optional<GeolocalisationEntity> findByPatrimoineId(UUID patrimoineId);
 
     boolean existsByPatrimoineId(UUID patrimoineId);
+    boolean existsByVillage_Id(UUID villageId);
+    boolean existsByQuartier_Id(UUID quartierId);
+    boolean existsByZoneTouristique_Id(UUID zoneTouristiqueId);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("UPDATE GeolocalisationEntity g SET g.village = null WHERE g.village.id = :villageId")
+    void detachVillage(@Param("villageId") UUID villageId);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("UPDATE GeolocalisationEntity g SET g.quartier = null WHERE g.quartier.id = :quartierId")
+    void detachQuartier(@Param("quartierId") UUID quartierId);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("UPDATE GeolocalisationEntity g SET g.zoneTouristique = null WHERE g.zoneTouristique.id = :zoneTouristiqueId")
+    void detachZoneTouristique(@Param("zoneTouristiqueId") UUID zoneTouristiqueId);
 
     // HQL/JPQL Hibernate 6 : On retire le "= true" car la fonction agit comme un prédicat booléen autonome
     @Query(value = "SELECT * FROM geolocalisations WHERE st_dwithin(geom, :center, :distanceRad) = true",

@@ -1,0 +1,68 @@
+<div class="card" [routerLink]="['/circuits', circuit.id]">
+  
+  <!-- Image Container -->
+  <div class="card-image">
+    <img #img [src]="circuit.imageUrl || 'assets/images/activite_saloum.jpg'" 
+         (error)="img.src='assets/images/activite_saloum.jpg'"
+         [alt]="circuit.nom" class="card-img">
+    
+    <!-- Hover overlay -->
+    <div class="card-image-overlay"></div>
+
+    <!-- Type de Circuit Badge -->
+    <div class="badge-top-left">
+      <span class="category-badge badge-circuit">
+        {{ getTypeLabel() }}
+      </span>
+    </div>
+    
+    <!-- Difficulty Badge -->
+    <div class="badge-top-right">
+      <div class="difficulty-badge" [ngClass]="getDifficultyClass()">
+        <span class="difficulty-dot"></span>
+        <span class="difficulty-text">{{ getDifficultyLabel() }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="card-body">
+    
+    <!-- Title & Description -->
+    <h3 class="card-title">{{ circuit.nom }}</h3>
+    <p class="card-description">{{ circuit.description || 'Circuit touristique d\'exception pour explorer les sites patrimoniaux et naturels.' }}</p>
+
+    <!-- Key Metrics -->
+    <div class="circuit-metrics">
+      <div class="metric-item" title="Nombre d'étapes">
+        <i class="fa-solid fa-map-pin metric-icon"></i>
+        <span>{{ circuit.nombreEtapes || circuit.etapes?.length || 0 }} étapes</span>
+      </div>
+      <div class="metric-item" title="Durée estimée">
+        <i class="fa-solid fa-clock metric-icon"></i>
+        <span>{{ formatDuree() }}</span>
+      </div>
+      <div class="metric-item" *ngIf="circuit.distanceKm" title="Distance totale">
+        <i class="fa-solid fa-route metric-icon"></i>
+        <span>{{ circuit.distanceKm }} km</span>
+      </div>
+    </div>
+
+    <!-- Footer / Action -->
+    <div class="card-footer">
+      <div class="circuit-price">
+        <span class="price-label">Tarif estimé</span>
+        <span class="price-value" [class.price-free]="!circuit.coutTotal || circuit.coutTotal <= 0">
+          {{ formatPrix() }}
+        </span>
+      </div>
+      <div class="card-action">
+        <span class="card-link-text">Explorer</span>
+        <div class="card-link-arrow">
+          <i class="fa-solid fa-arrow-right"></i>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</div>

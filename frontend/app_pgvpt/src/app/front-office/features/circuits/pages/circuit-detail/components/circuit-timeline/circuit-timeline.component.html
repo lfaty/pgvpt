@@ -1,0 +1,94 @@
+<section class="section-card timeline-card">
+  <div class="section-card-header">
+    <div>
+      <h2 class="section-title">
+        <i class="fa-solid fa-list-ol text-primary mr-2"></i>
+        Étapes et Découvertes ({{ etapes.length }})
+      </h2>
+      <p class="section-subtitle">Découvrez en détail chaque site patrimonial visité lors de cet itinéraire.</p>
+    </div>
+  </div>
+
+  <div class="timeline" *ngIf="etapes && etapes.length > 0">
+    <div *ngFor="let etape of etapes; let i = index" 
+         class="timeline-item"
+         [class.active]="activeStepIndex === i">
+      
+      <!-- Left connector node -->
+      <div class="timeline-node">
+        <div class="node-circle" (click)="onLocate(i)">
+          {{ etape.ordre }}
+        </div>
+        <div class="node-line" *ngIf="i < etapes.length - 1"></div>
+      </div>
+
+      <!-- Step Content Box -->
+      <div class="timeline-content">
+        <div class="step-card">
+          
+          <!-- Step Image Thumbnail -->
+          <div class="step-image-wrapper" *ngIf="etape.patrimoineDetail?.imageUrl">
+            <img [src]="etape.patrimoineDetail?.imageUrl" 
+                 [alt]="etape.patrimoineDetail?.nom" 
+                 class="step-image">
+            <span class="step-badge" *ngIf="etape.patrimoineDetail?.categorie">
+              {{ etape.patrimoineDetail?.categorie }}
+            </span>
+          </div>
+
+          <!-- Step Details -->
+          <div class="step-body">
+            <div class="step-meta">
+              <span class="step-number-tag">Étape {{ etape.ordre }}</span>
+              <span class="step-time" *ngIf="etape.dureeMinutes">
+                <i class="fa-solid fa-stopwatch mr-1"></i>
+                {{ formatDureeEtape(etape.dureeMinutes) }}
+              </span>
+              <span class="step-distance" *ngIf="etape.distanceDepuisPrecedenteKm">
+                <i class="fa-solid fa-road mr-1"></i>
+                +{{ etape.distanceDepuisPrecedenteKm }} km
+              </span>
+            </div>
+
+            <h3 class="step-title">
+              {{ etape.patrimoineDetail?.nom || 'Site de l\'étape ' + etape.ordre }}
+            </h3>
+
+            <p class="step-location" *ngIf="etape.patrimoineDetail?.region || etape.patrimoineDetail?.commune">
+              <i class="fa-solid fa-location-dot mr-1"></i>
+              {{ etape.patrimoineDetail?.commune }}{{ etape.patrimoineDetail?.commune && etape.patrimoineDetail?.region ? ', ' : '' }}{{ etape.patrimoineDetail?.region }}
+            </p>
+
+            <p class="step-desc">
+              {{ etape.patrimoineDetail?.description || 'Découverte privilégiée de ce patrimoine remarquable.' }}
+            </p>
+
+            <!-- Actions -->
+            <div class="step-actions">
+              <a *ngIf="etape.patrimoineId" 
+                 [routerLink]="['/patrimoines', etape.patrimoineId]" 
+                 class="btn-step-link">
+                <i class="fa-solid fa-landmark mr-1.5"></i>
+                Explorer le site
+              </a>
+              
+              <button (click)="onLocate(i)" class="btn-step-locate" type="button">
+                <i class="fa-solid fa-crosshairs mr-1"></i>
+                Localiser
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- If no steps -->
+  <div *ngIf="!etapes || etapes.length === 0" class="empty-steps">
+    <i class="fa-solid fa-route empty-steps-icon"></i>
+    <p>Les étapes détaillées de ce circuit sont en cours de finalisation.</p>
+  </div>
+
+</section>

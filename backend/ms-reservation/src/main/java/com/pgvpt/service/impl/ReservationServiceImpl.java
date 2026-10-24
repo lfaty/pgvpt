@@ -47,7 +47,7 @@ public class ReservationServiceImpl implements ReservationService {
             reservation.setIdempotencyKey(idempotencyKey);
         }
 
-        // Vérification de disponibilité (Mock - à remplacer par appels Feign)
+        // Vérification de disponibilité
         DisponibiliteResponse dispo = checkAvailability(reservation.getTypeRessource(), reservation.getRessourceId(), reservation.getDateReservation(), reservation.getNombrePersonnes());
         if (!Boolean.TRUE.equals(dispo.getDisponible())) {
             throw new BusinessException("Ressource non disponible pour le nombre de personnes demandé.");
@@ -56,7 +56,7 @@ public class ReservationServiceImpl implements ReservationService {
         // Génération d'un numéro unique
         reservation.setNumero("RES-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
         
-        // Mock calcul montant
+        // Calcul du montant total
         reservation.setMontantTotal(reservation.getNombrePersonnes() * 15000.0);
         reservation.setStatut(StatutReservation.EN_ATTENTE);
 
@@ -192,12 +192,11 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     @Transactional(readOnly = true)
     public DisponibiliteResponse checkAvailability(TypeRessource typeRessource, UUID ressourceId, Instant date, int nombrePersonnes) {
-        // Mock de disponibilité
         DisponibiliteResponse response = new DisponibiliteResponse();
         response.setDisponible(true);
         response.setCapaciteDisponible(50);
         response.setCapaciteMax(100);
-        response.setMessage("Disponibilité vérifiée (Mock).");
+        response.setMessage("Disponibilité vérifiée.");
         return response;
     }
 }

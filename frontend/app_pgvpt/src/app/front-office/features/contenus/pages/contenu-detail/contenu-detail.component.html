@@ -1,0 +1,79 @@
+<!-- BARRE DE PROGRESSION DE LECTURE FLOTTANTE -->
+<div class="reading-progress-bar" [style.width.%]="readingProgress"></div>
+
+<!-- SPINNER DE CHARGEMENT -->
+<div *ngIf="loading" class="min-h-screen flex flex-col items-center justify-center bg-[#FAFAF9]">
+  <div class="w-12 h-12 border-4 border-[#0b5d5e]/20 border-t-[#0b5d5e] rounded-full animate-spin mb-4"></div>
+  <p class="text-sm font-medium text-gray-500">Ouverture du récit patrimonial...</p>
+</div>
+
+<!-- ÉCRAN D'ERREUR -->
+<div *ngIf="!loading && error" class="min-h-[70vh] flex flex-col items-center justify-center px-6 text-center bg-[#FAFAF9]">
+  <div class="w-16 h-16 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center text-2xl mb-4 shadow-inner">
+    <i class="fas fa-file-circle-exclamation"></i>
+  </div>
+  <h2 class="font-serif text-2xl font-bold text-gray-900 mb-2">Récit introuvable</h2>
+  <p class="text-sm text-gray-500 max-w-md mb-6 leading-relaxed">{{ error }}</p>
+  <a routerLink="/patrimoines" class="px-6 py-2.5 bg-[#0b5d5e] hover:bg-[#084b4c] text-white text-xs font-bold rounded-xl shadow-sm transition-all">
+    Retour aux patrimoines
+  </a>
+</div>
+
+<!-- CONTENU PRINCIPAL DE L'ARTICLE -->
+<article *ngIf="!loading && contenu" class="bg-[#FAFAF9] min-h-screen pb-28 font-sans text-gray-800">
+
+  <!-- 1. BARRE DE LECTURE & FIL D'ARIANE -->
+  <app-barre-lecture-entete
+    [contenu]="contenu"
+    [patrimoine]="patrimoine"
+    [fontSizeMode]="fontSizeMode"
+    (toggleFontSizeEvent)="toggleFontSize()">
+  </app-barre-lecture-entete>
+
+  <!-- 2. EN-TÊTE ÉDITORIAL & CHAPEAU DE L'ARTICLE -->
+  <app-chapeau-article
+    [contenu]="contenu"
+    [patrimoine]="patrimoine">
+  </app-chapeau-article>
+
+  <!-- 3. ZONE DE CONTENU PRINCIPALE & SIDEBAR -->
+  <div class="max-w-6xl mx-auto px-6 mt-12">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      
+      <!-- COLONNE PRINCIPALE DE LECTURE (8 colonnes) -->
+      <div class="lg:col-span-8">
+        <app-corps-article
+          [contenu]="contenu"
+          [patrimoine]="patrimoine"
+          [associatedMedias]="associatedMedias"
+          [fontSizeMode]="fontSizeMode"
+          (openLightboxEvent)="openLightbox($event)">
+        </app-corps-article>
+      </div>
+
+      <!-- SIDEBAR COMPLÉMENTAIRE (4 colonnes) -->
+      <aside class="lg:col-span-4">
+        <app-panneau-site-rattache
+          [patrimoine]="patrimoine"
+          [otherContenus]="otherContenus"
+          [patrimoineId]="patrimoineId">
+        </app-panneau-site-rattache>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- 4. SECTION INFÉRIEURE : AUTRES RÉCITS DU PATRIMOINE -->
+  <app-recits-collection
+    [otherContenus]="otherContenus"
+    [patrimoineId]="patrimoineId">
+  </app-recits-collection>
+
+  <!-- 5. LIGHTBOX MODAL POUR AGRANDISSEMENT DES PHOTOS -->
+  <app-visionneuse-lightbox
+    [lightboxOpen]="lightboxOpen"
+    [selectedLightboxMedia]="selectedLightboxMedia"
+    (closeLightboxEvent)="closeLightbox()">
+  </app-visionneuse-lightbox>
+
+</article>

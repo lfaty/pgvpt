@@ -1,0 +1,387 @@
+<div class="space-y-6">
+
+  <!-- Toast Notification -->
+  <div *ngIf="notificationMessage"
+       class="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 text-sm font-medium border animate-slide-up"
+       [ngClass]="notificationType === 'success' ? 'bg-emerald-600 text-white border-emerald-500' : 'bg-rose-600 text-white border-rose-500'">
+    <i class="fas" [ngClass]="notificationType === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'"></i>
+    <span>{{ notificationMessage }}</span>
+    <button (click)="notificationMessage = null" class="ml-2 text-white/80 hover:text-white">
+      <i class="fas fa-times text-xs"></i>
+    </button>
+  </div>
+
+  <!-- ─── HEADER & ACTIONS ─── -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2 text-xs text-gray-500 mb-1">
+        <a routerLink="/admin/dashboard" class="hover:text-primary transition-colors">Accueil</a>
+        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        <span>Circuits & Activités</span>
+        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        <span class="text-gray-800 font-semibold">Activités</span>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-base">
+          <i class="fas fa-hiking"></i>
+        </div>
+        Activités Touristiques
+      </h1>
+      <p class="text-xs text-gray-500 mt-1">
+        Référentiel des activités (visites guidées, excursions, ateliers, etc.) associables aux étapes de circuits
+      </p>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button (click)="loadActivites()" [disabled]="isLoading"
+              class="px-3 py-2 text-xs font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center gap-1.5 shadow-sm disabled:opacity-50">
+        <i class="fas fa-sync-alt" [ngClass]="{'fa-spin': isLoading}"></i>
+        Actualiser
+      </button>
+
+      <button (click)="openCreateModal()"
+              class="px-4 py-2 text-xs font-semibold text-white bg-primary hover:bg-primary-hover rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+        <i class="fas fa-plus"></i>
+        Nouvelle activité
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── KPIS CARDS ─── -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div (click)="setStatutFilter('TOUS')"
+         class="p-4 bg-white rounded-2xl border transition-all cursor-pointer shadow-sm hover:border-gray-300"
+         [ngClass]="selectedStatut === 'TOUS' ? 'border-primary ring-2 ring-primary/10' : 'border-gray-100'">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Activités</span>
+        <div class="w-8 h-8 rounded-lg bg-gray-100 text-gray-600 flex items-center justify-center text-sm">
+          <i class="fas fa-th-list"></i>
+        </div>
+      </div>
+      <div class="mt-2 text-2xl font-black text-gray-900">{{ totalCount }}</div>
+      <p class="text-[11px] text-gray-400 mt-1">Toutes les activités configurées</p>
+    </div>
+
+    <div (click)="setStatutFilter('ACTIF')"
+         class="p-4 bg-white rounded-2xl border transition-all cursor-pointer shadow-sm hover:border-emerald-300"
+         [ngClass]="selectedStatut === 'ACTIF' ? 'border-emerald-500 ring-2 ring-emerald-50' : 'border-gray-100'">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Actives</span>
+        <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm">
+          <i class="fas fa-check-circle"></i>
+        </div>
+      </div>
+      <div class="mt-2 text-2xl font-black text-emerald-700">{{ actifCount }}</div>
+      <p class="text-[11px] text-emerald-600/80 mt-1">Disponibles pour de nouveaux circuits</p>
+    </div>
+
+    <div (click)="setStatutFilter('INACTIF')"
+         class="p-4 bg-white rounded-2xl border transition-all cursor-pointer shadow-sm hover:border-rose-300"
+         [ngClass]="selectedStatut === 'INACTIF' ? 'border-rose-500 ring-2 ring-rose-50' : 'border-gray-100'">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-semibold text-rose-700 uppercase tracking-wider">Inactives</span>
+        <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center text-sm">
+          <i class="fas fa-pause-circle"></i>
+        </div>
+      </div>
+      <div class="mt-2 text-2xl font-black text-rose-700">{{ inactifCount }}</div>
+      <p class="text-[11px] text-rose-600/80 mt-1">Désactivées ou en révision</p>
+    </div>
+  </div>
+
+  <!-- ─── RECHERCHE & FILTRES ─── -->
+  <div class="p-4 bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <!-- Champ de recherche -->
+    <div class="relative flex-1 max-w-md">
+      <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+      <input type="text"
+             [value]="searchQuery"
+             (input)="onSearch($event)"
+             placeholder="Rechercher par libellé, code ou mot-clé..."
+             class="w-full pl-9 pr-4 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:bg-white transition-all text-gray-800 placeholder-gray-400">
+      <button *ngIf="searchQuery" (click)="searchQuery = ''; applyFilters()"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Filtres d'état -->
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-semibold text-gray-500 mr-1">Statut :</span>
+      <button (click)="setStatutFilter('TOUS')"
+              class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all"
+              [ngClass]="selectedStatut === 'TOUS' ? 'bg-primary text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">
+        Tous
+      </button>
+      <button (click)="setStatutFilter('ACTIF')"
+              class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all"
+              [ngClass]="selectedStatut === 'ACTIF' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">
+        Actifs
+      </button>
+      <button (click)="setStatutFilter('INACTIF')"
+              class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all"
+              [ngClass]="selectedStatut === 'INACTIF' ? 'bg-rose-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">
+        Inactifs
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── TABLEAU DES ACTIVITÉS ─── -->
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="p-12 text-center text-gray-400">
+      <i class="fas fa-circle-notch fa-spin text-2xl text-primary mb-2"></i>
+      <p class="text-xs">Chargement des activités depuis le microservice...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && filteredActivites.length === 0" class="p-12 text-center">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl">
+        <i class="fas fa-hiking"></i>
+      </div>
+      <h3 class="text-base font-bold text-gray-800 mb-1">
+        {{ activites.length === 0 ? 'Aucune activité touristique' : 'Aucun résultat pour cette recherche' }}
+      </h3>
+      <p class="text-xs text-gray-500 max-w-md mx-auto mb-5">
+        {{ activites.length === 0 
+           ? 'Votre référentiel d\'activités est vide. Vous pouvez créer votre première activité touristique (ex: Visite guidée, Pirogue, Safari).' 
+           : 'Modifiez vos filtres ou réinitialisez la recherche pour voir les activités disponibles.' }}
+      </p>
+      <button *ngIf="activites.length === 0" (click)="openCreateModal()"
+              class="px-4 py-2 text-xs font-semibold text-white bg-primary hover:bg-primary-hover rounded-xl shadow-md transition-all inline-flex items-center gap-2">
+        <i class="fas fa-plus"></i>
+        Créer la première activité
+      </button>
+      <button *ngIf="activites.length > 0" (click)="searchQuery = ''; selectedStatut = 'TOUS'; applyFilters()"
+              class="px-4 py-2 text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all">
+        Réinitialiser la recherche
+      </button>
+    </div>
+
+    <!-- Table -->
+    <div *ngIf="!isLoading && filteredActivites.length > 0" class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-gray-50/75 border-b border-gray-100 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+            <th class="py-3 px-4">Code</th>
+            <th class="py-3 px-4">Libellé & Description</th>
+            <th class="py-3 px-4">Prix de référence</th>
+            <th class="py-3 px-4">Statut</th>
+            <th class="py-3 px-4 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 text-xs">
+          <tr *ngFor="let a of filteredActivites" class="hover:bg-gray-50/60 transition-colors">
+            
+            <!-- Code -->
+            <td class="py-3 px-4">
+              <span class="inline-flex items-center px-2 py-0.5 rounded font-mono text-[11px] font-semibold bg-gray-100 text-gray-800 border border-gray-200">
+                {{ a.code }}
+              </span>
+            </td>
+
+            <!-- Libellé & Description -->
+            <td class="py-3 px-4">
+              <div class="font-bold text-gray-900">{{ a.libelle }}</div>
+              <div *ngIf="a.description" class="text-[11px] text-gray-500 mt-0.5 line-clamp-2 max-w-lg">
+                {{ a.description }}
+              </div>
+            </td>
+
+            <!-- Prix Initial -->
+            <td class="py-3 px-4">
+              <span class="font-bold text-gray-900">{{ a.prixInitial | number }}</span>
+              <span class="text-[10px] text-gray-500 font-medium ml-1">FCFA</span>
+            </td>
+
+            <!-- Statut -->
+            <td class="py-3 px-4">
+              <button (click)="toggleActif(a)"
+                      title="Cliquer pour changer le statut"
+                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all"
+                      [ngClass]="a.actif !== false ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' : 'bg-rose-50 text-rose-700 hover:bg-rose-100'">
+                <span class="w-1.5 h-1.5 rounded-full" [ngClass]="a.actif !== false ? 'bg-emerald-500' : 'bg-rose-500'"></span>
+                {{ a.actif !== false ? 'Actif' : 'Inactif' }}
+              </button>
+            </td>
+
+            <!-- Actions -->
+            <td class="py-3 px-4 text-right">
+              <div class="inline-flex items-center gap-1">
+                <button (click)="openEditModal(a)"
+                        title="Modifier l'activité"
+                        class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                  <i class="fas fa-edit text-xs"></i>
+                </button>
+                <button (click)="confirmDelete(a)"
+                        title="Supprimer l'activité"
+                        class="p-1.5 text-gray-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">
+                  <i class="fas fa-trash-alt text-xs"></i>
+                </button>
+              </div>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Table Footer -->
+    <div *ngIf="!isLoading && filteredActivites.length > 0"
+         class="p-3 bg-gray-50/75 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+      <span>Affichage de {{ filteredActivites.length }} activité(s) sur {{ totalCount }}</span>
+      <span class="text-[11px] text-gray-400">Microservice Circuits & Activités</span>
+    </div>
+
+  </div>
+
+  <!-- ─── MODAL CRÉATION / MODIFICATION ─── -->
+  <div *ngIf="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
+    <div class="bg-white rounded-2xl shadow-2xl border border-gray-100 max-w-lg w-full overflow-hidden animate-scale-up">
+      
+      <!-- Modal Header -->
+      <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm">
+            <i class="fas" [ngClass]="isEditMode ? 'fa-edit' : 'fa-plus'"></i>
+          </div>
+          <div>
+            <h2 class="text-sm font-bold text-gray-900">
+              {{ isEditMode ? 'Modifier l\'Activité' : 'Nouvelle Activité Touristique' }}
+            </h2>
+            <p class="text-[11px] text-gray-500">
+              {{ isEditMode ? 'Mettez à jour les informations de l\'activité' : 'Créez une activité associable à des étapes de circuits' }}
+            </p>
+          </div>
+        </div>
+        <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600 p-1">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Form) -->
+      <form [formGroup]="activiteForm" (ngSubmit)="submitForm()" class="p-5 space-y-4">
+        
+        <!-- Indicateur champs obligatoires -->
+        <div class="flex items-center gap-2 p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900">
+          <i class="fas fa-asterisk text-rose-500 text-[10px]"></i>
+          <span>Les champs marqués d'une étoile rouge (<span class="text-rose-500 font-bold">*</span>) sont obligatoires.</span>
+        </div>
+
+        <!-- Code & Statut -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Code -->
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">
+              Code unique <span class="text-rose-500">*</span>
+            </label>
+            <input type="text"
+                   formControlName="code"
+                   (input)="onCodeInput($event)"
+                   placeholder="Ex: VISITE_GUIDEE"
+                   class="w-full px-3 py-2 text-xs font-mono uppercase bg-gray-50 border rounded-xl outline-none transition focus:bg-white focus:border-primary"
+                   [ngClass]="activiteForm.get('code')?.invalid && activiteForm.get('code')?.touched ? 'border-rose-400 ring-2 ring-rose-100' : 'border-gray-200'">
+            <p *ngIf="activiteForm.get('code')?.invalid && activiteForm.get('code')?.touched" class="text-[10px] text-rose-500 mt-1">
+              Format requis : lettres MAJUSCULES, chiffres, _ ou - (ex: DEGUSTATION).
+            </p>
+          </div>
+
+          <!-- Prix initial -->
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">
+              Prix de référence (FCFA) <span class="text-rose-500">*</span>
+            </label>
+            <input type="number"
+                   formControlName="prixInitial"
+                   min="0"
+                   step="500"
+                   placeholder="0"
+                   class="w-full px-3 py-2 text-xs bg-gray-50 border rounded-xl outline-none transition focus:bg-white focus:border-primary"
+                   [ngClass]="activiteForm.get('prixInitial')?.invalid && activiteForm.get('prixInitial')?.touched ? 'border-rose-400 ring-2 ring-rose-100' : 'border-gray-200'">
+            <p *ngIf="activiteForm.get('prixInitial')?.invalid && activiteForm.get('prixInitial')?.touched" class="text-[10px] text-rose-500 mt-1">
+              Le prix doit être supérieur ou égal à 0.
+            </p>
+          </div>
+        </div>
+
+        <!-- Libellé -->
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">
+            Libellé de l'activité <span class="text-rose-500">*</span>
+          </label>
+          <input type="text"
+                 formControlName="libelle"
+                 placeholder="Ex: Visite guidée historique & contes traditionnels"
+                 class="w-full px-3 py-2 text-xs bg-gray-50 border rounded-xl outline-none transition focus:bg-white focus:border-primary"
+                 [ngClass]="activiteForm.get('libelle')?.invalid && activiteForm.get('libelle')?.touched ? 'border-rose-400 ring-2 ring-rose-100' : 'border-gray-200'">
+          <p *ngIf="activiteForm.get('libelle')?.invalid && activiteForm.get('libelle')?.touched" class="text-[10px] text-rose-500 mt-1">
+            Le libellé est obligatoire (au moins 2 caractères).
+          </p>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">
+            Description détaillée
+          </label>
+          <textarea formControlName="description"
+                    rows="3"
+                    placeholder="Détails du déroulement de l'activité, matériel requis, consignes particulières..."
+                    class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl outline-none transition focus:bg-white focus:border-primary"></textarea>
+        </div>
+
+        <!-- Statut Actif -->
+        <div class="flex items-center gap-3 pt-1">
+          <input type="checkbox"
+                 id="modalActif"
+                 formControlName="actif"
+                 class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary cursor-pointer">
+          <label for="modalActif" class="text-xs font-medium text-gray-700 cursor-pointer">
+            Activité active et disponible immédiatement pour les circuits
+          </label>
+        </div>
+
+        <!-- Modal Actions -->
+        <div class="pt-4 border-t border-gray-100 flex items-center justify-end gap-3">
+          <button type="button" (click)="closeModal()"
+                  class="px-4 py-2 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
+            Annuler
+          </button>
+          <button type="submit" [disabled]="isSaving"
+                  class="px-5 py-2 text-xs font-semibold text-white bg-primary hover:bg-primary-hover rounded-xl shadow-md transition-all flex items-center gap-2 disabled:opacity-50">
+            <i class="fas fa-circle-notch fa-spin text-xs" *ngIf="isSaving"></i>
+            {{ isSaving ? 'Enregistrement...' : (isEditMode ? 'Enregistrer les modifications' : 'Créer l\'activité') }}
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ─── MODAL CONFIRMATION SUPPRESSION ─── -->
+  <div *ngIf="activiteToDelete" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
+    <div class="bg-white rounded-2xl shadow-2xl border border-gray-100 max-w-sm w-full p-5 text-center animate-scale-up">
+      <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-xl">
+        <i class="fas fa-trash-alt"></i>
+      </div>
+      <h3 class="text-sm font-bold text-gray-900 mb-1">Supprimer l'activité ?</h3>
+      <p class="text-xs text-gray-500 mb-4">
+        Êtes-vous sûr de vouloir supprimer définitivement l'activité 
+        <strong class="text-gray-800 font-semibold">« {{ activiteToDelete.libelle }} »</strong> ?
+      </p>
+      <div class="flex items-center justify-center gap-3">
+        <button (click)="cancelDelete()"
+                class="px-4 py-2 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
+          Annuler
+        </button>
+        <button (click)="executeDelete()"
+                class="px-4 py-2 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-xl shadow transition-colors">
+          Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

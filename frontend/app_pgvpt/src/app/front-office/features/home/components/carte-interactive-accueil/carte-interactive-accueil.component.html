@@ -1,0 +1,73 @@
+<section class="section section--light section--map-showcase">
+  <div class="section-container">
+    <div class="section-header section-header--center">
+      <div class="map-section-badge">
+        <span class="map-badge-pulse"></span>
+        GÉOGRAPHIE CULTURELLE &amp; VISITES
+      </div>
+      <h2 class="section-title">Cartographie des Trésors du Sénégal</h2>
+      <p class="section-subtitle">Visualisez la répartition géographique des patrimoines naturels, culturels et mémoriels sur l'ensemble des 14 régions.</p>
+    </div>
+
+    <div class="map-wrapper-luxury">
+      <div class="map-layout-modern">
+
+        <!-- Panneau de Contrôles -->
+        <div class="map-controls-panel">
+          <div class="panel-header-row">
+            <div class="panel-title-wrap">
+              <i class="fa-solid fa-sliders text-[#0B5D5E] mr-2"></i>
+              <span>Filtres thématiques</span>
+            </div>
+            <button type="button" class="reset-filter-btn" (click)="resetFilters()" title="Réinitialiser tous les filtres">
+              <i class="fa-solid fa-rotate-left mr-1 text-xs"></i>
+              Réinitialiser
+            </button>
+          </div>
+
+          <!-- Pilules interactives par catégorie -->
+          <div class="filter-pills-list">
+            <button 
+              *ngFor="let cat of categoriesList" 
+              type="button"
+              class="category-filter-pill"
+              [class.pill--active]="filterCategories[cat.key]"
+              (click)="toggleCategoryFilter(cat.key)">
+              <span class="pill-dot" [style.background-color]="cat.color"></span>
+              <span class="pill-label"><i [class]="cat.icon" class="mr-1.5 text-xs"></i> {{ cat.label }}</span>
+              <span class="pill-count">{{ getCategoryCount(cat.key) }}</span>
+            </button>
+          </div>
+
+          <!-- Sélecteur de Région -->
+          <div class="region-filter-wrapper">
+            <label class="region-filter-label">
+              <i class="fa-solid fa-location-dot text-[#0B5D5E] mr-1.5 text-xs"></i>
+              Filtrer par Région
+            </label>
+            <div class="select-styled-container">
+              <select [ngModel]="filterRegion" (ngModelChange)="onRegionChange($event)" class="filter-region-select-modern">
+                <option value="Toutes">Toutes les régions (14)</option>
+                <option *ngFor="let region of regions" [value]="region">{{ region }}</option>
+              </select>
+              <i class="fa-solid fa-chevron-down select-chevron"></i>
+            </div>
+          </div>
+
+          <!-- Compteur en direct -->
+          <div class="map-status-card">
+            <div class="status-indicator-dot"></div>
+            <div class="status-text">
+              <strong>{{ filteredCount }}</strong> patrimoine(s) affiché(s) sur la carte
+            </div>
+          </div>
+        </div>
+
+        <!-- Canvas Carte Leaflet -->
+        <div class="map-viewport-container">
+          <div id="senegal-map" class="leaflet-map-canvas"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

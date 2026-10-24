@@ -1,0 +1,47 @@
+<section class="categories-section">
+  <div class="categories-container">
+    <div class="categories-bar">
+
+      <a routerLink="/patrimoines" [queryParams]="{category: 'PATRIMOINE_CULTUREL'}" class="category-item">
+        <div class="category-icon category-icon--amber"><i class="fa-solid fa-landmark text-2xl"></i></div>
+        <div class="category-meta">
+          <span class="category-label">Culturel</span>
+          <span class="category-sub">Monuments &amp; Cités</span>
+        </div>
+      </a>
+
+      <a routerLink="/patrimoines" [queryParams]="{category: 'PATRIMOINE_NATUREL'}" class="category-item">
+        <div class="category-icon category-icon--green"><i class="fa-solid fa-leaf text-2xl"></i></div>
+        <div class="category-meta">
+          <span class="category-label">Naturel</span>
+          <span class="category-sub">Parcs &amp; Réserves</span>
+        </div>
+      </a>
+
+      <a routerLink="/patrimoines" [queryParams]="{category: 'PATRIMOINE_MEMORIEL'}" class="category-item">
+        <div class="category-icon category-icon--red"><i class="fa-solid fa-dove text-2xl"></i></div>
+        <div class="category-meta">
+          <span class="category-label">Mémoriel</span>
+          <span class="category-sub">Lieux de Mémoire</span>
+        </div>
+      </a>
+
+      <a routerLink="/patrimoines" [queryParams]="{category: 'PATRIMOINE_COLONIAL'}" class="category-item">
+        <div class="category-icon category-icon--blue"><i class="fa-solid fa-monument text-2xl"></i></div>
+        <div class="category-meta">
+          <span class="category-label">Colonial</span>
+          <span class="category-sub">Architecture &amp; Histoire</span>
+        </div>
+      </a>
+
+      <a routerLink="/patrimoines" [queryParams]="{category: 'PATRIMOINE_IMMATERIEL'}" class="category-item">
+        <div class="category-icon category-icon--purple"><i class="fa-solid fa-masks-theater text-2xl"></i></div>
+        <div class="category-meta">
+          <span class="category-label">Immatériel</span>
+          <span class="category-sub">Rituels &amp; Savoir-faire</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>

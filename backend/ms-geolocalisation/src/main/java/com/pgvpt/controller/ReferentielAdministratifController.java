@@ -3,20 +3,34 @@ package com.pgvpt.controller;
 import com.pgvpt.api.*;
 import com.pgvpt.dto.*;
 import com.pgvpt.service.ReferentielAdministratifService;
-import lombok.RequiredArgsConstructor;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequiredArgsConstructor
 public class ReferentielAdministratifController implements ReferentielAdministratifApi {
 
     private final ReferentielAdministratifService service;
+
+    public ReferentielAdministratifController(ReferentielAdministratifService service) {
+        this.service = service;
+    }
+
+    private String getQueryParam(String paramName) {
+        var attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attrs != null && attrs.getRequest() != null) {
+            return attrs.getRequest().getParameter(paramName);
+        }
+        return null;
+    }
 
 
     @Override
@@ -99,6 +113,10 @@ public class ReferentielAdministratifController implements ReferentielAdministra
     @Override
     public ResponseEntity<PageCommune> getCommunes(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
+        String deptIdStr = getQueryParam("departementId");
+        if (deptIdStr != null && !deptIdStr.isBlank()) {
+            return ResponseEntity.ok(service.getCommunesByDepartement(UUID.fromString(deptIdStr), pageable));
+        }
         return ResponseEntity.ok(service.getAllCommunes(pageable));
     }
 
@@ -110,6 +128,10 @@ public class ReferentielAdministratifController implements ReferentielAdministra
     @Override
     public ResponseEntity<PageDepartement> getDepartements(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
+        String regionIdStr = getQueryParam("regionId");
+        if (regionIdStr != null && !regionIdStr.isBlank()) {
+            return ResponseEntity.ok(service.getDepartementsByRegion(UUID.fromString(regionIdStr), pageable));
+        }
         return ResponseEntity.ok(service.getAllDepartements(pageable));
     }
 
@@ -126,6 +148,10 @@ public class ReferentielAdministratifController implements ReferentielAdministra
     @Override
     public ResponseEntity<PageQuartier> getQuartiers(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
+        String communeIdStr = getQueryParam("communeId");
+        if (communeIdStr != null && !communeIdStr.isBlank()) {
+            return ResponseEntity.ok(service.getQuartiersByCommune(UUID.fromString(communeIdStr), pageable));
+        }
         return ResponseEntity.ok(service.getQuartiers(pageable));
     }
 
@@ -148,6 +174,10 @@ public class ReferentielAdministratifController implements ReferentielAdministra
     @Override
     public ResponseEntity<PageVillage> getVillages(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
+        String communeIdStr = getQueryParam("communeId");
+        if (communeIdStr != null && !communeIdStr.isBlank()) {
+            return ResponseEntity.ok(service.getVillagesByCommune(UUID.fromString(communeIdStr), pageable));
+        }
         return ResponseEntity.ok(service.getVillages(pageable));
     }
 

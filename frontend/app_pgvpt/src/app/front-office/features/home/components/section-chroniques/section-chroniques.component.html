@@ -1,0 +1,64 @@
+<section id="recits-section" class="section section--recits-showcase" *ngIf="recentContenus && recentContenus.length > 0">
+  <div class="section-container">
+    <div class="recits-showcase-header">
+      <div class="recits-showcase-titles">
+        <div class="recits-badge">
+          <span class="recits-badge-dot"></span>
+          CHRONIQUES DU PATRIMOINE
+        </div>
+        <h2 class="section-title">Récits &amp; Guides Vivants</h2>
+        <p class="section-subtitle">
+          Plongez dans les légendes orales, les archives coloniales et les guides exclusifs de nos conservateurs.
+        </p>
+      </div>
+      <a routerLink="/recits" class="btn-all-recits">
+        <span>Découvrir tous les récits</span>
+        <i class="fa-solid fa-arrow-right ml-2 text-sm"></i>
+      </a>
+    </div>
+
+    <div class="recits-cards-grid">
+      <article class="recit-card-luxury" *ngFor="let item of recentContenus">
+        <a [routerLink]="['/patrimoines', item.patrimoineId, 'contenus', item.id]" class="recit-card-media">
+          <img [src]="getArticleImage(item)" [alt]="item.titre" loading="lazy">
+          <div class="recit-card-badges">
+            <span class="type-pill">
+              <i [class]="getContenuTypeIcon(item.type || item.typeContenu)" class="mr-1 text-xs"></i> {{ getContenuTypeLabel(item.type || item.typeContenu) }}
+            </span>
+            <span class="read-time-pill">
+              <i class="fa-regular fa-clock mr-1 text-xs"></i> {{ getReadingTime(item.corps || item.texte || item.resume) }} min
+            </span>
+          </div>
+          <div class="recit-card-gradient"></div>
+        </a>
+
+        <div class="recit-card-body">
+          <div class="recit-patrimoine-ref">
+            <i class="fa-solid fa-location-dot mr-1.5 text-xs text-[#0B5D5E]"></i>
+            <span>{{ getPatrimoineNom(item.patrimoineId) }}</span>
+          </div>
+
+          <h3 class="recit-card-title">
+            <a [routerLink]="['/patrimoines', item.patrimoineId, 'contenus', item.id]">
+              {{ item.titre }}
+            </a>
+          </h3>
+
+          <p class="recit-card-excerpt">
+            {{ (item.resume || item.corps || item.texte) | slice:0:130 }}...
+          </p>
+
+          <div class="recit-card-footer">
+            <span class="recit-date" *ngIf="item.createdAt || item.dateCreation">
+              {{ (item.createdAt || item.dateCreation) | date:'dd MMM yyyy' }}
+            </span>
+            <a [routerLink]="['/patrimoines', item.patrimoineId, 'contenus', item.id]" class="recit-read-link">
+              <span>Lire le récit</span>
+              <i class="fa-solid fa-arrow-right ml-1.5 text-xs"></i>
+            </a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>

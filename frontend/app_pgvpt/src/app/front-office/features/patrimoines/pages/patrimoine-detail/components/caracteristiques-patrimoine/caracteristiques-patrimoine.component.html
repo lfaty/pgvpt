@@ -1,0 +1,369 @@
+<!-- SECTION : HISTOIRE & PATRIMOINE -->
+<section id="caracteristiques" class="scroll-mt-24 mt-16 td-reveal" *ngIf="patrimoine">
+
+  <!-- HEADER DE SECTION -->
+  <div class="flex items-end gap-4 mb-10">
+    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#D16933] to-[#E8956A] text-white flex items-center justify-center text-lg shadow-lg shadow-[#D16933]/20 shrink-0">
+      <i class="fa-solid fa-landmark"></i>
+    </div>
+    <div>
+      <p class="td-kicker mb-0">Histoire & Patrimoine</p>
+      <h2 class="font-serif text-2xl md:text-3xl font-bold text-[#0B1A24] leading-tight">Un lieu, une histoire</h2>
+    </div>
+  </div>
+
+  <!-- ===== FRISE HISTORIQUE ===== -->
+  <div *ngIf="timeline.length" class="relative pl-12 md:pl-14 space-y-10 mb-16">
+    <!-- Ligne verticale avec dégradé -->
+    <div class="absolute left-[18px] md:left-[22px] top-4 bottom-4 w-[2px] bg-gradient-to-b from-[#D16933] via-[#E9C9B3]/60 to-transparent rounded-full"></div>
+
+    <div *ngFor="let t of timeline; let i = index" class="relative group">
+      <!-- Point sur la timeline -->
+      <div class="absolute -left-12 md:-left-14 top-0 w-10 h-10 md:w-11 md:h-11 rounded-full bg-white border-[2.5px] border-[#D16933] text-[#D16933] flex items-center justify-center text-sm shadow-md group-hover:bg-[#D16933] group-hover:text-white transition-all duration-300">
+        <i [class]="t.icon"></i>
+      </div>
+
+      <!-- Contenu de la timeline -->
+      <div class="bg-white rounded-2xl border border-[#F0EDE6] p-5 md:p-6 shadow-sm group-hover:shadow-lg group-hover:border-[#E0DDD6] transition-all duration-300">
+        <h3 class="font-serif text-lg md:text-xl font-bold text-[#0B1A24] mb-2">{{ t.titre }}</h3>
+        <p class="text-[14px] text-gray-600 leading-[1.85]">{{ t.texte }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RECONNAISSANCE & PROTECTION ===== -->
+  <div *ngIf="hasReconnaissance" class="mb-16">
+    <h3 class="flex items-center gap-2.5 font-serif text-xl font-bold text-[#0B1A24] mb-6">
+      <span class="w-8 h-8 rounded-lg bg-[#FFF8E1] text-[#C9A227] flex items-center justify-center text-sm"><i class="fa-solid fa-shield-halved"></i></span>
+      Reconnaissance & protection
+    </h3>
+
+    <!-- Bandeau UNESCO -->
+    <div *ngIf="patrimoine.inscritUnesco" class="mb-6 relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#FDF6E3] via-[#FFF8E1] to-[#FDF1D0] border border-[#EED9A0] p-6 md:p-7">
+      <!-- Accent doré en haut -->
+      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#C9A227] via-[#E4C856] to-[#C9A227]"></div>
+      <!-- Glow décoratif -->
+      <div class="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-[#C9A227]/10 blur-3xl"></div>
+      
+      <div class="relative flex items-start gap-5">
+        <span class="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#C9A227] to-[#A88420] text-white flex items-center justify-center text-2xl shrink-0 shadow-lg shadow-[#C9A227]/30">
+          <i class="fa-solid fa-award"></i>
+        </span>
+        <div>
+          <p class="text-[10px] font-extrabold uppercase tracking-[0.22em] text-[#8A6D14] mb-1">Patrimoine mondial de l'UNESCO</p>
+          <p class="font-serif text-xl font-bold text-[#0B1A24] leading-snug">{{ patrimoine.nomSiteUnesco || patrimoine.nom }}</p>
+          <p *ngIf="patrimoine.dateInscriptionUnesco" class="text-xs text-[#8A6D14]/70 mt-1.5 flex items-center gap-1.5">
+            <i class="fa-regular fa-calendar"></i>
+            Inscrit en {{ patrimoine.dateInscriptionUnesco }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div *ngIf="hasValue(patrimoine.classePatrimoine)" class="group flex items-start gap-4 p-5 rounded-2xl bg-white border border-[#F0EDE6] hover:border-[#D16933]/30 hover:shadow-md transition-all duration-300">
+        <span class="w-11 h-11 rounded-xl bg-gradient-to-br from-[#D16933]/10 to-[#D16933]/5 text-[#D16933] flex items-center justify-center text-base shrink-0">
+          <i class="fa-solid fa-medal"></i>
+        </span>
+        <div>
+          <p class="td-info-label">Classement national</p>
+          <p class="td-info-value">{{ patrimoine.classePatrimoine }}</p>
+          <p *ngIf="patrimoine.referenceClassement || patrimoine.dateClassement" class="text-xs text-gray-400 mt-1 flex items-center gap-1">
+            <span *ngIf="patrimoine.referenceClassement">Réf. {{ patrimoine.referenceClassement }}</span>
+            <span *ngIf="patrimoine.referenceClassement && patrimoine.dateClassement"> · </span>
+            <span *ngIf="patrimoine.dateClassement">{{ patrimoine.dateClassement | date:'dd/MM/yyyy' }}</span>
+          </p>
+        </div>
+      </div>
+      <div *ngIf="hasValue(patrimoine.organismeGestionnaire || patrimoine.gestionnaire)" class="group flex items-start gap-4 p-5 rounded-2xl bg-white border border-[#F0EDE6] hover:border-[#087F5B]/30 hover:shadow-md transition-all duration-300">
+        <span class="w-11 h-11 rounded-xl bg-gradient-to-br from-[#087F5B]/10 to-[#087F5B]/5 text-[#087F5B] flex items-center justify-center text-base shrink-0">
+          <i class="fa-solid fa-building-columns"></i>
+        </span>
+        <div>
+          <p class="td-info-label">Gestion du site</p>
+          <p class="td-info-value">{{ patrimoine.organismeGestionnaire || patrimoine.gestionnaire }}</p>
+        </div>
+      </div>
+      <div *ngIf="hasValue(patrimoine.proprietaire)" class="group flex items-start gap-4 p-5 rounded-2xl bg-white border border-[#F0EDE6] hover:border-[#7C3AED]/30 hover:shadow-md transition-all duration-300">
+        <span class="w-11 h-11 rounded-xl bg-gradient-to-br from-[#7C3AED]/10 to-[#7C3AED]/5 text-[#7C3AED] flex items-center justify-center text-base shrink-0">
+          <i class="fa-solid fa-key"></i>
+        </span>
+        <div>
+          <p class="td-info-label">Propriétaire</p>
+          <p class="td-info-value">{{ patrimoine.proprietaire }}</p>
+        </div>
+      </div>
+      <div *ngIf="hasValue(patrimoine.protectionJuridique)" class="group flex items-start gap-4 p-5 rounded-2xl bg-white border border-[#F0EDE6] hover:border-[#0B6E99]/30 hover:shadow-md transition-all duration-300 md:col-span-2">
+        <span class="w-11 h-11 rounded-xl bg-gradient-to-br from-[#0B6E99]/10 to-[#0B6E99]/5 text-[#0B6E99] flex items-center justify-center text-base shrink-0">
+          <i class="fa-solid fa-shield-halved"></i>
+        </span>
+        <div>
+          <p class="td-info-label">Statut de protection</p>
+          <p class="text-sm text-gray-700 leading-relaxed mt-1">{{ patrimoine.protectionJuridique }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CARACTÉRISTIQUES SPÉCIFIQUES ===== -->
+  <div *ngIf="hasSpecifique" class="mb-16">
+
+    <!-- MONUMENT -->
+    <ng-container *ngIf="patrimoine.type === 'MONUMENT'">
+      <h3 class="flex items-center gap-3 font-serif text-xl font-bold text-[#0B1A24] mb-8">
+        <span class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D16933] to-[#E8956A] text-white flex items-center justify-center text-base shadow-md shadow-[#D16933]/20"><i class="fa-solid fa-gopuram"></i></span>
+        Architecture
+      </h3>
+
+      <!-- Carte Style (pleine largeur, mise en avant) -->
+      <div *ngIf="hasValue(patrimoine.styleArchitectural)" class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0B1A24] to-[#163447] text-white p-6 md:p-7 mb-5 group">
+        <div class="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-[#D16933]/15 blur-3xl"></div>
+        <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#F4A261]/50 to-transparent"></div>
+        <div class="relative flex items-start gap-4">
+          <span class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm text-[#F4A261] flex items-center justify-center text-lg shrink-0 border border-white/10">
+            <i class="fa-solid fa-compass-drafting"></i>
+          </span>
+          <div>
+            <p class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#F4A261]/80 mb-1">Style architectural</p>
+            <p class="font-serif text-lg md:text-xl font-bold leading-snug">{{ patrimoine.styleArchitectural }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grille des caractéristiques avec icônes -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div *ngIf="hasValue(patrimoine.natureMonument)" class="group flex items-start gap-4 p-5 rounded-2xl bg-white border border-[#F0EDE6] hover:border-[#D16933]/30 hover:shadow-lg transition-all duration-300">
+          <span class="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100/50 text-amber-600 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+            <i class="fa-solid fa-monument"></i>
+          </span>
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-gray-400 mb-1">Nature</p>
+            <p class="text-[15px] font-bold text-[#0B1A24] leading-snug">{{ humanize(patrimoine.natureMonument) }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="hasValue(patrimoine.dimensions)" class="group flex items-start gap-4 p-5 rounded-2xl bg-white border border-[#F0EDE6] hover:border-[#087F5B]/30 hover:shadow-lg transition-all duration-300">
+          <span class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100/50 text-emerald-600 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+            <i class="fa-solid fa-ruler-combined"></i>
+          </span>
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-gray-400 mb-1">Dimensions</p>
+            <p class="text-[15px] font-bold text-[#0B1A24] leading-snug">{{ patrimoine.dimensions }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="hasValue(patrimoine.anneeConstruction)" class="group flex items-start gap-4 p-5 rounded-2xl bg-white border border-[#F0EDE6] hover:border-[#7C3AED]/30 hover:shadow-lg transition-all duration-300">
+          <span class="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-50 to-violet-100/50 text-violet-600 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+            <i class="fa-solid fa-calendar-check"></i>
+          </span>
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-gray-400 mb-1">Construit en</p>
+            <p class="text-[15px] font-bold text-[#0B1A24] leading-snug">{{ patrimoine.anneeConstruction }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="hasValue(patrimoine.anneeRenovation)" class="group flex items-start gap-4 p-5 rounded-2xl bg-white border border-[#F0EDE6] hover:border-[#0B6E99]/30 hover:shadow-lg transition-all duration-300">
+          <span class="w-11 h-11 rounded-xl bg-gradient-to-br from-sky-50 to-sky-100/50 text-sky-600 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+            <i class="fa-solid fa-screwdriver-wrench"></i>
+          </span>
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-gray-400 mb-1">Rénové en</p>
+            <p class="text-[15px] font-bold text-[#0B1A24] leading-snug">{{ patrimoine.anneeRenovation }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="hasValue(patrimoine.architecte)" class="group flex items-start gap-4 p-5 rounded-2xl bg-white border border-[#F0EDE6] hover:border-[#D16933]/30 hover:shadow-lg transition-all duration-300">
+          <span class="w-11 h-11 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100/50 text-orange-600 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+            <i class="fa-solid fa-pen-ruler"></i>
+          </span>
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-gray-400 mb-1">Architecte</p>
+            <p class="text-[15px] font-bold text-[#0B1A24] leading-snug">{{ patrimoine.architecte }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="hasValue(patrimoine.commanditaire)" class="group flex items-start gap-4 p-5 rounded-2xl bg-white border border-[#F0EDE6] hover:border-[#C9A227]/30 hover:shadow-lg transition-all duration-300">
+          <span class="w-11 h-11 rounded-xl bg-gradient-to-br from-yellow-50 to-amber-100/50 text-[#C9A227] flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+            <i class="fa-solid fa-crown"></i>
+          </span>
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-gray-400 mb-1">Commanditaire</p>
+            <p class="text-[15px] font-bold text-[#0B1A24] leading-snug">{{ patrimoine.commanditaire }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Matériaux & Personnages -->
+      <div class="flex flex-col gap-5">
+        <div *ngIf="patrimoine.materiauxConstruction?.length" class="p-5 rounded-2xl bg-[#F6F4EE] border border-[#E9E3D3]">
+          <p class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-gray-500 mb-3">
+            <i class="fa-solid fa-cubes text-[#D16933] text-xs"></i> Matériaux de construction
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span *ngFor="let m of patrimoine.materiauxConstruction"
+                  class="px-3.5 py-1.5 rounded-full bg-white text-[#374151] border border-[#E9E3D3] text-xs font-semibold shadow-sm hover:shadow-md hover:border-[#D16933]/30 transition-all cursor-default">
+              {{ m }}
+            </span>
+          </div>
+        </div>
+        <div *ngIf="patrimoine.personnagesAssocies?.length" class="p-5 rounded-2xl bg-[#F6F4EE] border border-[#E9E3D3]">
+          <p class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-gray-500 mb-3">
+            <i class="fa-solid fa-users text-[#7C3AED] text-xs"></i> Personnages historiques associés
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span *ngFor="let p of patrimoine.personnagesAssocies"
+                  class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white text-[#374151] border border-[#E9E3D3] text-xs font-semibold shadow-sm hover:shadow-md hover:border-[#7C3AED]/30 transition-all cursor-default">
+              <span class="w-5 h-5 rounded-full bg-[#7C3AED]/10 text-[#7C3AED] flex items-center justify-center text-[8px]"><i class="fa-solid fa-user"></i></span>
+              {{ p }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- MUSÉE -->
+    <ng-container *ngIf="patrimoine.type === 'MUSEE'">
+      <h3 class="flex items-center gap-2.5 font-serif text-xl font-bold text-[#0B1A24] mb-6">
+        <span class="w-8 h-8 rounded-lg bg-[#F0EDE6] text-[#D16933] flex items-center justify-center text-sm"><i class="fa-solid fa-palette"></i></span>
+        Collections & scénographie
+      </h3>
+      <div class="grid grid-cols-3 gap-3 mb-6">
+        <div *ngIf="hasValue(patrimoine.nombreCollections)" class="text-center p-5 rounded-2xl bg-gradient-to-b from-white to-[#FAFAF7] border border-[#F0EDE6]">
+          <p class="text-3xl font-serif font-bold text-[#D16933]">{{ patrimoine.nombreCollections }}</p>
+          <p class="td-info-label mt-1">Collections</p>
+        </div>
+        <div *ngIf="hasValue(patrimoine.nombreOeuvres)" class="text-center p-5 rounded-2xl bg-gradient-to-b from-white to-[#FAFAF7] border border-[#F0EDE6]">
+          <p class="text-3xl font-serif font-bold text-[#D16933]">{{ patrimoine.nombreOeuvres }}</p>
+          <p class="td-info-label mt-1">Œuvres</p>
+        </div>
+        <div *ngIf="hasValue(patrimoine.capaciteAccueil)" class="text-center p-5 rounded-2xl bg-gradient-to-b from-white to-[#FAFAF7] border border-[#F0EDE6]">
+          <p class="text-3xl font-serif font-bold text-[#D16933]">{{ patrimoine.capaciteAccueil }}</p>
+          <p class="td-info-label mt-1">Visiteurs max.</p>
+        </div>
+      </div>
+      <p *ngIf="patrimoine.museographie" class="text-[15px] text-gray-600 leading-[1.8] mb-6">{{ patrimoine.museographie }}</p>
+      <div *ngIf="patrimoine.collections?.length" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div *ngFor="let col of patrimoine.collections" class="p-5 rounded-2xl bg-white border border-[#F0EDE6] hover:shadow-md transition-all">
+          <h4 class="font-bold text-[#0B1A24] mb-1">{{ col.nom }} <span *ngIf="col.nombreOeuvres" class="text-xs font-normal text-gray-500">· {{ col.nombreOeuvres }} œuvres</span></h4>
+          <p class="text-sm text-gray-600 mb-3" *ngIf="col.description">{{ col.description }}</p>
+          <div class="flex gap-4 text-xs text-gray-500">
+            <span *ngIf="col.periode"><i class="fa-regular fa-clock mr-1"></i>{{ col.periode }}</span>
+            <span *ngIf="col.origine"><i class="fa-solid fa-earth-africa mr-1"></i>{{ col.origine }}</span>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- SITE NATUREL -->
+    <ng-container *ngIf="isNaturel">
+      <h3 class="flex items-center gap-2.5 font-serif text-xl font-bold text-[#0B1A24] mb-6">
+        <span class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm"><i class="fa-solid fa-leaf"></i></span>
+        Nature & biodiversité
+      </h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <div *ngIf="hasValue(patrimoine.superficie)" class="td-nature-stat">
+          <p class="text-2xl font-serif font-bold">{{ patrimoine.superficie }}<span class="text-sm font-sans ml-1">ha</span></p>
+          <p class="td-nature-label">Superficie</p>
+        </div>
+        <div *ngIf="hasValue(patrimoine.natureSite)" class="td-nature-stat">
+          <i class="fa-solid fa-water text-xl mb-1"></i>
+          <p class="text-sm font-bold">{{ humanize(patrimoine.natureSite) }}</p>
+          <p class="td-nature-label">Type de milieu</p>
+        </div>
+        <div *ngIf="patrimoine.zoneProtegee" class="td-nature-stat">
+          <i class="fa-solid fa-shield-heart text-xl mb-1"></i>
+          <p class="text-sm font-bold">Zone protégée</p>
+          <p class="td-nature-label">Statut</p>
+        </div>
+        <div *ngIf="hasValue(patrimoine.categorieProtection)" class="td-nature-stat">
+          <i class="fa-solid fa-ribbon text-xl mb-1"></i>
+          <p class="text-sm font-bold">{{ humanize(patrimoine.categorieProtection) }}</p>
+          <p class="td-nature-label">Protection</p>
+        </div>
+      </div>
+
+      <p *ngIf="patrimoine.ecosysteme" class="text-[15px] text-gray-600 leading-[1.8] mb-6">{{ patrimoine.ecosysteme }}</p>
+
+      <div *ngIf="biodiversiteList.length" class="mb-6">
+        <p class="td-info-label mb-3">Faune & flore à observer</p>
+        <div class="flex flex-wrap gap-2">
+          <span *ngFor="let bio of biodiversiteList" class="px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-100 text-xs font-semibold">
+            <i class="fa-solid fa-leaf text-[10px] mr-1.5 text-emerald-500"></i>{{ bio }}
+          </span>
+        </div>
+      </div>
+
+      <div *ngIf="patrimoine.especesProtegees?.length" class="mb-6">
+        <p class="td-info-label mb-3">Espèces protégées</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div *ngFor="let esp of patrimoine.especesProtegees" class="flex gap-3 items-center p-3 rounded-2xl bg-white border border-[#F0EDE6] hover:shadow-sm transition-all">
+            <span class="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                  [ngClass]="esp.type === 'FLORE' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'">
+              <i class="fa-solid" [ngClass]="esp.type === 'FLORE' ? 'fa-seedling' : 'fa-paw'"></i>
+            </span>
+            <div class="min-w-0">
+              <p class="text-sm font-bold text-[#0B1A24] truncate">{{ esp.nomCommun || esp.nomScientifique }}</p>
+              <p class="text-xs text-gray-500 italic truncate" *ngIf="esp.nomCommun && esp.nomScientifique">{{ esp.nomScientifique }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="patrimoine.risquesEnvironnementaux?.length">
+        <p class="td-info-label mb-3">Fragilités du milieu</p>
+        <div class="flex flex-wrap gap-2">
+          <span *ngFor="let r of patrimoine.risquesEnvironnementaux" class="px-3 py-1.5 rounded-full bg-amber-50 text-amber-800 border border-amber-100 text-xs font-semibold">
+            <i class="fa-solid fa-triangle-exclamation text-[10px] mr-1"></i>{{ r }}
+          </span>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- ===== BON À SAVOIR (REDESIGNED) ===== -->
+  <div *ngIf="hasBonASavoir" class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0B1A24] to-[#163447]">
+    <!-- Ornements décoratifs -->
+    <div class="absolute top-0 right-0 w-72 h-72 rounded-full bg-[#D16933]/8 blur-3xl"></div>
+    <div class="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-[#F4A261]/6 blur-3xl"></div>
+    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#F4A261] to-transparent opacity-60"></div>
+
+    <div class="relative p-6 md:p-8 lg:p-10">
+      <!-- En-tête -->
+      <div class="flex items-center gap-4 mb-7">
+        <span class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#F4A261] to-[#D16933] text-white flex items-center justify-center text-lg shadow-lg shadow-[#D16933]/30">
+          <i class="fa-solid fa-lightbulb"></i>
+        </span>
+        <div>
+          <p class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#F4A261]">Informations pratiques</p>
+          <h3 class="font-serif text-xl md:text-2xl font-bold text-white">Bon à savoir avant de partir</h3>
+        </div>
+      </div>
+
+      <!-- Conditions d'accès -->
+      <div *ngIf="patrimoine.accessibilite.conditionsAcces" class="mb-6">
+        <div class="flex gap-4 p-5 rounded-2xl bg-white/[0.07] backdrop-blur-sm border border-white/10">
+          <span class="w-10 h-10 rounded-xl bg-[#D16933]/20 text-[#F4A261] flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-circle-info"></i>
+          </span>
+          <p class="text-sm text-white/85 leading-relaxed">{{ patrimoine.accessibilite.conditionsAcces }}</p>
+        </div>
+      </div>
+
+      <!-- Règles du site -->
+      <div *ngIf="patrimoine.accessibilite.restrictions?.length">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#F4A261]"></span>
+          <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-[#F4A261]/80">Les règles du site</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div *ngFor="let r of patrimoine.accessibilite.restrictions" class="flex items-start gap-3 p-4 rounded-xl bg-white/[0.05] border border-white/[0.08] hover:bg-white/[0.09] transition-colors">
+            <span class="w-8 h-8 rounded-lg bg-white/10 text-[#F4A261] flex items-center justify-center shrink-0 text-xs mt-0.5">
+              <i [class]="regleIcon(r)"></i>
+            </span>
+            <span class="text-sm text-white/80 leading-relaxed">{{ r }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

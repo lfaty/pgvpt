@@ -98,4 +98,18 @@ public class CircuitsController implements CircuitsApi {
         response.setCalculeLe(vm.getCalculeLe());
         return ResponseEntity.ok(response);
     }
+
+    @Override
+    public ResponseEntity<GetCircuitDisponibilite200Response> getCircuitDisponibilite(UUID id, OffsetDateTime date, Integer nombrePersonnes) {
+        var circuit = circuitService.rechercherParId(id);
+        GetCircuitDisponibilite200Response response = new GetCircuitDisponibilite200Response();
+        boolean disponible = circuit.isActif() && circuit.getStatut() == com.pgvpt.enums.StatutCircuit.PUBLIE;
+        response.setDisponible(disponible);
+        response.setCapaciteMax(50);
+        response.setPlacesRestantes(disponible ? 50 : 0);
+        if (!disponible) {
+            response.setMotif("Circuit non disponible ou non publié");
+        }
+        return ResponseEntity.ok(response);
+    }
 }

@@ -1,0 +1,112 @@
+<div #viewerStage 
+     class="media-viewer-stage rounded-3xl overflow-hidden shadow-2xl flex flex-col items-center justify-center min-h-[460px] max-h-[78vh] relative group border border-gray-800"
+     *ngIf="media">
+  
+  <!-- 1. PHOTO / CARTE / ARCHIVE NUMÉRISÉE -->
+  <ng-container *ngIf="['PHOTO', 'CARTE', 'ARCHIVE_NUMERISEE'].includes(media.type)">
+    <div class="w-full h-full max-h-[74vh] flex items-center justify-center overflow-auto p-4">
+      <img [src]="media.url" 
+           [alt]="media.nom" 
+           class="media-zoomable-img max-w-full max-h-[70vh] object-contain shadow-2xl rounded-sm"
+           [style.transform]="'scale(' + zoomLevel + ')'"
+           [ngClass]="{'sepia': media.type === 'ARCHIVE_NUMERISEE'}">
+    </div>
+
+    <!-- Barre de contrôle flottante pour les images -->
+    <div class="viewer-controls-bar">
+      <!-- Zoom arrière -->
+      <button type="button" (click)="zoomOut()" [disabled]="zoomLevel <= 0.5"
+              class="viewer-control-btn" title="Zoom arrière (-)">
+        <i class="fas fa-minus text-xs"></i>
+      </button>
+
+      <!-- Affichage pourcentage -->
+      <span class="text-white text-[11px] font-mono px-2 font-bold min-w-[48px] text-center">
+        {{ (zoomLevel * 100) | number:'1.0-0' }}%
+      </span>
+
+      <!-- Zoom avant -->
+      <button type="button" (click)="zoomIn()" [disabled]="zoomLevel >= 3"
+              class="viewer-control-btn" title="Zoom avant (+)">
+        <i class="fas fa-plus text-xs"></i>
+      </button>
+
+      <div class="h-4 w-[1px] bg-white/20 mx-1"></div>
+
+      <!-- Réinitialiser zoom -->
+      <button type="button" (click)="resetZoom()" *ngIf="zoomLevel !== 1"
+              class="viewer-control-btn" title="Réinitialiser le zoom">
+        <i class="fas fa-rotate-left text-xs"></i>
+      </button>
+
+      <!-- Plein écran -->
+      <button type="button" (click)="toggleFullscreen()"
+              class="viewer-control-btn" title="Plein écran">
+        <i class="fas" [ngClass]="isFullscreen ? 'fa-compress' : 'fa-expand'" text-xs></i>
+      </button>
+    </div>
+  </ng-container>
+
+  <!-- 2. VIDÉO -->
+  <ng-container *ngIf="media.type === 'VIDEO'">
+    <div class="w-full h-full max-h-[74vh] flex items-center justify-center bg-black">
+      <video [src]="getSafeUrl(media.url)" 
+             controls 
+             autoplay 
+             class="w-full h-full max-h-[74vh] object-contain shadow-2xl"></video>
+    </div>
+  </ng-container>
+
+  <!-- 3. AUDIO / ENREGISTREMENT HISTORIQUE -->
+  <ng-container *ngIf="media.type === 'AUDIO'">
+    <div class="w-full py-20 px-8 flex flex-col items-center justify-center text-center">
+      <div class="w-24 h-24 rounded-full bg-[#D16933] text-white flex items-center justify-center mb-6 shadow-xl audio-visual-pulse">
+        <i class="fa-solid fa-headphones text-4xl"></i>
+      </div>
+      <h4 class="text-white font-serif text-2xl font-bold mb-2">{{ media.nom }}</h4>
+      <p class="text-gray-400 text-xs max-w-md mb-8">Piste audio d'archive et mémoire sonore • PGVPT</p>
+      <audio [src]="getSafeUrl(media.url)" controls class="w-full max-w-lg shadow-lg"></audio>
+    </div>
+  </ng-container>
+
+  <!-- 4. DOCUMENT PDF -->
+  <ng-container *ngIf="media.type === 'DOCUMENT'">
+    <div class="w-full py-20 px-8 flex flex-col items-center justify-center text-center">
+      <div class="w-20 h-20 rounded-3xl bg-red-600/20 text-red-500 flex items-center justify-center mb-6 shadow-inner">
+        <i class="fa-solid fa-file-pdf text-4xl"></i>
+      </div>
+      <h4 class="text-white font-serif text-2xl font-bold mb-2">{{ media.nom }}</h4>
+      <p class="text-gray-400 text-xs max-w-md mb-8">Document numérisé officiel (Format PDF)</p>
+      <a [href]="media.url" target="_blank" 
+         class="inline-flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow-lg transition">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        <span>Consulter le document complet</span>
+      </a>
+    </div>
+  </ng-container>
+
+  <!-- 5. PANORAMA 360° & MODÈLE 3D -->
+  <ng-container *ngIf="['PANORAMA_360', 'MODELE_3D'].includes(media.type)">
+    <div class="w-full py-20 px-8 flex flex-col items-center justify-center text-center">
+      <div class="w-24 h-24 rounded-full bg-emerald-600/20 text-emerald-400 flex items-center justify-center mb-6 shadow-xl">
+        <i class="fa-solid text-4xl" [ngClass]="media.type === 'PANORAMA_360' ? 'fa-vr-cardboard' : 'fa-cube'"></i>
+      </div>
+      <h4 class="text-white font-serif text-2xl font-bold mb-2">{{ media.nom }}</h4>
+      <p class="text-gray-400 text-xs max-w-md mb-8">
+        {{ media.type === 'PANORAMA_360' ? 'Expérience panoramique immersive à 360 degrés' : 'Modélisation tridimensionnelle du site' }}
+      </p>
+      <a [href]="media.url" target="_blank"
+         class="inline-flex items-center gap-2 px-6 py-3 bg-[#0b5d5e] hover:bg-[#084b4c] text-white font-bold text-xs rounded-xl shadow-lg transition">
+        <i class="fa-solid fa-expand"></i>
+        <span>Lancer l'immersion plein écran</span>
+      </a>
+    </div>
+  </ng-container>
+
+  <!-- Bouton ouvrir original en coin haut -->
+  <a [href]="media.url" target="_blank" title="Ouvrir le fichier original dans un nouvel onglet"
+     class="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/60 hover:bg-black text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow-lg">
+    <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+  </a>
+
+</div>

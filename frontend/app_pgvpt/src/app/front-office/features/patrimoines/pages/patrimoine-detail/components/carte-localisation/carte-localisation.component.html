@@ -1,0 +1,99 @@
+<!-- SECTION : ACCÈS & CARTE -->
+<section id="localisation" class="scroll-mt-24 bg-white border-t border-gray-100">
+  <div class="mx-auto max-w-[1200px] px-6 py-20 font-sans text-gray-800">
+
+    <!-- En-tête de section -->
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+      <div>
+        <p class="td-kicker">Accès & Carte</p>
+        <h2 class="font-serif text-3xl md:text-4xl font-bold text-[#0B1A24]">Comment s'y rendre</h2>
+        <p class="text-sm text-gray-500 mt-2 max-w-xl">Localisez le site, repérez les points d'accès et lancez votre itinéraire en un clic.</p>
+      </div>
+      <a *ngIf="itineraireUrl" id="btn-itineraire-carte" [href]="itineraireUrl" target="_blank" rel="noopener"
+         class="td-cta self-start md:self-auto inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0B1A24] text-white font-bold text-sm shadow-lg">
+        <i class="fa-solid fa-route text-[#F4A261]"></i> Ouvrir dans Google Maps
+      </a>
+    </div>
+
+    <!-- Carte -->
+    <div class="relative rounded-[28px] overflow-hidden shadow-xl shadow-gray-200/60 border border-gray-100 h-[360px] md:h-[480px]">
+      <ng-container *ngIf="mapUrl; else noMap">
+        <iframe [src]="mapUrl" title="Carte de localisation" class="absolute inset-0 w-full h-full border-0" loading="lazy"></iframe>
+
+        <!-- Carte flottante d'infos -->
+        <div *ngIf="geolocalisation" class="absolute left-4 bottom-4 right-4 md:right-auto md:max-w-sm bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-white">
+          <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-gray-400 mb-1">Coordonnées GPS</p>
+          <p class="text-sm font-bold text-[#0B1A24] font-mono">{{ coordsLabel || 'Non renseignées' }}</p>
+          <div class="flex flex-wrap items-center gap-2 mt-3">
+            <span *ngIf="geolocalisation.niveauFiabilite" class="text-[11px] font-semibold px-2.5 py-1 rounded-lg inline-flex items-center gap-1.5"
+                  [ngClass]="getFiabiliteBadgeClass(geolocalisation.niveauFiabilite)">
+              <i class="fa-solid fa-satellite text-[10px]"></i> Précision : {{ formatFiabilite(geolocalisation.niveauFiabilite) }}
+            </span>
+            <span *ngIf="methodeLabel" class="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-gray-100 text-gray-600 inline-flex items-center gap-1.5">
+              <i class="fa-solid fa-compass-drafting text-[10px]"></i> {{ methodeLabel }}
+            </span>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #noMap>
+        <div class="absolute inset-0 flex flex-col items-center justify-center bg-[#F6F4EE] text-center p-6">
+          <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-sm mb-4">
+            <i class="fa-solid fa-map-location-dot text-[#D16933] text-2xl"></i>
+          </div>
+          <h4 class="font-serif text-xl font-bold text-gray-900 mb-2">Cartographie en cours</h4>
+          <p class="text-sm text-gray-600 max-w-md">
+            Les coordonnées exactes de ce patrimoine sont en cours de validation par nos experts. Elles seront affichées très prochainement.
+          </p>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Points d'accès -->
+    <div *ngIf="geolocalisation?.pointsAcces?.length" class="mt-12">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="font-serif text-2xl font-bold text-[#0B1A24] flex items-center gap-3">
+          <span class="w-10 h-10 rounded-xl bg-[#FBF3EC] text-[#D16933] flex items-center justify-center text-base"><i class="fa-solid fa-signs-post"></i></span>
+          Points d'accès
+        </h3>
+        <span class="px-3 py-1 rounded-full text-xs font-bold bg-[#D16933]/10 text-[#D16933]">
+          {{ geolocalisation.pointsAcces.length }} accès
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <article *ngFor="let pt of geolocalisation.pointsAcces"
+                 class="td-card td-lift p-5 flex flex-col">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="w-11 h-11 rounded-xl bg-gradient-to-br from-[#D16933] to-[#F4A261] text-white flex items-center justify-center shrink-0 shadow-md shadow-[#D16933]/25">
+              <i [class]="getPointAccesIcon(pt.type)"></i>
+            </span>
+            <div class="min-w-0">
+              <h4 class="font-bold text-[#0B1A24] text-sm leading-tight">{{ pt.nom }}</h4>
+              <span class="text-[11px] text-gray-500 font-medium">{{ getPointAccesLabel(pt.type) }}</span>
+            </div>
+          </div>
+
+          <p *ngIf="pt.description" class="text-sm text-gray-600 mb-4 leading-relaxed">{{ pt.description }}</p>
+
+          <ul class="text-xs text-gray-500 space-y-1.5 mb-4">
+            <li *ngIf="pt.adresse" class="flex items-center gap-2"><i class="fa-solid fa-map-pin w-3.5 text-gray-400"></i><span class="truncate">{{ pt.adresse }}</span></li>
+            <li *ngIf="pt.distancePatrimoineMetres" class="flex items-center gap-2"><i class="fa-solid fa-person-walking w-3.5 text-gray-400"></i>À {{ pt.distancePatrimoineMetres }} m du site</li>
+            <li *ngIf="pt.horaires" class="flex items-center gap-2"><i class="fa-regular fa-clock w-3.5 text-gray-400"></i>{{ pt.horaires }}</li>
+          </ul>
+
+          <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between gap-2">
+            <div class="flex flex-wrap gap-1.5">
+              <span *ngIf="pt.accessiblePMR" title="Accessible PMR" class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs"><i class="fa-solid fa-wheelchair"></i></span>
+              <span *ngIf="pt.parkingDisponible" title="Parking" class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs"><i class="fa-solid fa-square-parking"></i></span>
+              <span *ngIf="pt.transportPublic" title="Transports publics" class="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-xs"><i class="fa-solid fa-bus"></i></span>
+            </div>
+            <a *ngIf="pointItineraire(pt)" [href]="pointItineraire(pt)" target="_blank" rel="noopener"
+               class="text-xs font-bold text-[#D16933] hover:underline flex items-center gap-1.5 shrink-0">
+              Y aller <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>

@@ -6,7 +6,6 @@ import com.pgvpt.dto.ZoneTouristique;
 import com.pgvpt.dto.ZoneTouristiqueCreate;
 import com.pgvpt.dto.ZoneTouristiqueUpdate;
 import com.pgvpt.service.ZoneService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -17,10 +16,13 @@ import java.util.UUID;
 
 
 @RestController
-@RequiredArgsConstructor
 public class ZonesTouristiqueController implements ZoneTouristiqueApi {
 
     private final ZoneService service;
+
+    public ZonesTouristiqueController(ZoneService service) {
+        this.service = service;
+    }
 
     @Override
     public ResponseEntity<ZoneTouristique> createZoneTouristique(ZoneTouristiqueCreate zoneTouristiqueCreate) {

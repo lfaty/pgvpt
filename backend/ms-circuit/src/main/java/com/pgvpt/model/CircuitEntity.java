@@ -3,9 +3,9 @@ package com.pgvpt.model;
 import com.pgvpt.common.BaseEntity;
 import com.pgvpt.enums.*;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
 
@@ -15,8 +15,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "circuits")
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
 public class CircuitEntity extends BaseEntity {
 

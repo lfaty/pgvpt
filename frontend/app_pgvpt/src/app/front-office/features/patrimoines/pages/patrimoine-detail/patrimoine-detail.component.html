@@ -1,1208 +1,138 @@
 <!-- Loading State -->
-<div *ngIf="loading" class="loading-screen">
-  <div class="spinner"></div>
+<div *ngIf="loading" class="td-loading">
+  <div class="td-loader">
+    <div class="td-loader-ring"></div>
+    <p class="mt-6 text-sm font-semibold text-gray-500 tracking-wide">Chargement du patrimoine…</p>
+  </div>
 </div>
 
 <!-- Main Content -->
-<div *ngIf="!loading && patrimoine" class="detail-page-premium">
-  
-  <!-- Back Button -->
-  <a routerLink="/patrimoines" class="back-button">
-    <i class="fa-solid fa-arrow-left mr-2"></i>
-    Retour
-  </a>
+<div *ngIf="!loading && patrimoine" class="td-page">
 
   <!-- HERO IMMERSIF -->
-  <div class="hero-premium">
-    <img [src]="mainImage" [alt]="patrimoine.nom" class="hero-bg-img">
-    <div class="hero-overlay"></div>
-    
-    <div class="hero-content">
-      <div class="hero-top-badges">
-        <span class="badge-premium">{{ facadeService.formatCategorieLabel(patrimoine.categorie) }}</span>
-        <span class="badge-premium" *ngIf="patrimoine.statut" style="background: rgba(255, 255, 255, 0.1); border-color: transparent;">
-          {{ patrimoine.statut.replace('_', ' ') | titlecase }}
-        </span>
+  <app-entete-patrimoine
+    [patrimoine]="patrimoine"
+    [geolocalisation]="geolocalisation"
+    [mainImage]="mainImage"
+    [mediaCount]="galerieMedias.length"
+    (navigate)="scrollToSection($event)">
+  </app-entete-patrimoine>
+
+  <!-- NAVIGATION STICKY -->
+  <app-onglets-navigation
+    [activeSection]="activeSection"
+    [scrollProgress]="scrollProgress"
+    [hasRecits]="contenus && contenus.length > 0"
+    [hasConservation]="!!patrimoine.conservation"
+    [hasGalerie]="galerieMedias.length > 0"
+    [titre]="patrimoine.nom"
+    (sectionChange)="scrollToSection($event)">
+  </app-onglets-navigation>
+
+  <!-- CONTENU PRINCIPAL + SIDEBAR -->
+  <div class="td-body">
+    <div class="mx-auto max-w-[1200px] px-6 py-12 md:py-16">
+      <div class="flex flex-col lg:flex-row gap-10">
+
+        <!-- Colonne principale (2/3) -->
+        <div class="lg:w-2/3 min-w-0">
+
+          <!-- Section 1 : Aperçu -->
+          <app-apercu-patrimoine
+            [patrimoine]="patrimoine"
+            [geolocalisation]="geolocalisation"
+            [mainImage]="mainImage">
+          </app-apercu-patrimoine>
+
+          <!-- Section 2 : Histoire & Caractéristiques -->
+          <app-caracteristiques-patrimoine
+            [patrimoine]="patrimoine"
+            [geolocalisation]="geolocalisation"
+            [mainImage]="mainImage">
+          </app-caracteristiques-patrimoine>
+
+          <!-- Section 3 : Récits & Guides éditoriaux -->
+          <app-recits-patrimoine
+            *ngIf="contenus && contenus.length > 0"
+            [patrimoine]="patrimoine"
+            [contenus]="contenus"
+            [filteredContenus]="filteredContenus"
+            [uniqueContenuTypes]="uniqueContenuTypes"
+            [selectedContenuType]="selectedContenuType"
+            [contenuSearchQuery]="contenuSearchQuery"
+            [allMedias]="allMedias"
+            [medias]="medias"
+            [mainImage]="mainImage"
+            (contenuTypeChange)="setContenuTypeFilter($event)"
+            (searchQueryChange)="contenuSearchQuery = $event; applyContenuFilters()"
+            (selectContenu)="openContenuReader($event)">
+          </app-recits-patrimoine>
+        </div>
+
+        <!-- Sidebar « Préparer votre visite » (1/3, sticky) -->
+        <aside class="lg:w-1/3 shrink-0">
+          <div class="lg:sticky lg:top-[80px]">
+            <app-planifier-visite
+              [patrimoine]="patrimoine"
+              [geolocalisation]="geolocalisation"
+              (navigate)="scrollToSection($event)">
+            </app-planifier-visite>
+          </div>
+        </aside>
       </div>
-      
-      <h1 class="hero-title-premium">{{ patrimoine.nom }}</h1>
-      <p class="text-white/80 text-sm italic mb-2" *ngIf="patrimoine.nomLocal || patrimoine.nomHistorique">
-        <span *ngIf="patrimoine.nomLocal">Localement: {{ patrimoine.nomLocal }}</span>
-        <span *ngIf="patrimoine.nomLocal && patrimoine.nomHistorique"> | </span>
-        <span *ngIf="patrimoine.nomHistorique">Anciennement: {{ patrimoine.nomHistorique }}</span>
-      </p>
-      <p class="hero-subtitle" *ngIf="geolocalisation?.region || geolocalisation?.commune">
-        <span *ngIf="geolocalisation?.commune">{{ geolocalisation?.commune }} • </span>
-        <span *ngIf="geolocalisation?.departement && geolocalisation?.departement !== geolocalisation?.commune">{{ geolocalisation?.departement }} • </span>
-        {{ geolocalisation?.region }}
-      </p>
     </div>
   </div>
 
-  <!-- NAVIGATION INTERNE -->
-  <nav class="internal-nav-premium" id="internalNav">
-    <div class="scroll-progress-bar" [style.width.%]="scrollProgress"></div>
-    <div class="nav-container">
-      <a (click)="scrollToSection('presentation')" [class.active]="activeSection === 'presentation'">Présentation</a>
-      <a (click)="scrollToSection('recits')" [class.active]="activeSection === 'recits'" *ngIf="contenus && contenus.length > 0">Récits & Guides</a>
-      <a (click)="scrollToSection('caracteristiques')" [class.active]="activeSection === 'caracteristiques'">Caractéristiques</a>
-      <a (click)="scrollToSection('galerie')" [class.active]="activeSection === 'galerie'">Galerie</a>
-      <a (click)="scrollToSection('conservation')" [class.active]="activeSection === 'conservation'" *ngIf="patrimoine.conservation">Conservation</a>
-      <a (click)="scrollToSection('localisation')" [class.active]="activeSection === 'localisation'">Localisation</a>
-    </div>
-  </nav>
-
-  <!-- SECTION : PRESENTATION -->
-  <section id="presentation" class="scroll-mt bg-[#FAFAF9] pt-16 pb-24 font-sans text-gray-800">
-    <div class="mx-auto max-w-[1200px] px-6">
-      
-      <div class="flex flex-col md:flex-row gap-12 items-center mb-16 fade-slide-up">
-        <div class="md:w-1/2">
-          <p class="text-[#D16933] font-bold text-xs uppercase tracking-[0.2em] mb-4">Présentation</p>
-          <h2 class="font-serif text-5xl leading-tight text-gray-900 mb-6">
-            À la découverte du {{ patrimoine.nom }}
-          </h2>
-          <p class="text-gray-700 leading-relaxed text-sm font-medium">
-            {{ patrimoine.descriptionCourte || (patrimoine.description | slice:0:200) + '...' }}
-          </p>
-        </div>
-        <div class="md:w-1/2 rounded-[24px] overflow-hidden shadow-sm h-[250px] md:h-[320px] w-full">
-          <img [src]="mainImage || 'assets/images/placeholder.jpg'" class="w-full h-full object-cover">
-        </div>
-      </div>
-
-      <div class="flex flex-col lg:flex-row gap-8 mb-8 fade-slide-up items-stretch">
-         <div class="lg:w-2/3 bg-white rounded-[24px] p-8 border border-gray-100 shadow-sm flex flex-col justify-between">
-            <div class="flex items-center gap-3 mb-8">
-               <div class="w-10 h-10 rounded-full bg-green-700 text-white flex items-center justify-center shrink-0 shadow-sm">
-                  <i class="fa-solid fa-circle-info text-lg"></i>
-               </div>
-               <h3 class="font-serif text-2xl font-bold text-gray-900">Informations générales</h3>
-            </div>
-            
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-               <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col gap-3">
-                  <div class="w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center">
-                     <i class="fa-solid fa-landmark text-green-600"></i>
-                  </div>
-                  <div>
-                     <h5 class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">Type</h5>
-                     <p class="font-bold text-gray-900 text-sm leading-tight">{{ formatEnum(patrimoine.type) }}</p>
-                  </div>
-               </div>
-               <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col gap-3">
-                  <div class="w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center">
-                     <i class="fa-solid fa-layer-group text-green-600"></i>
-                  </div>
-                  <div>
-                     <h5 class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">Catégorie</h5>
-                     <p class="font-bold text-gray-900 text-sm leading-tight">{{ formatEnum(patrimoine.categorie) }}</p>
-                  </div>
-               </div>
-               <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col gap-3">
-                  <div class="w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center">
-                     <i class="fa-solid fa-tags text-green-600"></i>
-                  </div>
-                  <div>
-                     <h5 class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">Sous-catégorie</h5>
-                     <p class="font-bold text-gray-900 text-sm leading-tight">{{ patrimoine.sousCategorie || '-' }}</p>
-                  </div>
-               </div>
-               <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col gap-3">
-                  <div class="w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center">
-                     <i class="fa-solid fa-shield-halved text-green-600"></i>
-                  </div>
-                  <div>
-                     <h5 class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Statut</h5>
-                     <span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-[10px] font-bold bg-green-100 text-green-800">
-                        {{ formatEnum(patrimoine.statut) }}
-                     </span>
-                  </div>
-               </div>
-               <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col gap-3" *ngIf="patrimoine.periode || patrimoine.siecle">
-                  <div class="w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center">
-                     <i class="fa-solid fa-hourglass-half text-green-600"></i>
-                  </div>
-                  <div>
-                     <h5 class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">Époque</h5>
-                     <p class="font-bold text-gray-900 text-sm leading-tight">{{ patrimoine.periode }} <span *ngIf="patrimoine.siecle">({{ patrimoine.siecle }}e siècle)</span></p>
-                  </div>
-               </div>
-               <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col gap-3" *ngIf="patrimoine.dateOuverture">
-                  <div class="w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center">
-                     <i class="fa-solid fa-calendar-check text-green-600"></i>
-                  </div>
-                  <div>
-                     <h5 class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">Ouverture</h5>
-                     <p class="font-bold text-gray-900 text-sm leading-tight">{{ patrimoine.dateOuverture | date:'dd/MM/yyyy' }}</p>
-                  </div>
-               </div>
-            </div>
-         </div>
-
-         <div class="lg:w-1/3 bg-[#F6F4EE] rounded-[24px] p-8 border border-gray-100 flex flex-col justify-between">
-            <div class="flex items-center gap-3 mb-6">
-               <div class="w-8 h-8 rounded-full bg-[#D16933] text-white flex items-center justify-center shrink-0">
-                  <span class="font-serif font-bold text-lg">i</span>
-               </div>
-               <h3 class="font-serif text-2xl font-bold text-gray-900">Localisation</h3>
-            </div>
-            <div class="space-y-4 flex-1">
-               <div class="flex items-center justify-between">
-                  <span class="font-bold text-gray-900 text-sm">Région</span>
-                  <span class="text-sm text-gray-600">{{ geolocalisation?.region || '-' }}</span>
-               </div>
-               <div class="flex items-center justify-between">
-                  <span class="font-bold text-gray-900 text-sm">Département</span>
-                  <span class="text-sm text-gray-600">{{ geolocalisation?.departement || '-' }}</span>
-               </div>
-               <div class="flex items-center justify-between">
-                  <span class="font-bold text-gray-900 text-sm">Communes</span>
-                  <span class="text-sm text-gray-600">{{ geolocalisation?.commune || 'Plusieurs communes' }}</span>
-               </div>
-            </div>
-         </div>
-      </div>
-
-      <!-- Description et Valeur Patrimoniale (qui vient du contrat) -->
-      <div class="bg-white rounded-[24px] p-8 md:p-10 border border-gray-100 shadow-sm mb-8 flex flex-col gap-8 fade-slide-up">
-         <div>
-            <h3 class="font-serif text-2xl font-bold text-gray-900 mb-4">Description</h3>
-            <p class="text-sm text-gray-700 leading-relaxed">{{ patrimoine.description }}</p>
-         </div>
-         <div *ngIf="patrimoine.valeurPatrimoniale">
-            <h3 class="font-serif text-2xl font-bold text-gray-900 mb-4">Valeur Patrimoniale</h3>
-            <p class="text-sm text-gray-700 leading-relaxed">{{ patrimoine.valeurPatrimoniale }}</p>
-         </div>
-         <div *ngIf="patrimoine.valeurSpirituelle || patrimoine.importanceCulturelle || patrimoine.importanceTouristique">
-            <h3 class="font-serif text-2xl font-bold text-gray-900 mb-4">Portée Culturelle & Spirituelle</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-               <div *ngIf="patrimoine.importanceCulturelle">
-                  <h5 class="font-bold text-gray-900 text-sm mb-1">Importance Culturelle</h5>
-                  <p class="text-sm text-gray-600">{{ patrimoine.importanceCulturelle }}</p>
-               </div>
-               <div *ngIf="patrimoine.valeurSpirituelle">
-                  <h5 class="font-bold text-gray-900 text-sm mb-1">Valeur Spirituelle</h5>
-                  <p class="text-sm text-gray-600">{{ patrimoine.valeurSpirituelle }}</p>
-               </div>
-               <div *ngIf="patrimoine.importanceTouristique">
-                  <h5 class="font-bold text-gray-900 text-sm mb-1">Attrait Touristique</h5>
-                  <p class="text-sm text-gray-600">{{ patrimoine.importanceTouristique }}</p>
-               </div>
-            </div>
-         </div>
-         <div *ngIf="patrimoine.traditionsAssociees || patrimoine.langues" class="flex flex-col gap-4">
-            <div *ngIf="patrimoine.traditionsAssociees">
-               <h5 class="font-bold text-gray-900 text-sm mb-2">Traditions Associées</h5>
-               <div class="flex flex-wrap gap-2">
-                  <span *ngFor="let t of patrimoine.traditionsAssociees" class="px-3 py-1 bg-amber-50 text-amber-800 text-xs rounded-full">{{ t }}</span>
-               </div>
-            </div>
-            <div *ngIf="patrimoine.langues">
-               <h5 class="font-bold text-gray-900 text-sm mb-2">Langues Locales</h5>
-               <div class="flex flex-wrap gap-2">
-                  <span *ngFor="let l of patrimoine.langues" class="px-3 py-1 bg-blue-50 text-blue-800 text-xs rounded-full">{{ l }}</span>
-               </div>
-            </div>
-         </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- SECTION : RÉCITS & GUIDES ÉDITORIAUX -->
-  <section id="recits" class="scroll-mt editorial-section section-white page-recits" *ngIf="contenus && contenus.length > 0">
-    <div class="mx-auto max-w-[1200px] px-6 py-16 font-sans text-gray-800">
-      
-      <!-- En-tête de section -->
-      <div class="mb-10 text-center max-w-2xl mx-auto">
-        <span class="text-[#D16933] font-bold text-xs uppercase tracking-[0.2em] mb-2 inline-block">
-          Bibliothèque Éditoriale
-        </span>
-        <h2 class="font-serif text-4xl font-bold text-gray-900 mb-3">
-          Récits, Mémoires & Guides de Visite
-        </h2>
-        <p class="text-sm text-gray-600 leading-relaxed">
-          Plongez dans l'histoire vivante du patrimoine à travers les articles d'historiens, guides pratiques et chroniques culturelles.
-        </p>
-      </div>
-
-      <!-- Barre de Filtres & Recherche Récits (Design Premium) -->
-      <div class="flex flex-col lg:flex-row gap-4 justify-between items-stretch lg:items-center mb-10 pb-6 border-b border-gray-200/70 fade-slide-up">
-        
-        <!-- Filtres par Type (Scroll horizontal fluide, sans retour à la ligne) -->
-        <div class="flex overflow-x-auto gap-2 pb-2 lg:pb-0 flex-1 min-w-0 hide-scrollbar items-center">
-          <!-- TOUS -->
-          <button type="button" (click)="setContenuTypeFilter('TOUS')"
-                  class="shrink-0 whitespace-nowrap px-5 py-2.5 rounded-full text-xs font-bold transition-all cursor-pointer border"
-                  [ngClass]="selectedContenuType === 'TOUS' ? 'bg-[#0b5d5e] text-white border-[#0b5d5e] shadow-xs' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50 hover:text-[#0b5d5e]'">
-            Tous les récits
-          </button>
-          
-          <!-- TYPES DYNAMIQUES -->
-          <button *ngFor="let t of uniqueContenuTypes"
-                  type="button" (click)="setContenuTypeFilter(t.type)"
-                  class="shrink-0 whitespace-nowrap px-5 py-2.5 rounded-full text-xs font-bold transition-all cursor-pointer border flex items-center gap-2"
-                  [ngClass]="selectedContenuType === t.type ? 'bg-[#0b5d5e] text-white border-[#0b5d5e] shadow-xs' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50 hover:text-[#0b5d5e]'">
-            <i class="fa-solid" [ngClass]="getContenuTypeIcon(t.type)"></i>
-            <span>{{ t.label }}</span>
-          </button>
-        </div>
-
-        <!-- Recherche textuelle -->
-        <div class="search-recits-wrapper relative w-full sm:w-80 shrink-0">
-          <i class="fa-solid fa-magnifying-glass search-recits-icon"></i>
-          <input type="text" [(ngModel)]="contenuSearchQuery" (input)="applyContenuFilters()"
-                 placeholder="Rechercher un récit, un guide..."
-                 class="search-recits-input">
-          <button *ngIf="contenuSearchQuery" (click)="contenuSearchQuery = ''; applyContenuFilters()"
-                  type="button"
-                  class="search-recits-clear-btn"
-                  title="Effacer la recherche">
-            <i class="fa-solid fa-xmark text-xs"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- Grille des Contenus -->
-      <div *ngIf="filteredContenus.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <a *ngFor="let c of filteredContenus"
-           [routerLink]="['/patrimoines', patrimoine.id, 'contenus', c.id]"
-           class="bg-white rounded-[24px] border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between cursor-pointer group no-underline">
-          
-          <div>
-            <!-- Image d'accroche (si média associé ou par défaut) -->
-            <div class="relative h-48 bg-gray-100 overflow-hidden">
-              <img [src]="getMediaUrlForContenu(c) || mainImage" [alt]="c.titre"
-                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-              <div class="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent"></div>
-              
-              <!-- Badge Type Flottant -->
-              <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-xs text-[#0b5d5e] px-2.5 py-1 rounded-full text-[11px] font-bold shadow-xs flex items-center gap-1.5">
-                <i class="fas" [ngClass]="getContenuTypeIcon(c.type)"></i>
-                <span>{{ getContenuTypeLabel(c.type) }}</span>
-              </div>
-
-              <!-- Badge Langue & Temps de lecture -->
-              <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-[11px] font-medium">
-                <span class="flex items-center gap-1 drop-shadow-sm">
-                  <i class="far fa-clock"></i> {{ getReadingTime(c.corps) }} min de lecture
-                </span>
-                <span class="bg-black/40 backdrop-blur-xs px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider">
-                  {{ c.langue || 'FR' }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Corps de Carte -->
-            <div class="p-6">
-              <h3 class="font-serif text-xl font-bold text-gray-900 group-hover:text-[#0b5d5e] transition-colors leading-snug mb-3">
-                {{ c.titre }}
-              </h3>
-
-              <p class="text-xs text-gray-600 line-clamp-3 leading-relaxed mb-4">
-                {{ c.resume || c.corps }}
-              </p>
-
-              <!-- Mots-clés / Tags -->
-              <div *ngIf="c.motsCles && c.motsCles.length > 0" class="flex flex-wrap gap-1.5 mb-2">
-                <span *ngFor="let tag of c.motsCles.slice(0, 3)"
-                      class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
-                  #{{ tag }}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Pied de Carte -->
-          <div class="px-6 py-4 bg-gray-50/60 border-t border-gray-100 flex items-center justify-between text-xs">
-            <span class="text-gray-400 font-medium">
-              <i class="far fa-calendar-alt mr-1"></i>
-              {{ (c.createdAt | date:'d MMMM y') || 'Publié récemment' }}
-            </span>
-            <span class="text-[#0b5d5e] font-bold inline-flex items-center gap-1 group-hover:gap-2 transition-all">
-              <span>Découvrir le récit</span>
-              <i class="fas fa-arrow-right text-[10px]"></i>
-            </span>
-          </div>
-
-        </a>
-      </div>
-
-      <!-- État vide : Aucun contenu trouvé -->
-      <div *ngIf="filteredContenus.length === 0"
-           class="py-16 px-6 bg-white rounded-[28px] border border-dashed border-gray-200 text-center max-w-lg mx-auto">
-        <div class="w-16 h-16 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
-          <i class="fas fa-book-open"></i>
-        </div>
-        <h4 class="font-serif text-xl font-bold text-gray-900 mb-2">Aucun contenu trouvé</h4>
-        <p class="text-xs text-gray-500 leading-relaxed mb-6">
-          {{ contenuSearchQuery || selectedContenuType !== 'TOUS' ? 'Aucun résultat ne correspond à votre filtre.' : 'Aucun récit ni guide de visite n\'a encore été publié pour ce patrimoine.' }}
-        </p>
-        <button *ngIf="contenuSearchQuery || selectedContenuType !== 'TOUS'"
-                type="button" (click)="selectedContenuType = 'TOUS'; contenuSearchQuery = ''; applyContenuFilters()"
-                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition-all cursor-pointer">
-          Réinitialiser les filtres
-        </button>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- SECTION : CARACTERISTIQUES -->
-  <section id="caracteristiques" class="scroll-mt bg-[#FDFBF7] pt-16 pb-24 font-sans text-gray-800">
-    <div class="mx-auto max-w-[1200px] px-6">
-      
-      <div class="flex flex-col lg:flex-row gap-8 mb-8 fade-slide-up items-stretch">
-         <div class="lg:w-1/2 bg-white rounded-[24px] p-8 border border-gray-100 shadow-sm">
-            <h3 class="font-serif text-2xl font-bold text-gray-900 mb-6">Repères historiques</h3>
-            <div class="grid grid-cols-1 gap-6">
-               <div *ngIf="patrimoine.historique">
-                  <h5 class="font-bold text-gray-900 text-sm mb-1">Historique</h5>
-                  <p class="text-sm text-gray-600">{{ patrimoine.historique }}</p>
-               </div>
-               <div *ngIf="patrimoine.importanceHistorique">
-                  <h5 class="font-bold text-gray-900 text-sm mb-1">Importance Historique</h5>
-                  <p class="text-sm text-gray-600">{{ patrimoine.importanceHistorique }}</p>
-               </div>
-            </div>
-         </div>
-
-         <div class="lg:w-1/2 bg-white rounded-[24px] p-8 border border-gray-100 shadow-sm">
-            <h3 class="font-serif text-2xl font-bold text-gray-900 mb-6">Classement et reconnaissance</h3>
-            <div class="flex flex-col gap-4">
-               <div class="flex items-center justify-between">
-                  <span class="font-bold text-gray-900 text-sm">Inscription UNESCO</span>
-                  <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold" *ngIf="patrimoine.inscritUnesco">Oui</span>
-                  <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-bold" *ngIf="!patrimoine.inscritUnesco">Non</span>
-               </div>
-               <div class="flex items-center justify-between" *ngIf="patrimoine.nomSiteUnesco">
-                  <span class="font-bold text-gray-900 text-sm">Nom site UNESCO</span>
-                  <span class="text-sm text-gray-600">{{ patrimoine.nomSiteUnesco }}</span>
-               </div>
-               <div class="flex items-center justify-between" *ngIf="patrimoine.dateInscriptionUnesco">
-                  <span class="font-bold text-gray-900 text-sm">Date d'inscription</span>
-                  <span class="text-sm text-gray-600">{{ patrimoine.dateInscriptionUnesco }}</span>
-               </div>
-               
-               <div class="h-px bg-gray-100 my-2" *ngIf="patrimoine.classePatrimoine || patrimoine.protectionJuridique || patrimoine.organismeGestionnaire || patrimoine.proprietaire"></div>
-
-               <div class="flex items-center justify-between" *ngIf="patrimoine.classePatrimoine">
-                  <span class="font-bold text-gray-900 text-sm">Classement National</span>
-                  <span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold">{{ patrimoine.classePatrimoine }}</span>
-               </div>
-               <div class="flex items-center justify-between" *ngIf="patrimoine.referenceClassement">
-                  <span class="font-bold text-gray-900 text-sm">Réf. Classement</span>
-                  <span class="text-sm text-gray-600">{{ patrimoine.referenceClassement }}</span>
-               </div>
-               <div class="flex items-center justify-between" *ngIf="patrimoine.dateClassement">
-                  <span class="font-bold text-gray-900 text-sm">Date Classement</span>
-                  <span class="text-sm text-gray-600">{{ patrimoine.dateClassement | date:'dd/MM/yyyy' }}</span>
-               </div>
-
-               <div class="flex items-center justify-between" *ngIf="patrimoine.protectionJuridique">
-                  <span class="font-bold text-gray-900 text-sm">Protection Juridique</span>
-                  <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-bold">{{ patrimoine.protectionJuridique }}</span>
-               </div>
-               
-               <div class="flex flex-col gap-1 mt-2" *ngIf="patrimoine.organismeGestionnaire || patrimoine.gestionnaire">
-                  <span class="font-bold text-gray-900 text-sm">Gestion</span>
-                  <span class="text-sm text-gray-600 flex items-center gap-2">
-                    <i class="fa-solid fa-building text-gray-400"></i>
-                    {{ patrimoine.organismeGestionnaire || patrimoine.gestionnaire }}
-                  </span>
-               </div>
-
-               <div class="flex flex-col gap-1 mt-2" *ngIf="patrimoine.proprietaire">
-                  <span class="font-bold text-gray-900 text-sm">Propriétaire</span>
-                  <span class="text-sm text-gray-600 flex items-center gap-2">
-                    <i class="fa-solid fa-user-shield text-gray-400"></i>
-                    {{ patrimoine.proprietaire }}
-                  </span>
-               </div>
-            </div>
-         </div>
-      </div>
-
-      <!-- CARACTÉRISTIQUES SPÉCIFIQUES -->
-      <div class="bg-white rounded-[24px] p-8 border border-gray-100 shadow-sm fade-slide-up mt-8">
-         
-         <!-- MONUMENT -->
-         <div *ngIf="patrimoine.type === 'MONUMENT'">
-            <h3 class="font-serif text-2xl font-bold text-gray-900 mb-6">Détails Architecturaux</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-               <div *ngIf="patrimoine.styleArchitectural">
-                  <span class="font-bold text-gray-900 text-sm block mb-1">Style Architectural</span>
-                  <span class="text-sm text-gray-600">{{ patrimoine.styleArchitectural }}</span>
-               </div>
-               <div *ngIf="patrimoine.natureMonument">
-                  <span class="font-bold text-gray-900 text-sm block mb-1">Nature du Monument</span>
-                  <span class="text-sm text-gray-600">{{ patrimoine.natureMonument }}</span>
-               </div>
-               <div *ngIf="patrimoine.dimensions">
-                  <span class="font-bold text-gray-900 text-sm block mb-1">Dimensions</span>
-                  <span class="text-sm text-gray-600">{{ patrimoine.dimensions }}</span>
-               </div>
-               <div *ngIf="patrimoine.anneeConstruction || patrimoine.anneeRenovation">
-                  <span class="font-bold text-gray-900 text-sm block mb-1">Construction / Rénovation</span>
-                  <span class="text-sm text-gray-600">
-                     <ng-container *ngIf="patrimoine.anneeConstruction">{{ patrimoine.anneeConstruction }}</ng-container>
-                     <ng-container *ngIf="patrimoine.anneeConstruction && patrimoine.anneeRenovation"> / </ng-container>
-                     <ng-container *ngIf="patrimoine.anneeRenovation">Rénové en {{ patrimoine.anneeRenovation }}</ng-container>
-                  </span>
-               </div>
-               <div *ngIf="patrimoine.architecte || patrimoine.identiteArchitecte">
-                  <span class="font-bold text-gray-900 text-sm block mb-1">Architecte(s)</span>
-                  <span class="text-sm text-gray-600">{{ patrimoine.architecte }} <span *ngIf="patrimoine.identiteArchitecte">({{ patrimoine.identiteArchitecte }})</span></span>
-               </div>
-               <div *ngIf="patrimoine.commanditaire">
-                  <span class="font-bold text-gray-900 text-sm block mb-1">Commanditaire</span>
-                  <span class="text-sm text-gray-600">{{ patrimoine.commanditaire }}</span>
-               </div>
-            </div>
-            
-            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-               <div *ngIf="patrimoine.contexteHistorique">
-                  <span class="font-bold text-gray-900 text-sm block mb-1">Contexte Historique</span>
-                  <p class="text-sm text-gray-600">{{ patrimoine.contexteHistorique }}</p>
-               </div>
-               <div>
-                  <div *ngIf="patrimoine.materiauxConstruction && patrimoine.materiauxConstruction.length > 0" class="mb-4">
-                     <span class="font-bold text-gray-900 text-sm block mb-2">Matériaux</span>
-                     <div class="flex flex-wrap gap-2">
-                        <span *ngFor="let m of patrimoine.materiauxConstruction" class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">{{ m }}</span>
-                     </div>
-                  </div>
-                  <div *ngIf="patrimoine.personnagesAssocies && patrimoine.personnagesAssocies.length > 0">
-                     <span class="font-bold text-gray-900 text-sm block mb-2">Personnages Associés</span>
-                     <div class="flex flex-wrap gap-2">
-                        <span *ngFor="let p of patrimoine.personnagesAssocies" class="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded">{{ p }}</span>
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </div>
-
-         <!-- MUSEE -->
-         <div *ngIf="patrimoine.type === 'MUSEE'">
-            <h3 class="font-serif text-2xl font-bold text-gray-900 mb-6">Collections & Scénographie</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-               <div *ngIf="patrimoine.nombreCollections !== null" class="bg-gray-50 p-4 rounded-xl text-center border border-gray-100">
-                  <span class="text-3xl font-bold text-[#D16933] block mb-1">{{ patrimoine.nombreCollections }}</span>
-                  <span class="text-xs font-bold text-gray-500 uppercase">Collections</span>
-               </div>
-               <div *ngIf="patrimoine.nombreOeuvres !== null" class="bg-gray-50 p-4 rounded-xl text-center border border-gray-100">
-                  <span class="text-3xl font-bold text-[#D16933] block mb-1">{{ patrimoine.nombreOeuvres }}</span>
-                  <span class="text-xs font-bold text-gray-500 uppercase">Œuvres</span>
-               </div>
-               <div *ngIf="patrimoine.capaciteAccueil !== null" class="bg-gray-50 p-4 rounded-xl text-center border border-gray-100">
-                  <span class="text-3xl font-bold text-[#D16933] block mb-1">{{ patrimoine.capaciteAccueil }}</span>
-                  <span class="text-xs font-bold text-gray-500 uppercase">Capacité (visiteurs)</span>
-               </div>
-            </div>
-            <div *ngIf="patrimoine.museographie" class="mb-8">
-               <span class="font-bold text-gray-900 text-sm block mb-2">Muséographie</span>
-               <p class="text-sm text-gray-600">{{ patrimoine.museographie }}</p>
-            </div>
-            
-            <div *ngIf="patrimoine.collections && patrimoine.collections.length > 0">
-               <h4 class="font-serif text-xl font-bold text-gray-900 mb-4">Détail des Collections</h4>
-               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div *ngFor="let col of patrimoine.collections" class="border border-gray-200 rounded-xl p-4 bg-gray-50">
-                     <h5 class="font-bold text-gray-900 mb-2">{{ col.nom }} <span *ngIf="col.nombreOeuvres" class="text-xs font-normal text-gray-500">({{ col.nombreOeuvres }} œuvres)</span></h5>
-                     <p class="text-sm text-gray-600 mb-2" *ngIf="col.description">{{ col.description }}</p>
-                     <div class="flex justify-between items-center text-xs text-gray-500 mb-2">
-                        <span *ngIf="col.periode"><i class="fa-regular fa-clock mr-1"></i> {{ col.periode }}</span>
-                        <span *ngIf="col.origine"><i class="fa-solid fa-earth-africa mr-1"></i> {{ col.origine }}</span>
-                     </div>
-                     <div class="flex flex-wrap gap-1" *ngIf="col.themes">
-                        <span *ngFor="let t of col.themes" class="text-[10px] bg-white border border-gray-200 px-2 py-0.5 rounded-full">{{ t }}</span>
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </div>
-
-         <!-- SITE NATUREL -->
-         <div *ngIf="patrimoine.type === 'SITE_NATUREL' || patrimoine.type === 'PATRIMOINE_NATUREL'">
-            <h3 class="font-serif text-2xl font-bold text-gray-900 mb-6">Écosystème & Environnement</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-               <div *ngIf="patrimoine.superficie !== null" class="bg-green-50 p-4 rounded-xl border border-green-100 flex flex-col items-center justify-center">
-                  <span class="text-2xl font-bold text-green-700 block mb-1">{{ patrimoine.superficie }} <span class="text-sm">ha</span></span>
-                  <span class="text-xs font-bold text-green-800 uppercase text-center">Superficie</span>
-               </div>
-               <div *ngIf="patrimoine.natureSite" class="bg-green-50 p-4 rounded-xl border border-green-100 flex flex-col items-center justify-center text-center">
-                  <i class="fa-solid fa-leaf text-2xl text-green-600 mb-2"></i>
-                  <span class="text-sm font-bold text-green-800 text-center leading-tight">{{ patrimoine.natureSite }}</span>
-               </div>
-               <div *ngIf="patrimoine.zoneProtegee" class="bg-green-50 p-4 rounded-xl border border-green-100 flex flex-col items-center justify-center">
-                  <i class="fa-solid fa-shield-cat text-2xl text-green-600 mb-2"></i>
-                  <span class="text-sm font-bold text-green-800 text-center leading-tight">Zone Protégée</span>
-               </div>
-               <div *ngIf="patrimoine.categorieProtection" class="bg-green-50 p-4 rounded-xl border border-green-100 flex flex-col items-center justify-center">
-                  <i class="fa-solid fa-ribbon text-2xl text-green-600 mb-2"></i>
-                  <span class="text-sm font-bold text-green-800 text-center leading-tight">{{ patrimoine.categorieProtection }}</span>
-               </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-               <div *ngIf="patrimoine.ecosysteme">
-                  <span class="font-bold text-gray-900 text-sm block mb-2">Écosystème</span>
-                  <p class="text-sm text-gray-600">{{ patrimoine.ecosysteme }}</p>
-               </div>
-               <div *ngIf="patrimoine.risquesEnvironnementaux && patrimoine.risquesEnvironnementaux.length > 0">
-                  <span class="font-bold text-gray-900 text-sm block mb-2">Risques Environnementaux</span>
-                  <div class="flex flex-wrap gap-2">
-                     <span *ngFor="let r of patrimoine.risquesEnvironnementaux" class="px-2 py-1 bg-red-50 text-red-700 text-xs rounded border border-red-100"><i class="fa-solid fa-triangle-exclamation mr-1"></i> {{ r }}</span>
-                  </div>
-               </div>
-            </div>
-
-            <div *ngIf="biodiversiteList && biodiversiteList.length > 0" class="mb-8">
-               <span class="font-bold text-gray-900 text-sm block mb-4">Biodiversité phares</span>
-               <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div *ngFor="let bio of biodiversiteList" class="relative h-24 rounded-xl overflow-hidden group">
-                     <img [src]="getBiodiversiteImage(bio)" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500">
-                     <div class="absolute inset-0 bg-black/40 flex items-center justify-center p-2 text-center">
-                        <span class="text-white font-bold text-sm leading-tight drop-shadow-md">{{ bio }}</span>
-                     </div>
-                  </div>
-               </div>
-            </div>
-
-            <div *ngIf="patrimoine.especesProtegees && patrimoine.especesProtegees.length > 0">
-               <h4 class="font-serif text-xl font-bold text-gray-900 mb-4">Espèces Protégées</h4>
-               <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  <div *ngFor="let esp of patrimoine.especesProtegees" class="flex gap-4 items-center bg-white border border-gray-100 rounded-xl p-3 shadow-sm">
-                     <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-                        <i class="fa-solid" [ngClass]="esp.type === 'FLORE' ? 'fa-seedling text-green-600' : 'fa-paw text-amber-600'"></i>
-                     </div>
-                     <div class="flex-1 min-w-0">
-                        <h5 class="text-sm font-bold text-gray-900 truncate" [title]="esp.nomCommun || esp.nomScientifique">{{ esp.nomCommun || esp.nomScientifique }}</h5>
-                        <p class="text-xs text-gray-500 italic truncate" *ngIf="esp.nomCommun && esp.nomScientifique">{{ esp.nomScientifique }}</p>
-                        <span class="inline-block mt-1 text-[10px] px-2 py-0.5 rounded-full font-bold" 
-                              [ngClass]="{'bg-red-100 text-red-800': esp.niveauProtection === 'STRICTE', 'bg-orange-100 text-orange-800': esp.niveauProtection === 'PARTIELLE', 'bg-blue-100 text-blue-800': esp.niveauProtection === 'INTERNATIONALE', 'bg-gray-100 text-gray-800': !esp.niveauProtection}">
-                           {{ esp.statutConservation || 'Statut inconnu' }}
-                        </span>
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </div>
-
-        <!-- HORAIRES, CONTACTS & ACCESSIBILITÉ -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8 fade-slide-up">
-           
-           <!-- ACCESSIBILITÉ & VISITE -->
-           <div class="bg-white rounded-[24px] p-8 border border-gray-100 shadow-sm" *ngIf="patrimoine.accessibilite">
-               <h3 class="font-serif text-2xl font-bold text-gray-900 mb-6">Informations Pratiques</h3>
-               <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                   <div class="flex flex-col items-center justify-center p-4 rounded-xl border" 
-                        [ngClass]="patrimoine.accessibilite.accessiblePublic ? 'bg-green-50 border-green-200 text-green-700' : 'bg-gray-50 border-gray-200 text-gray-400'">
-                       <i class="fa-solid fa-users text-2xl mb-2"></i>
-                       <span class="text-xs font-bold text-center">Accessible au Public</span>
-                   </div>
-                   <div class="flex flex-col items-center justify-center p-4 rounded-xl border" 
-                        [ngClass]="patrimoine.accessibilite.accessibilitePMR ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-gray-50 border-gray-200 text-gray-400'">
-                       <i class="fa-solid fa-wheelchair text-2xl mb-2"></i>
-                       <span class="text-xs font-bold text-center">PMR</span>
-                   </div>
-                   <div class="flex flex-col items-center justify-center p-4 rounded-xl border" 
-                        [ngClass]="patrimoine.accessibilite.parking ? 'bg-slate-50 border-slate-300 text-slate-700' : 'bg-gray-50 border-gray-200 text-gray-400'">
-                       <i class="fa-solid fa-square-parking text-2xl mb-2"></i>
-                       <span class="text-xs font-bold text-center">Parking</span>
-                   </div>
-                   <div class="flex flex-col items-center justify-center p-4 rounded-xl border" 
-                        [ngClass]="patrimoine.accessibilite.guideDisponible ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-gray-50 border-gray-200 text-gray-400'">
-                       <i class="fa-solid fa-person-chalkboard text-2xl mb-2"></i>
-                       <span class="text-xs font-bold text-center">Guide Dispo</span>
-                   </div>
-                   <div class="flex flex-col items-center justify-center p-4 rounded-xl border" 
-                        [ngClass]="patrimoine.accessibilite.guideAudio ? 'bg-orange-50 border-orange-200 text-orange-700' : 'bg-gray-50 border-gray-200 text-gray-400'">
-                       <i class="fa-solid fa-headphones text-2xl mb-2"></i>
-                       <span class="text-xs font-bold text-center">Audio-guide</span>
-                   </div>
-                   <div class="flex flex-col items-center justify-center p-4 rounded-xl border" 
-                        [ngClass]="patrimoine.accessibilite.accesEnfant ? 'bg-pink-50 border-pink-200 text-pink-700' : 'bg-gray-50 border-gray-200 text-gray-400'">
-                       <i class="fa-solid fa-child-reaching text-2xl mb-2"></i>
-                       <span class="text-xs font-bold text-center">Enfants</span>
-                   </div>
-                   <div class="flex flex-col items-center justify-center p-4 rounded-xl border" 
-                        [ngClass]="patrimoine.accessibilite.accesFauteuilRoulant ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-gray-50 border-gray-200 text-gray-400'">
-                       <i class="fa-brands fa-accessible-icon text-2xl mb-2"></i>
-                       <span class="text-xs font-bold text-center">Fauteuil Roulant</span>
-                   </div>
-                   <div class="flex flex-col items-center justify-center p-4 rounded-xl border" 
-                        [ngClass]="patrimoine.accessibilite.accesTransportPublic ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-gray-50 border-gray-200 text-gray-400'">
-                       <i class="fa-solid fa-bus text-2xl mb-2"></i>
-                       <span class="text-xs font-bold text-center">Transports Publics</span>
-                   </div>
-               </div>
-               
-               <div class="mt-6 flex flex-col gap-3">
-                   <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 flex gap-3 items-start" *ngIf="patrimoine.accessibilite.conditionsAcces">
-                       <i class="fa-solid fa-circle-info text-[#D16933] mt-1"></i>
-                       <div>
-                           <h5 class="text-xs font-bold text-gray-900 uppercase tracking-wider mb-1">Conditions d'accès</h5>
-                           <p class="text-sm text-gray-600">{{ patrimoine.accessibilite.conditionsAcces }}</p>
-                       </div>
-                   </div>
-                   
-                   <div class="p-4 bg-red-50 rounded-xl border border-red-100 flex gap-3 items-start" *ngIf="patrimoine.accessibilite.restrictions && patrimoine.accessibilite.restrictions.length > 0">
-                       <i class="fa-solid fa-ban text-red-600 mt-1"></i>
-                       <div>
-                           <h5 class="text-xs font-bold text-red-900 uppercase tracking-wider mb-1">Restrictions & Interdits</h5>
-                           <ul class="list-disc list-inside text-sm text-red-800">
-                              <li *ngFor="let r of patrimoine.accessibilite.restrictions">{{ r }}</li>
-                           </ul>
-                       </div>
-                   </div>
-
-                   <div class="p-4 bg-blue-50 rounded-xl border border-blue-100 flex gap-3 items-start" *ngIf="patrimoine.accessibilite.langueVisite && patrimoine.accessibilite.langueVisite.length > 0">
-                       <i class="fa-solid fa-language text-blue-600 mt-1"></i>
-                       <div>
-                           <h5 class="text-xs font-bold text-blue-900 uppercase tracking-wider mb-2">Langues de visite</h5>
-                           <div class="flex flex-wrap gap-2">
-                               <span *ngFor="let l of patrimoine.accessibilite.langueVisite" class="px-2 py-1 bg-white text-blue-800 text-[10px] font-bold rounded shadow-sm border border-blue-200">{{ l }}</span>
-                           </div>
-                       </div>
-                   </div>
-               </div>
-           </div>
-
-           <!-- HORAIRES & CONTACTS -->
-           <div class="flex flex-col gap-8">
-              <!-- Horaires -->
-              <div class="bg-white rounded-[24px] p-8 border border-gray-100 shadow-sm" *ngIf="patrimoine.horaires && patrimoine.horaires.length > 0">
-                 <div class="flex items-center justify-between mb-6">
-                    <h3 class="font-serif text-2xl font-bold text-gray-900">Horaires d'Ouverture</h3>
-                    <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                       <i class="fa-regular fa-clock text-lg"></i>
-                    </div>
-                 </div>
-                 <div class="flex flex-col gap-3">
-                    <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0" *ngFor="let h of patrimoine.horaires">
-                       <span class="font-bold text-gray-700 text-sm capitalize">{{ h.jour | lowercase }}</span>
-                       <span class="text-sm font-bold text-gray-900" *ngIf="h.ouvert">
-                          {{ h.heureOuverture?.substring(0, 5) }} - {{ h.heureFermeture?.substring(0, 5) }}
-                          <span class="text-gray-400 font-normal ml-1" *ngIf="h.pauseDebut">(Pause: {{ h.pauseDebut?.substring(0, 5) }}-{{ h.pauseFin?.substring(0, 5) }})</span>
-                       </span>
-                       <span class="text-sm font-bold text-red-600 bg-red-50 px-2 py-1 rounded-md" *ngIf="!h.ouvert">Fermé</span>
-                    </div>
-                 </div>
-              </div>
-
-              <!-- Contacts -->
-              <div class="bg-white rounded-[24px] p-8 border border-gray-100 shadow-sm" *ngIf="patrimoine.contact">
-                 <div class="flex items-center justify-between mb-6">
-                    <h3 class="font-serif text-2xl font-bold text-gray-900">Contact & Infos</h3>
-                    <div class="w-10 h-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-                       <i class="fa-regular fa-address-book text-lg"></i>
-                    </div>
-                 </div>
-                 <div class="flex flex-col gap-4">
-                    <div class="flex items-center gap-3" *ngIf="patrimoine.contact.nom">
-                       <i class="fa-solid fa-user text-gray-400 w-5"></i>
-                       <div>
-                          <p class="text-sm font-bold text-gray-900">{{ patrimoine.contact.nom }}</p>
-                          <p class="text-xs text-gray-500" *ngIf="patrimoine.contact.fonction">{{ patrimoine.contact.fonction }}</p>
-                       </div>
-                    </div>
-                    <div class="flex items-center gap-3" *ngIf="patrimoine.contact.telephone">
-                       <i class="fa-solid fa-phone text-gray-400 w-5"></i>
-                       <a [href]="'tel:' + patrimoine.contact.telephone" class="text-sm text-gray-700 hover:text-blue-600 font-medium">{{ patrimoine.contact.telephone }}</a>
-                    </div>
-                    <div class="flex items-center gap-3" *ngIf="patrimoine.contact.email">
-                       <i class="fa-solid fa-envelope text-gray-400 w-5"></i>
-                       <a [href]="'mailto:' + patrimoine.contact.email" class="text-sm text-gray-700 hover:text-blue-600 font-medium">{{ patrimoine.contact.email }}</a>
-                    </div>
-                    <div class="flex items-center gap-3" *ngIf="patrimoine.contact.siteWeb">
-                       <i class="fa-solid fa-globe text-gray-400 w-5"></i>
-                       <a [href]="patrimoine.contact.siteWeb" target="_blank" class="text-sm text-blue-600 hover:underline font-medium">{{ patrimoine.contact.siteWeb }}</a>
-                    </div>
-                 </div>
-     <!-- SECTION : GALERIE -->
-  <section id="galerie" class="scroll-mt galerie-section section-white page-galerie">
-    <div class="mx-auto max-w-[1200px] px-6 py-16 font-sans text-gray-800">
-      <h3 class="font-serif text-3xl font-bold text-gray-900 mb-12">Médiathèque</h3>
-
-      <!-- Barre de Filtres Multimédias -->
-      <div class="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center mb-8 border-b border-gray-200 pb-6 fade-slide-up" *ngIf="galerieMedias.length > 0">
-        
-        <!-- Filtres par Type (Scroll horizontal sur mobile) -->
-        <div class="flex overflow-x-auto gap-2 pb-2 w-full md:w-auto hide-scrollbar">
-          <!-- TOUT -->
-          <button (click)="setMediaFilter('ALL')" 
-                  class="shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-colors border"
-                  [ngClass]="activeMediaFilter === 'ALL' ? 'bg-[#D16933] text-white border-[#D16933]' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'">
-            Tout ({{ galerieMedias.length }})
-          </button>
-          
-          <!-- TYPES DYNAMIQUES -->
-          <button *ngFor="let tab of mediaTabs"
-                  (click)="setMediaFilter(tab.type)" 
-                  class="shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-colors border"
-                  [ngClass]="activeMediaFilter === tab.type ? 'bg-[#D16933] text-white border-[#D16933]' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
-                  [hidden]="tab.count === 0">
-            {{ tab.label }} ({{ tab.count }})
-          </button>
-        </div>
-
-        <!-- Recherche et Tri -->
-        <div class="flex gap-3 w-full md:w-auto shrink-0">
-          <!-- Recherche -->
-          <div class="relative w-full md:w-52 flex items-center">
-            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none z-10"></i>
-            <input type="text" [(ngModel)]="mediaSearchQuery" (input)="applyMediaFilters()" placeholder="Rechercher..." 
-                   class="w-full bg-white text-gray-800 text-xs rounded-full !pl-9 !pr-4 !py-2 border border-gray-200 focus:ring-2 focus:ring-[#D16933]/50 focus:border-[#D16933] outline-none shadow-sm transition-all box-border">
-          </div>
-          
-          <!-- Tri -->
-          <select [(ngModel)]="mediaSortOrder" (change)="applyMediaFilters()" class="bg-white text-gray-800 text-sm rounded-full px-4 py-2 border border-gray-200 focus:ring-2 focus:ring-[#D16933]/50 focus:border-[#D16933] outline-none font-bold cursor-pointer shadow-sm">
-            <option value="NEWEST">Plus récents</option>
-            <option value="OLDEST">Plus anciens</option>
-          </select>
-        </div>
-      </div>
-      
-      <div class="flex flex-col gap-12">
-        
-        <!-- État vide : Aucune image ou média -->
-        <div *ngIf="galerieMedias.length === 0" class="flex flex-col items-center justify-center py-16 px-6 bg-[#F6F4EE] rounded-[24px] border border-dashed border-gray-300 text-center fade-slide-up">
-           <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-sm mb-4">
-              <i class="fa-solid fa-images text-[#D16933] text-2xl"></i>
-           </div>
-           <h4 class="font-serif text-xl font-bold text-gray-900 mb-2">Médiathèque en préparation</h4>
-           <p class="text-sm text-gray-600 max-w-md">
-              Nous rassemblons actuellement les plus belles ressources visuelles pour enrichir cette section. Revenez très vite !
-           </p>
-        </div>
-
-        <!-- PHOTOS -->
-        <div *ngIf="filteredPhotos.length > 0" class="fade-slide-up">
-          <div class="flex items-center justify-between mb-4">
-            <h4 class="font-serif text-xl font-bold text-gray-900"><i class="fa-regular fa-image mr-2 text-gray-500"></i>Photos</h4>
-          </div>
-          <div class="flex overflow-x-auto gap-4 pb-4 snap-x hide-scrollbar">
-             <div class="shrink-0 w-[75vw] sm:w-[280px] h-[200px] rounded-[16px] overflow-hidden relative group cursor-pointer snap-start shadow-sm hover:shadow-md transition" 
-                  *ngFor="let m of filteredPhotos; let i = index" 
-                  [routerLink]="['/patrimoines', patrimoine.id, 'medias', m.id]">
-                <img [src]="m.url" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" [ngClass]="{'sepia': m.type === 'ARCHIVE_NUMERISEE'}">
-                
-                <!-- Type Badge -->
-                <div class="absolute top-2 left-2 z-10" *ngIf="m.type === 'CARTE' || m.type === 'ARCHIVE_NUMERISEE'">
-                  <span class="bg-white/90 text-gray-900 px-2 py-1 rounded text-[10px] font-bold uppercase shadow-sm">
-                    <i class="fa-solid" [ngClass]="m.type === 'CARTE' ? 'fa-map' : 'fa-archive'"></i> {{ m.type === 'CARTE' ? 'Carte' : 'Archive' }}
-                  </span>
-                </div>
-
-                <!-- Hover Details -->
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                  <h5 class="text-white font-bold text-sm leading-tight mb-1">{{ m.nom }}</h5>
-                  <p class="text-white/80 text-[10px] line-clamp-2 mb-2" *ngIf="m.description">{{ m.description }}</p>
-                  <p class="text-white/60 text-[9px]" *ngIf="m.auteur || m.credit">
-                    <span *ngIf="m.auteur"><i class="fa-solid fa-user-edit mr-1"></i> {{ m.auteur }}</span>
-                    <span *ngIf="m.auteur && m.credit"> • </span>
-                    <span *ngIf="m.credit"><i class="fa-solid fa-camera mr-1"></i> {{ m.credit }}</span>
-                  </p>
-                </div>
-             </div>
-          </div>
-        </div>
-
-        <!-- VIDEOS -->
-        <div *ngIf="filteredVideos.length > 0" class="fade-slide-up">
-          <div class="flex items-center justify-between mb-4">
-            <h4 class="font-serif text-xl font-bold text-gray-900"><i class="fa-solid fa-video mr-2 text-gray-500"></i>Vidéos</h4>
-          </div>
-          <div class="flex overflow-x-auto gap-4 pb-4 snap-x hide-scrollbar">
-             <div class="shrink-0 w-[85vw] sm:w-[350px] h-[200px] rounded-[16px] overflow-hidden relative group cursor-pointer snap-start bg-black shadow-sm hover:shadow-md transition" 
-                  *ngFor="let m of filteredVideos; let i = index" 
-                  [routerLink]="['/patrimoines', patrimoine.id, 'medias', m.id]">
-                <!-- Video miniature -->
-                <video [src]="m.url" class="w-full h-full object-cover pointer-events-none"></video>
-                <div class="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/10 transition">
-                  <div class="w-16 h-16 rounded-full bg-black/60 text-white flex items-center justify-center backdrop-blur-sm">
-                    <i class="fa-solid fa-play text-2xl ml-1"></i>
-                  </div>
-                </div>
-             </div>
-          </div>
-        </div>
-
-        <!-- IMMERSIONS -->
-        <div *ngIf="filteredImmersions.length > 0" class="fade-slide-up">
-          <div class="flex items-center justify-between mb-4">
-            <h4 class="font-serif text-xl font-bold text-gray-900"><i class="fa-solid fa-vr-cardboard mr-2 text-gray-500"></i>Vues Immersives</h4>
-          </div>
-          <div class="flex overflow-x-auto gap-4 pb-4 snap-x hide-scrollbar">
-             <div class="shrink-0 w-[75vw] sm:w-[280px] h-[200px] rounded-[16px] overflow-hidden relative group cursor-pointer snap-start shadow-sm hover:shadow-md transition" 
-                  *ngFor="let m of filteredImmersions; let i = index" 
-                  [routerLink]="['/patrimoines', patrimoine.id, 'medias', m.id]">
-                <!-- Fallback to placeholder if it's a 3D model without miniature -->
-                <img [src]="m.url" class="w-full h-full object-cover transition duration-500 blur-[2px] group-hover:blur-0" *ngIf="m.type === 'PANORAMA_360'">
-                <div class="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center" *ngIf="m.type === 'MODELE_3D'">
-                   <i class="fa-solid fa-cube text-4xl text-white/20"></i>
-                </div>
-                
-                <!-- Play Icon center -->
-                <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/30 transition duration-500" [ngClass]="{'group-hover:opacity-0': m.type === 'PANORAMA_360'}">
-                  <div class="w-12 h-12 rounded-full bg-black/70 text-white flex items-center justify-center mb-2 shadow-lg backdrop-blur-sm">
-                     <i class="fa-solid" [ngClass]="m.type === 'PANORAMA_360' ? 'fa-vr-cardboard' : 'fa-cube'"></i>
-                  </div>
-                  <span class="bg-black/70 text-white px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm">{{ m.type === 'PANORAMA_360' ? 'Vue 360°' : 'Modèle 3D' }}</span>
-               </div>
-
-                <!-- Hover Details (Bottom) -->
-                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                  <h5 class="text-white font-bold text-sm leading-tight mb-1">{{ m.nom }}</h5>
-                  <p class="text-white/80 text-[10px] line-clamp-2" *ngIf="m.description">{{ m.description }}</p>
-                </div>
-             </div>
-          </div>
-        </div>
-
-        <!-- AUDIOS -->
-        <div *ngIf="filteredAudios.length > 0" class="fade-slide-up">
-          <div class="flex items-center justify-between mb-4">
-            <h4 class="font-serif text-xl font-bold text-gray-900"><i class="fa-solid fa-headphones mr-2 text-gray-500"></i>Audioguides</h4>
-          </div>
-          <div class="flex overflow-x-auto gap-4 pb-4 snap-x hide-scrollbar">
-             <div class="shrink-0 w-[75vw] sm:w-[280px] h-[160px] rounded-[16px] overflow-hidden relative group snap-start border border-gray-100 bg-[#F6F4EE] p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition cursor-pointer" 
-                  *ngFor="let m of filteredAudios" 
-                  [routerLink]="['/patrimoines', patrimoine.id, 'medias', m.id]">
-                <div class="flex items-start gap-3">
-                   <div class="w-10 h-10 rounded-full bg-[#D16933] text-white flex items-center justify-center shrink-0">
-                      <i class="fa-solid fa-headphones text-lg"></i>
-                   </div>
-                   <div>
-                      <h5 class="text-sm font-bold text-gray-900 line-clamp-1" [title]="m.nom">{{ m.nom || 'Piste audio' }}</h5>
-                      <p class="text-[10px] text-gray-500 line-clamp-2 leading-tight mt-0.5" *ngIf="m.description">{{ m.description }}</p>
-                   </div>
-                </div>
-                <audio [src]="m.url" controls class="w-full h-8 opacity-80 mt-3"></audio>
-             </div>
-          </div>
-        </div>
-
-        <!-- DOCUMENTS -->
-        <div *ngIf="filteredDocuments.length > 0" class="fade-slide-up">
-          <div class="flex items-center justify-between mb-4">
-            <h4 class="font-serif text-xl font-bold text-gray-900"><i class="fa-solid fa-file-pdf mr-2 text-gray-500"></i>Documents & Brochures</h4>
-          </div>
-          <div class="flex overflow-x-auto gap-4 pb-4 snap-x hide-scrollbar">
-             <div class="shrink-0 w-[200px] h-[160px] rounded-[16px] overflow-hidden relative group snap-start border border-gray-100 bg-gray-50 hover:bg-gray-100 transition p-4 flex flex-col justify-between items-center text-center shadow-sm hover:shadow-md cursor-pointer" 
-                  *ngFor="let m of filteredDocuments"
-                  [routerLink]="['/patrimoines', patrimoine.id, 'medias', m.id]">
-                <i class="fa-solid fa-file-pdf text-4xl text-red-500 mb-2"></i>
-                <div>
-                   <p class="text-xs font-bold text-gray-900 line-clamp-2 mb-1" [title]="m.nom">{{ m.nom || 'Document PDF' }}</p>
-                   <p class="text-[9px] text-gray-500 line-clamp-1" *ngIf="m.description">{{ m.description }}</p>
-                </div>
-                <a [href]="m.url" target="_blank" class="text-[10px] bg-white px-3 py-1.5 rounded-full font-bold shadow-sm hover:shadow-md text-gray-800 mt-2">Ouvrir le fichier</a>
-             </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION : CONSERVATION -->
-  <section id="conservation" class="scroll-mt editorial-section section-white page-conservation" *ngIf="patrimoine.conservation">
-    <div class="mx-auto max-w-[1200px] px-6 py-16 font-sans text-gray-800">
-      
-      <div class="flex flex-col md:flex-row gap-6 mb-12 fade-slide-up">
-         <div class="flex-1 bg-[#F6F8F6] rounded-[24px] p-8 border border-gray-100 flex gap-5 items-start">
-            <div class="w-12 h-12 rounded-full bg-green-700 text-white flex items-center justify-center shrink-0">
-               <i class="fa-solid fa-check-circle  text-lg"></i>
-            </div>
-            <div>
-               <h5 class="font-bold text-gray-900 mb-2">État de conservation</h5>
-               <span class="bg-green-700 text-white text-[10px] font-bold uppercase px-3 py-1 rounded-full">{{ patrimoine.conservation.etat }}</span>
-            </div>
-         </div>
-         
-         <div class="flex-1 bg-[#F6F8F6] rounded-[24px] p-8 border border-gray-100 flex gap-5 items-start">
-            <div class="w-12 h-12 rounded-full bg-green-700/10 text-green-700 flex items-center justify-center shrink-0">
-               <i class="fa-solid fa-building  text-lg"></i>
-            </div>
-            <div>
-               <h5 class="font-bold text-gray-900 mb-1">Organisme</h5>
-               <p class="font-bold text-gray-900 text-sm">{{ patrimoine.conservation.organismeConservation || patrimoine.organismeGestionnaire || '-' }}</p>
-            </div>
-         </div>
-      </div>
-
-      <div class="bg-[#F6F4EE] rounded-[24px] p-8 md:p-10 mb-8 border border-gray-100 fade-slide-up" *ngIf="patrimoine.conservation.descriptionEtat">
-         <h3 class="font-serif text-2xl font-bold text-gray-900 mb-4">Description de l'état</h3>
-         <p class="text-sm text-gray-700 leading-relaxed">{{ patrimoine.conservation.descriptionEtat }}</p>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16 fade-slide-up">
-         <!-- Dégradations & Causes -->
-         <div class="bg-white border border-gray-100 rounded-[24px] p-8 shadow-sm" *ngIf="(patrimoine.conservation.degradations && patrimoine.conservation.degradations.length > 0) || (patrimoine.conservation.causesDegradation && patrimoine.conservation.causesDegradation.length > 0)">
-            <h4 class="font-serif text-xl font-bold text-gray-900 mb-6">Dégradations & Causes</h4>
-            <div class="mb-6" *ngIf="patrimoine.conservation.degradations && patrimoine.conservation.degradations.length > 0">
-               <span class="text-sm font-bold text-gray-900 block mb-3"><i class="fa-solid fa-crack text-orange-600 w-5"></i> Dégradations observées</span>
-               <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
-                  <li *ngFor="let d of patrimoine.conservation.degradations">{{ d }}</li>
-               </ul>
-            </div>
-            <div *ngIf="patrimoine.conservation.causesDegradation && patrimoine.conservation.causesDegradation.length > 0">
-               <span class="text-sm font-bold text-gray-900 block mb-3"><i class="fa-solid fa-fire text-red-600 w-5"></i> Causes principales</span>
-               <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
-                  <li *ngFor="let c of patrimoine.conservation.causesDegradation">{{ c }}</li>
-               </ul>
-            </div>
-         </div>
-
-         <!-- Travaux & Recommandations -->
-         <div class="bg-white border border-gray-100 rounded-[24px] p-8 shadow-sm flex flex-col gap-6">
-            <div *ngIf="patrimoine.conservation.dernierTravaux || patrimoine.conservation.dateDerniersTravaux">
-               <span class="text-sm font-bold text-gray-900 block mb-2"><i class="fa-solid fa-hammer text-gray-500 w-5"></i> Derniers Travaux <span class="text-xs font-normal text-gray-500" *ngIf="patrimoine.conservation.dateDerniersTravaux">({{ patrimoine.conservation.dateDerniersTravaux | date:'dd/MM/yyyy' }})</span></span>
-               <p class="text-sm text-gray-600">{{ patrimoine.conservation.dernierTravaux || 'Non précisé' }}</p>
-            </div>
-            <div *ngIf="patrimoine.conservation.travauxNecessaires && patrimoine.conservation.travauxNecessaires.length > 0">
-               <span class="text-sm font-bold text-gray-900 block mb-3"><i class="fa-solid fa-trowel-bricks text-amber-600 w-5"></i> Travaux nécessaires</span>
-               <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
-                  <li *ngFor="let t of patrimoine.conservation.travauxNecessaires">{{ t }}</li>
-               </ul>
-            </div>
-            <div *ngIf="patrimoine.conservation.budgetEstime !== null && patrimoine.conservation.budgetEstime !== undefined">
-               <span class="text-sm font-bold text-gray-900 block mb-1"><i class="fa-solid fa-coins text-yellow-600 w-5"></i> Budget estimé</span>
-               <p class="text-sm font-bold text-gray-700">{{ patrimoine.conservation.budgetEstime | currency:'XOF':'symbol':'1.0-0' }}</p>
-            </div>
-         </div>
-
-         <!-- Contact Conservateur & Recommandations -->
-         <div class="col-span-1 lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8" *ngIf="(patrimoine.conservation.recommandations && patrimoine.conservation.recommandations.length > 0) || patrimoine.conservation.contactConservateur">
-            <div class="bg-blue-50 border border-blue-100 rounded-[24px] p-8" *ngIf="patrimoine.conservation.recommandations && patrimoine.conservation.recommandations.length > 0">
-               <h4 class="font-serif text-xl font-bold text-blue-900 mb-4"><i class="fa-solid fa-lightbulb text-blue-600 mr-2"></i> Recommandations</h4>
-               <ul class="list-disc list-inside text-sm text-blue-800 space-y-2">
-                  <li *ngFor="let r of patrimoine.conservation.recommandations">{{ r }}</li>
-               </ul>
-            </div>
-            
-            <div class="bg-white border border-gray-100 shadow-sm rounded-[24px] p-8" *ngIf="patrimoine.conservation.contactConservateur">
-               <h4 class="font-serif text-xl font-bold text-gray-900 mb-4"><i class="fa-solid fa-user-shield text-gray-400 mr-2"></i> Contact Conservateur</h4>
-               <div class="flex flex-col gap-3">
-                  <div class="flex items-center gap-3">
-                     <i class="fa-solid fa-user text-gray-400 w-4 text-center"></i>
-                     <span class="text-sm font-bold text-gray-900">{{ patrimoine.conservation.contactConservateur.nom }} <span class="font-normal text-gray-500" *ngIf="patrimoine.conservation.contactConservateur.fonction">- {{ patrimoine.conservation.contactConservateur.fonction }}</span></span>
-                  </div>
-                  <div class="flex items-center gap-3" *ngIf="patrimoine.conservation.contactConservateur.organisme">
-                     <i class="fa-solid fa-building text-gray-400 w-4 text-center"></i>
-                     <span class="text-sm text-gray-600">{{ patrimoine.conservation.contactConservateur.organisme }}</span>
-                  </div>
-                  <div class="flex items-center gap-3" *ngIf="patrimoine.conservation.contactConservateur.telephone">
-                     <i class="fa-solid fa-phone text-gray-400 w-4 text-center"></i>
-                     <a [href]="'tel:' + patrimoine.conservation.contactConservateur.telephone" class="text-sm text-blue-600 hover:underline">{{ patrimoine.conservation.contactConservateur.telephone }}</a>
-                  </div>
-                  <div class="flex items-center gap-3" *ngIf="patrimoine.conservation.contactConservateur.email">
-                     <i class="fa-solid fa-envelope text-gray-400 w-4 text-center"></i>
-                     <a [href]="'mailto:' + patrimoine.conservation.contactConservateur.email" class="text-sm text-blue-600 hover:underline">{{ patrimoine.conservation.contactConservateur.email }}</a>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </div>
-
-      <!-- MENACES -->
-      <div class="mb-12 fade-slide-up" *ngIf="patrimoine.menaces && patrimoine.menaces.length > 0">
-         <h3 class="font-serif text-2xl font-bold text-gray-900 mb-6">Menaces identifiées</h3>
-         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="bg-white border border-gray-100 rounded-[16px] p-6 shadow-sm flex flex-col gap-2" *ngFor="let m of patrimoine.menaces">
-               <div class="flex justify-between items-center">
-                  <h5 class="font-bold text-gray-900 text-lg">{{ m.type }}</h5>
-                  <span class="bg-red-100 text-red-700 text-[10px] font-bold uppercase px-3 py-1 rounded-full">{{ m.niveau }}</span>
-               </div>
-               <p class="text-sm text-gray-600">{{ m.description }}</p>
-               <div class="mt-2 text-xs font-bold text-green-700" *ngIf="m.mesuresPrevention">
-                 Mesure: {{ m.mesuresPrevention }}
-               </div>
-            </div>
-         </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- SECTION : LOCALISATION -->
-  <section id="localisation" class="scroll-mt localisation-section section-white page-localisation">
-    <div class="mx-auto max-w-[1200px] px-6 py-16 font-sans text-gray-800">
-      
-      <div class="flex flex-col lg:flex-row gap-8 mb-16 fade-slide-up items-stretch">
-         <div class="lg:w-full relative rounded-[24px] overflow-hidden shadow-sm border border-gray-100 min-h-[300px] md:min-h-[500px]">
-            <ng-container *ngIf="mapUrl; else noMap">
-               <iframe [src]="mapUrl" width="100%" height="100%" class="absolute inset-0 w-full h-full border-0" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>
-            </ng-container>
-            <ng-template #noMap>
-               <div class="absolute inset-0 flex flex-col items-center justify-center bg-[#F6F4EE] text-center p-6">
-                  <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-sm mb-4">
-                     <i class="fa-solid fa-map-location-dot text-[#D16933] text-2xl"></i>
-                  </div>
-                  <h4 class="font-serif text-xl font-bold text-gray-900 mb-2">Cartographie en cours</h4>
-                  <p class="text-sm text-gray-600 max-w-md">
-                     Les coordonnées exactes de ce patrimoine sont en cours de validation par nos experts. Elles seront affichées sur notre carte interactive très prochainement.
-                  </p>
-               </div>
-            </ng-template>
-         </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- VOUS AIMEREZ AUSSI -->
-  <section class="editorial-section section-white" *ngIf="similaires && similaires.length > 0">
-    <div class="editorial-container">
-      <div class="similar-header">
-        <div>
-          <p class="section-label">POUR ALLER PLUS LOIN</p>
-          <h2 class="editorial-main-title" style="margin-bottom: 0;">Vous aimerez aussi</h2>
-        </div>
-      </div>
-      <div class="patrimoines-grid-carousel mt-8" #similarCarousel>
-        <div *ngFor="let p of similaires" class="similar-card-wrapper">
-          <app-patrimoine-card [patrimoine]="p"></app-patrimoine-card>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- LIGHTBOX MODAL -->
-  <div class="fixed inset-0 z-[100] bg-black/95 flex flex-col backdrop-blur-sm transition-opacity duration-300"
-       *ngIf="lightboxOpen"
-       (click)="closeLightbox()">
-    
-    <!-- Top Bar -->
-    <div class="flex justify-between items-center p-6 text-white absolute top-0 w-full z-10 bg-gradient-to-b from-black/80 to-transparent">
-      <div class="font-bold text-sm">
-        {{ currentLightboxIndex + 1 }} / {{ currentLightboxMedias.length }}
-      </div>
-      <button class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition" (click)="closeLightbox()">
-        <i class="fa-solid fa-xmark text-xl"></i>
-      </button>
-    </div>
-
-    <!-- Main Content -->
-    <div class="flex-1 flex items-center justify-center relative w-full h-full p-4 md:p-12" (click)="$event.stopPropagation()">
-      <!-- Left Arrow -->
-      <button class="absolute left-4 md:left-8 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition z-10" 
-              *ngIf="currentLightboxMedias.length > 1"
-              (click)="prevLightboxMedia($event)">
-        <i class="fa-solid fa-chevron-left text-xl"></i>
-      </button>
-
-      <!-- Media Display -->
-      <div class="max-w-6xl max-h-full w-full h-full flex flex-col items-center justify-center relative select-none">
-        <!-- Photo -->
-        <img *ngIf="['PHOTO', 'CARTE', 'ARCHIVE_NUMERISEE', 'PANORAMA_360'].includes(currentLightboxMedias[currentLightboxIndex].type)" 
-             [src]="currentLightboxMedias[currentLightboxIndex].url" 
-             class="max-w-full max-h-[85vh] object-contain shadow-2xl rounded-sm fade-in">
-        
-        <!-- Video -->
-        <video *ngIf="currentLightboxMedias[currentLightboxIndex].type === 'VIDEO'" 
-               [src]="currentLightboxMedias[currentLightboxIndex].url" 
-               controls autoplay class="max-w-full max-h-[85vh] shadow-2xl rounded-sm fade-in"></video>
-
-        <!-- Legend / Info -->
-        <div class="absolute bottom-4 left-0 right-0 text-center">
-          <div class="inline-block bg-black/70 backdrop-blur-md px-6 py-3 rounded-2xl text-white max-w-2xl mx-auto shadow-lg">
-             <h4 class="font-bold text-lg leading-tight mb-1">{{ currentLightboxMedias[currentLightboxIndex].nom || 'Média' }}</h4>
-             <p class="text-sm text-white/80 line-clamp-2" *ngIf="currentLightboxMedias[currentLightboxIndex].description">{{ currentLightboxMedias[currentLightboxIndex].description }}</p>
-             <div class="mt-2 text-xs text-white/50 flex gap-4 justify-center" *ngIf="currentLightboxMedias[currentLightboxIndex].auteur || currentLightboxMedias[currentLightboxIndex].credit">
-                <span *ngIf="currentLightboxMedias[currentLightboxIndex].auteur"><i class="fa-solid fa-user-edit mr-1"></i> {{ currentLightboxMedias[currentLightboxIndex].auteur }}</span>
-                <span *ngIf="currentLightboxMedias[currentLightboxIndex].credit"><i class="fa-solid fa-camera mr-1"></i> {{ currentLightboxMedias[currentLightboxIndex].credit }}</span>
-             </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Right Arrow -->
-      <button class="absolute right-4 md:right-8 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition z-10" 
-              *ngIf="currentLightboxMedias.length > 1"
-              (click)="nextLightboxMedia($event)">
-        <i class="fa-solid fa-chevron-right text-xl"></i>
-      </button>
-    </div>
-  </div>
-
-  <!-- MODAL DE LECTURE IMMERSIVE DU RÉCIT / GUIDE -->
-  <div *ngIf="readingModalOpen && selectedContenuForReading"
-       class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/70 backdrop-blur-xs animate-fade-in"
-       (click)="closeContenuReader()">
-    
-    <div class="bg-white rounded-[28px] shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col"
-         (click)="$event.stopPropagation()">
-      
-      <!-- En-tête Modal avec image ou gradient -->
-      <div class="relative bg-linear-to-r from-[#0b5d5e] to-[#084b4c] text-white p-6 sm:p-8">
-        <div class="flex items-center justify-between gap-4 mb-4">
-          <div class="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-xs text-white px-3 py-1 rounded-full text-xs font-bold">
-            <i class="fas" [ngClass]="getContenuTypeIcon(selectedContenuForReading.type)"></i>
-            {{ getContenuTypeLabel(selectedContenuForReading.type) }}
-          </div>
-          <button type="button" (click)="closeContenuReader()"
-                  class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all cursor-pointer"
-                  title="Fermer (Échap)">
-            <i class="fas fa-times text-sm"></i>
-          </button>
-        </div>
-
-        <h2 class="font-serif text-2xl sm:text-3xl font-bold leading-tight mb-3">
-          {{ selectedContenuForReading.titre }}
-        </h2>
-
-        <div class="flex flex-wrap items-center gap-4 text-xs text-white/80">
-          <span><i class="far fa-calendar-alt mr-1"></i> {{ (selectedContenuForReading.createdAt | date:'d MMMM y') || 'Publication récente' }}</span>
-          <span><i class="far fa-clock mr-1"></i> {{ getReadingTime(selectedContenuForReading.corps) }} min de lecture</span>
-          <span *ngIf="selectedContenuForReading.langue" class="uppercase font-mono bg-white/10 px-2 py-0.5 rounded">
-            Langue: {{ selectedContenuForReading.langue }}
-          </span>
-        </div>
-      </div>
-
-      <!-- Corps du récit avec scroll confortable -->
-      <div class="p-6 sm:p-8 overflow-y-auto space-y-6 text-gray-700 leading-relaxed font-sans text-sm sm:text-base">
-        
-        <!-- Chapeau / Résumé en exergue -->
-        <div *ngIf="selectedContenuForReading.resume"
-             class="bg-[#FDFBF7] p-5 rounded-2xl border-l-4 border-[#D16933] italic text-gray-800 font-serif text-base sm:text-lg">
-          {{ selectedContenuForReading.resume }}
-        </div>
-
-        <!-- Texte intégral découpé en paragraphes -->
-        <div class="space-y-4 text-justify whitespace-pre-line leading-loose">
-          {{ selectedContenuForReading.corps }}
-        </div>
-
-        <!-- Mots-clés en fin d'article -->
-        <div *ngIf="selectedContenuForReading.motsCles && selectedContenuForReading.motsCles.length > 0"
-             class="pt-6 border-t border-gray-100 flex flex-wrap items-center gap-2">
-          <span class="text-xs font-bold text-gray-400">Thématiques :</span>
-          <span *ngFor="let k of selectedContenuForReading.motsCles"
-                class="px-3 py-1 rounded-full bg-[#0b5d5e]/10 text-[#0b5d5e] text-xs font-semibold">
-            #{{ k }}
-          </span>
-        </div>
-
-      </div>
-
-      <!-- Pied de modal -->
-      <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-        <span class="text-xs text-gray-500">
-          Source : Patrimoine culturel du Sénégal (PGVPT)
-        </span>
-        <button type="button" (click)="closeContenuReader()"
-                class="px-5 py-2 bg-[#0b5d5e] hover:bg-[#084b4c] text-white text-xs font-bold rounded-xl transition-all cursor-pointer">
-          Fermer la lecture
-        </button>
-      </div>
-
-    </div>
-  </div>
-
+  <!-- Section 4 : Galerie multimédia (pleine largeur) -->
+  <app-galerie-medias
+    [patrimoine]="patrimoine"
+    [galerieMedias]="galerieMedias"
+    [mediaTabs]="mediaTabs"
+    [activeMediaFilter]="activeMediaFilter"
+    [mediaSearchQuery]="mediaSearchQuery"
+    [mediaSortOrder]="mediaSortOrder"
+    [filteredPhotos]="filteredPhotos"
+    [filteredVideos]="filteredVideos"
+    [filteredAudios]="filteredAudios"
+    [filteredDocuments]="filteredDocuments"
+    [filteredImmersions]="filteredImmersions"
+    (filterChange)="setMediaFilter($event)"
+    (searchChange)="mediaSearchQuery = $event; applyMediaFilters()"
+    (sortChange)="mediaSortOrder = $event; applyMediaFilters()">
+  </app-galerie-medias>
+
+  <!-- Section 5 : Conservation -->
+  <app-etat-conservation
+    *ngIf="patrimoine.conservation"
+    [patrimoine]="patrimoine"
+    [expandedThreatIndex]="expandedThreatIndex"
+    (toggleThreat)="toggleThreat($event)">
+  </app-etat-conservation>
+
+  <!-- Section 6 : Accès & Carte -->
+  <app-carte-localisation
+    [mapUrl]="mapUrl"
+    [geolocalisation]="geolocalisation">
+  </app-carte-localisation>
+
+  <!-- Section 7 : Patrimoines similaires -->
+  <app-patrimoines-similaires
+    [similaires]="similaires">
+  </app-patrimoines-similaires>
+
+  <!-- Modales -->
+  <app-visionneuse-plein-ecran
+    [isOpen]="lightboxOpen"
+    [medias]="currentLightboxMedias"
+    [currentIndex]="currentLightboxIndex"
+    (close)="closeLightbox()"
+    (next)="nextLightboxMedia($event)"
+    (prev)="prevLightboxMedia($event)">
+  </app-visionneuse-plein-ecran>
+
+  <app-modale-lecture-recit
+    [isOpen]="readingModalOpen"
+    [contenu]="selectedContenuForReading"
+    (close)="closeContenuReader()">
+  </app-modale-lecture-recit>
 </div>

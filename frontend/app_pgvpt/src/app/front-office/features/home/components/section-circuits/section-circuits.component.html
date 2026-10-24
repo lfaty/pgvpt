@@ -1,0 +1,41 @@
+<!-- 5. CIRCUITS TOURISTIQUES -->
+<section class="section section--light" *ngIf="circuits && circuits.length > 0">
+  <div class="section-container">
+    <div class="section-header section-header--center">
+      <h2 class="section-title">Circuits Touristiques</h2>
+      <p class="section-subtitle">
+        Embarquez pour des voyages itinérants soigneusement conçus pour vous faire vivre le Sénégal de l'intérieur.
+      </p>
+    </div>
+
+    <div class="circuits-grid">
+      <a *ngFor="let circuit of circuits" 
+         [routerLink]="['/circuits', circuit.id]" 
+         class="circuit-card block no-underline text-inherit cursor-pointer">
+        <div class="circuit-image">
+          <img [src]="circuit.imageUrl || 'assets/images/activite_saloum.jpg'" [alt]="circuit.nom" loading="lazy">
+          <div class="circuit-image-overlay">
+            <span class="circuit-duration-badge">{{ formatDuree(circuit.dureeMinutes) }}</span>
+            <h3 class="circuit-name">{{ circuit.nom }}</h3>
+          </div>
+        </div>
+        <div class="circuit-body">
+          <p class="circuit-desc">{{ circuit.description }}</p>
+          <div class="circuit-footer">
+            <span class="circuit-difficulty">{{ circuit.niveauDifficulte || 'FACILE' }}</span>
+            <span class="circuit-price">
+              {{ (circuit.coutTotal && circuit.coutTotal > 0) ? ((circuit.coutTotal | number) + ' FCFA') : 'Gratuit' }}
+            </span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="text-center mt-10" *ngIf="circuits.length > 0">
+      <a routerLink="/circuits" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-emerald-800 text-white font-semibold text-sm hover:bg-emerald-900 transition shadow-md hover:shadow-lg">
+        <span>Explorer tous les circuits</span>
+        <i class="fa-solid fa-arrow-right text-xs"></i>
+      </a>
+    </div>
+  </div>
+</section>

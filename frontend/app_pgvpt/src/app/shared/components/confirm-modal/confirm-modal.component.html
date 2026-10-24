@@ -1,0 +1,50 @@
+<div *ngIf="isOpen"
+     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity animate-fade-in"
+     aria-modal="true" role="dialog">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 text-center border border-gray-100 animate-scale-up">
+    <!-- Icon -->
+    <div class="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 text-xl"
+         [ngClass]="{
+           'bg-rose-100 text-rose-600': variant === 'danger',
+           'bg-amber-100 text-amber-600': variant === 'warning',
+           'bg-blue-100 text-blue-600': variant === 'primary'
+         }">
+      <i [class]="variant === 'danger' ? 'fas fa-trash-alt' : (variant === 'warning' ? 'fas fa-exclamation-triangle' : 'fas fa-info-circle')"></i>
+    </div>
+
+    <!-- Title & Message -->
+    <h3 class="text-lg font-bold text-gray-900 mb-2">{{ title }}</h3>
+    <p class="text-xs text-gray-500 mb-2 leading-relaxed">
+      {{ message }}
+    </p>
+
+    <!-- Highlighted item name if provided -->
+    <div *ngIf="itemName"
+         class="p-3 bg-gray-50 rounded-xl border border-gray-200 text-xs font-semibold text-gray-800 mb-6 truncate max-w-full">
+      {{ itemName }}
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-end gap-3" [class.mt-6]="!itemName">
+      <button type="button"
+              (click)="onCancel()"
+              [disabled]="isProcessing"
+              class="flex-1 py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl transition-colors disabled:opacity-50">
+        {{ cancelText }}
+      </button>
+
+      <button type="button"
+              (click)="onConfirm()"
+              [disabled]="isProcessing"
+              class="flex-1 py-2.5 px-4 text-white text-xs font-semibold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
+              [ngClass]="{
+                'bg-rose-600 hover:bg-rose-700': variant === 'danger',
+                'bg-amber-600 hover:bg-amber-700': variant === 'warning',
+                'bg-blue-600 hover:bg-blue-700': variant === 'primary'
+              }">
+        <i *ngIf="isProcessing" class="fas fa-spinner fa-spin"></i>
+        <span>{{ isProcessing ? processingText : confirmText }}</span>
+      </button>
+    </div>
+  </div>
+</div>

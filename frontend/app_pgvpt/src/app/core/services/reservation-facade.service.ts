@@ -1,17 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of, catchError } from 'rxjs';
+import { tap, map } from 'rxjs/operators';
 import { Reservation } from '../models/reservation.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReservationFacadeService {
-  private readonly mockUrl = 'assets/data/reservations.json';
+  private readonly apiUrl = '/api/v1/reservations';
   
-  // We use a BehaviorSubject to hold the current list of reservations in memory
-  // so we can simulate adding a new reservation during the session
   private reservationsSubject = new BehaviorSubject<Reservation[]>([]);
   public reservations$ = this.reservationsSubject.asObservable();
 
@@ -21,25 +19,24 @@ export class ReservationFacadeService {
 
   getAllReservations(): Observable<Reservation[]> {
     if (!this.isLoaded) {
-      return this.http.get<Reservation[]>(this.mockUrl).pipe(
+      return this.http.get<any>(this.apiUrl).pipe(
+        map(res => Array.isArray(res) ? res : (res?.content || [])),
         tap(reservations => {
           this.reservationsSubject.next(reservations);
           this.isLoaded = true;
-        })
+        }),
+        catchError(() => of([]))
       );
     }
     return this.reservations$;
   }
 
   createReservation(reservation: Reservation): Observable<Reservation> {
-    // Simulate API call for creation
-    return new Observable(observer => {
-      setTimeout(() => {
+    return this.http.post<Reservation>(this.apiUrl, reservation).pipe(
+      tap(created => {
         const currentList = this.reservationsSubject.getValue();
-        this.reservationsSubject.next([reservation, ...currentList]);
-        observer.next(reservation);
-        observer.complete();
-      }, 800); // simulate network delay
-    });
+        this.reservationsSubject.next([created, ...currentList]);
+      })
+    );
   }
 }

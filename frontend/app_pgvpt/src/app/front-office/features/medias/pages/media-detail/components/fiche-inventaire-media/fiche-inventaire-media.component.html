@@ -1,0 +1,102 @@
+<div class="bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-sm space-y-6" *ngIf="media">
+  
+  <!-- En-tête Titre & Type -->
+  <div>
+    <div class="flex items-center justify-between gap-2 mb-2">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#0b5d5e]/10 text-[#0b5d5e]">
+        <i class="fa-solid" [ngClass]="getTypeIcon(media.type)"></i>
+        {{ getTypeLabel(media.type) }}
+      </span>
+
+      <span *ngIf="media.statut"
+            class="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide"
+            [ngClass]="{
+              'bg-emerald-50 text-emerald-700': media.statut === 'PUBLIE',
+              'bg-blue-50 text-blue-700': media.statut === 'VALIDE',
+              'bg-amber-50 text-amber-700': media.statut === 'BROUILLON',
+              'bg-gray-100 text-gray-700': media.statut === 'ARCHIVE'
+            }">
+        {{ media.statut }}
+      </span>
+    </div>
+
+    <h1 class="font-serif text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
+      {{ media.nom }}
+    </h1>
+  </div>
+
+  <!-- Description -->
+  <div class="border-t border-gray-100 pt-5">
+    <h4 class="text-xs font-bold uppercase text-gray-400 tracking-wider mb-2">Notice descriptive</h4>
+    <p class="text-sm text-gray-700 leading-relaxed font-serif" *ngIf="media.description; else noDesc">
+      {{ media.description }}
+    </p>
+    <ng-template #noDesc>
+      <p class="text-sm text-gray-400 italic">Notice descriptive en cours de rédaction par le conservateur.</p>
+    </ng-template>
+  </div>
+
+  <!-- Auteurs, Crédits & Droits d'usage -->
+  <div class="border-t border-gray-100 pt-5 space-y-3.5">
+    <h4 class="text-xs font-bold uppercase text-gray-400 tracking-wider mb-2">Droits & Attribution</h4>
+    
+    <!-- Auteur -->
+    <div class="flex items-start justify-between text-xs">
+      <span class="text-gray-500 flex items-center gap-1.5">
+        <i class="fa-solid fa-user-edit text-gray-400"></i> Auteur / Source
+      </span>
+      <span class="font-bold text-gray-900 text-right">{{ media.auteur || 'Inventaire National' }}</span>
+    </div>
+
+    <!-- Crédit -->
+    <div class="flex items-start justify-between text-xs" *ngIf="media.credit">
+      <span class="text-gray-500 flex items-center gap-1.5">
+        <i class="fa-solid fa-camera text-gray-400"></i> Crédit photographique
+      </span>
+      <span class="font-bold text-gray-900 text-right">{{ media.credit }}</span>
+    </div>
+
+    <!-- Droits d'utilisation -->
+    <div class="flex items-start justify-between text-xs">
+      <span class="text-gray-500 flex items-center gap-1.5">
+        <i class="fa-solid fa-copyright text-gray-400"></i> Licence d'usage
+      </span>
+      <span class="font-medium text-gray-900 text-right">
+        <span *ngIf="media.droitsUtilisation" class="bg-gray-100 px-2 py-0.5 rounded text-[11px] border border-gray-200">
+          {{ media.droitsUtilisation }}
+        </span>
+        <span *ngIf="!media.droitsUtilisation" class="text-gray-500 italic">Tous droits réservés (PGVPT)</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- Caractéristiques Techniques -->
+  <div class="border-t border-gray-100 pt-5 space-y-3">
+    <h4 class="text-xs font-bold uppercase text-gray-400 tracking-wider mb-2">Fiche technique</h4>
+
+    <div class="flex items-center justify-between text-xs">
+      <span class="text-gray-500">Format d'archive</span>
+      <span class="font-mono text-gray-800 font-bold">{{ getTypeLabel(media.type) }}</span>
+    </div>
+
+    <div class="flex items-center justify-between text-xs" *ngIf="media.langue">
+      <span class="text-gray-500">Langue du document</span>
+      <span class="font-bold text-gray-800 uppercase">{{ media.langue }}</span>
+    </div>
+
+    <div class="flex items-center justify-between text-xs">
+      <span class="text-gray-500">Conservation</span>
+      <span class="text-gray-800">Ministère de la Culture</span>
+    </div>
+  </div>
+
+  <!-- Bouton Télécharger / Accéder -->
+  <div class="border-t border-gray-100 pt-6">
+    <a [href]="media.url" target="_blank"
+       class="w-full flex items-center justify-center gap-2 py-3 bg-[#0b5d5e] hover:bg-[#084b4c] text-white font-bold text-xs rounded-xl shadow-sm transition">
+      <i class="fa-solid fa-download"></i>
+      <span>Télécharger le fichier original</span>
+    </a>
+  </div>
+
+</div>
